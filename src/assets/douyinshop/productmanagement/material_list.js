@@ -708,10 +708,16 @@ export class RecycleBinMethod {
     RecoverMaterialId=ref([])// 单个恢复素材id
     BatchRecoverMaterialIdList=ref([])// 批量恢复素材id列表
 
+    // 查询条件
+    filterForm=reactive({
+        name: '',
+        material_id:''
+    })
+
     // 默认查询状态
     navData=ref({
         "folder_id":"-1",      // 文件夹id，0-素材中心； -1-回收站；
-        "operate_status":[4],               // 素材状态，0-待下载；1-有效；4-回收站中；
+        "operate_status":[4],  // 素材状态，0-待下载；1-有效；4-回收站中；
         "page_num": 1,
         "page_size": 10,
         "order_by":0 
@@ -738,7 +744,7 @@ export class RecycleBinMethod {
         // 请求回收站素材列表列表接口数据
         getmaterialData:async(data) => {
 
-            console.log('查询条件', data)
+            // console.log('查询条件', data)
 
             this.PAGEDATA.loading = true;
 
@@ -749,7 +755,7 @@ export class RecycleBinMethod {
             var material_list = res_data.material_info_list;// 素材列表
             var total = res_data.total;// 素材总数 total_num
             
-            console.log('回收站素材列表', res_data)
+            // console.log('回收站素材列表', res_data)
 
             // 请求数据为空
             if(material_list.length == 0){
@@ -800,8 +806,54 @@ export class RecycleBinMethod {
     // 列表方法
     list = {
 
-        // 加载页面数据
-        getlistDate:()=>{
+        // 筛选查询操作
+        handleFilter:() => {
+
+            var material_id = this.filterForm.material_id || undefined;// id 如果为'',则置为undefined
+            var key_word = this.filterForm.name || undefined;// 关键词 如果为'',则置为undefined
+
+            // 验证输入关键词是否为空
+            if(key_word != undefined && material_id != undefined){
+                tool.Fun_.message('warning','仅支持一个查询条件！')// 提示-请输入查询条件
+            }else if(key_word != undefined && material_id == undefined){ // 查询关键词
+                this.PAGEDATA.List_conditions.page = 1
+                delete this.navData.value.material_id;
+                this.navData.value.material_name = key_word
+                this.load.getmaterialData(this.navData.value)
+                // console.log('查询关键词', this.navData.value)
+            }else if(key_word == undefined && material_id != undefined){ // 查询素材id
+                this.PAGEDATA.List_conditions.page = 1
+                delete this.navData.value.material_name;
+                this.navData.value.material_id = material_id
+                this.load.getmaterialData(this.navData.value)
+                // console.log('查询id', this.navData.value)
+            }else{
+                tool.Fun_.message('warning','请输入查询条件！')// 提示-请输入查询条件
+
+            }
+            
+
+            
+            // 不为为空
+            // 请求关键词结果
+            // 为空
+            // 提示语
+        },
+
+        // 重置页面查询
+        resethandle:()=>{
+
+            this.navData.value = {
+                "folder_id":"-1",      // 文件夹id，0-素材中心； -1-回收站；
+                "operate_status":[4],  // 素材状态，0-待下载；1-有效；4-回收站中；
+                "page_num": 1,
+                "page_size": 10,
+                "order_by":0 
+            }
+            this.PAGEDATA.List_conditions.page = 1
+            this.load.getmaterialData(this.navData.value)
+            // console.log('重置页面',this.navData.value)
+
         },
 
         // 全选/取消全选
@@ -895,7 +947,7 @@ export class RecycleBinMethod {
 
         this.PAGEDATA.DeleteButtonVisible = true; // 确认按钮状态-加载
 
-        console.log('删除素材ID：', this.DelMaterialId.value);
+        // console.log('删除素材ID：', this.DelMaterialId.value);
 
         axios.post(API.AppSrtoreAPI.material.deletematerial,{
 

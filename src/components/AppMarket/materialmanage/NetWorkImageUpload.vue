@@ -126,12 +126,10 @@ export default {
 
       const tool = new TOOL.TOOL();
       const API = new utils.A_Patch();
-
       const netImageModalVisible = ref(false);            // 上传网络图片弹出层状态
       const confirmLoading = ref(false);                  // 确认按钮加载状态
       const netImageFormRef = ref(null);                  // 网络图片表单 ref
-      // 联级选择器文件夹选项
-      const netImageFolderOptions = ref([]);
+      const netImageFolderOptions = ref([]);// 联级选择器文件夹选项
 
       // 网络图片表单数据
       const netImageForm = reactive({
@@ -173,7 +171,6 @@ export default {
                isLeaf: false,
                children: convertTreeToCascader(treeValue)
             }];
-
          }
       };
 

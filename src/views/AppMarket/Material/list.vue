@@ -700,7 +700,7 @@ setup(props,ctx) {
         if(childvideoDrawer.value){// 添加详情信息
             Material_Images.video_detaile.value = undefined;
             Material_Images.video_detaile.value = item;
-            console.log(Material_Images.video_detaile.value)
+            // console.log(Material_Images.video_detaile.value)
         }else{ // 清空详情内容
             // Material_Images.video_detaile.value = undefined;
         }

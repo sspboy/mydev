@@ -36,8 +36,15 @@
                             <a-space>
                                 <a-input 
                                     type="text" 
+                                    placeholder="输入素材ID"
+                                    v-model:value="RecycleBinMethod.filterForm.material_id"
+                                    autoComplete="off"
+                                    style="width: 160px;"
+                                />
+                                <a-input 
+                                    type="text" 
                                     placeholder="输入素材名称"
-                                    v-model:value="filterForm.name"
+                                    v-model:value="RecycleBinMethod.filterForm.name"
                                     autoComplete="off"
                                     style="width: 160px;"
                                 />
@@ -45,9 +52,12 @@
                                 <a-button 
                                     type="primary" 
                                     size="small"
-                                    @click="handleFilter"
+                                    @click="RecycleBinMethod.list.handleFilter"
                                 >查询</a-button>
-
+                                <a-button 
+                                    size="small"
+                                    @click="RecycleBinMethod.list.resethandle"
+                                >重置</a-button>
                             </a-space>
                         </a-col>
                     </a-row>
@@ -314,110 +324,16 @@ export default {
         });
 
         RecycleBinMethod.PAGEDATA = PAGEDATA; // 页面数据加载到脚本文件
-
         RecycleBinMethod.load.getmaterialData(RecycleBinMethod.navData.value)
 
 
-        // 筛选表单
-        const filterForm = reactive({
-            name: '',
-            dateRange: 'all'
-        });
 
 
 
-        // 模拟数据列表（10天数据）
-        const mockDataList = ref([]);
-
-        // 生成模拟数据
-        const generateMockData = () => {
-            const list = [];
-            const now = new Date();
-            const materialNames = [
-                '商品主图_春季新款', '详情页_产品展示', '广告图_促销', ' Banner_首页',
-                '视频_产品介绍', '图片_模特展示', '海报_节日活动', '截图_用户好评',
-                '动图_效果展示', '封面_视频号', '白底图_标准', '场景图_家居',
-                '对比图_前后', '步骤图_教程', '合集_多色展示', '特写_细节',
-                '包装_外观', '标签_吊牌', '资质_认证', '售后_说明'
-            ];
-            const imageUrls = [
-                'https://picsum.photos/200/200?random=1',
-                'https://picsum.photos/200/200?random=2',
-                'https://picsum.photos/200/200?random=3',
-                'https://picsum.photos/200/200?random=4',
-                'https://picsum.photos/200/200?random=5',
-                'https://picsum.photos/200/200?random=6',
-                'https://picsum.photos/200/200?random=7',
-                'https://picsum.photos/200/200?random=8',
-                'https://picsum.photos/200/200?random=9',
-                'https://picsum.photos/200/200?random=10',
-            ];
-
-            for (let day = 0; day < 10; day++) {
-                const date = new Date(now);
-                date.setDate(date.getDate() - day);
-                const dateStr = date.toISOString().split('T')[0] + ' ' + 
-                    String(date.getHours()).padStart(2, '0') + ':' + 
-                    String(date.getMinutes()).padStart(2, '0') + ':' + 
-                    String(date.getSeconds()).padStart(2, '0');
-
-                // 每天 3-8 条数据
-                const count = 3 + Math.floor(Math.random() * 6);
-                for (let i = 0; i < count; i++) {
-                    const id = day * 100 + i + 1;
-                    list.push({
-                        material_id: 'M' + String(id).padStart(6, '0'),
-                        materil_name: materialNames[Math.floor(Math.random() * materialNames.length)] + '_' + id,
-                        material_type: Math.random() > 0.3 ? 'photo' : 'video',
-                        byte_url: imageUrls[Math.floor(Math.random() * imageUrls.length)],
-                        size: Math.floor(Math.random() * 5000 + 100),
-                        create_time: dateStr,
-                        delete_time: dateStr,
-                        operate_status: 4,
-                        dayOffset: day
-                    });
-                }
-            }
-            return list;
-        };
-
-        // 筛选后的列表
-        const filteredList = ref([]);
-
-        // 显示列表（分页后）
-        const displayList = computed(() => {
-            const start = (PAGEDATA.page - 1) * PAGEDATA.pageSize;
-            const end = start + PAGEDATA.pageSize;
-            return filteredList.value.slice(start, end);
-        });
-
-
-
-        // 筛选操作
-        const handleFilter = () => {
-            PAGEDATA.page = 1;
-            let result = [...mockDataList.value];
-
-            // 按名称筛选
-            if (filterForm.name.trim()) {
-                const keyword = filterForm.name.trim().toLowerCase();
-                result = result.filter(item => item.materil_name.toLowerCase().includes(keyword));
-            }
-
-            // 按时间筛选
-            if (filterForm.dateRange !== 'all') {
-                const days = parseInt(filterForm.dateRange);
-                result = result.filter(item => item.dayOffset < days);
-            }
-
-            filteredList.value = result;
-            PAGEDATA.total_number = result.length;
-        };
 
         // 详情抽屉
         const detailDrawer = ref(false);
         const currentItem = ref(null);
-
         const showDetail = (item) => {
             currentItem.value = item;
             detailDrawer.value = true;
@@ -440,11 +356,8 @@ export default {
             store,
             PAGEDATA,
             RecycleBinMethod,
-            filterForm,
-            displayList,
             detailDrawer,
             currentItem,
-            handleFilter,
             showDetail,
         };
     }
