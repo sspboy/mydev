@@ -88,7 +88,7 @@
                     <a-row>
 
                         <!--面包屑导航-->
-                        <a-col :span="12">
+                        <a-col :span="10">
                             <a-space>
                                 <div style="margin: 10px 0 0 20px;"> 
                                     <a-breadcrumb>
@@ -106,7 +106,7 @@
                             </a-space>
                         </a-col>
 
-                        <a-col :span="12" style="padding:8px 6px 0 0;">
+                        <a-col :span="14" style="padding:8px 6px 0 0;">
                             <a-space style="width: 100%;justify-content: flex-end;">
                                 <a-input 
                                     type="text" 
@@ -127,8 +127,10 @@
                                 size="small"
                                 @click="MaterialListMethod.SelectMaterial.search"
                                 >查询</a-button>
-                                <a-button type="primary" size="small" @click="networkUploadRef.showNetImageModal()">网络图片上传</a-button>
-                                <a-button type="primary" size="small" @click="localUploadRef.showLocalUploadModal()">本地图片上传</a-button>
+                                <a-button type="primary" size="small" @click="networkUploadRef.showNetImageModal()">图片地址上传</a-button>
+                                <a-button type="primary" size="small" @click="networkVideoUploadRef.showNetVideoModal()">视频地址上传</a-button>
+                                <!-- <a-button type="primary" size="small" @click="localUploadRef.showLocalUploadModal()">本地文件上传</a-button> -->
+
                             </a-space>
                         </a-col>
 
@@ -515,6 +517,9 @@
     <!-- 网络图片上传组件 -->
     <networkimageupload_components ref="networkUploadRef" :treeData="PAGEDATA.treeData" @uploadSuccess="handleUploadSuccess" />
 
+    <!-- 网络视频上传组件 -->
+    <networkvideoupload_components ref="networkVideoUploadRef" :treeData="PAGEDATA.treeData" @uploadSuccess="handleUploadSuccess" />
+
     <!-- 本地图片上传组件 -->
     <localimageupload_components ref="localUploadRef" />
     
@@ -580,6 +585,8 @@ export default {
         PlaySquareOutlined,
         // 网络图片上传组件
         networkimageupload_components: defineAsyncComponent(() => import('@/components/AppMarket/materialmanage/NetWorkImageUpload.vue')),
+        // 网络视频上传组件
+        networkvideoupload_components: defineAsyncComponent(() => import('@/components/AppMarket/materialmanage/NetWorkVideoUpload.vue')),
         // 本地图片上传组件
         localimageupload_components: defineAsyncComponent(() => import('@/components/AppMarket/materialmanage/LoaclImageUpload.vue')),
         // 关键词搜索组件
@@ -663,6 +670,7 @@ setup(props,ctx) {
     const childvideoDrawer = ref(false);                // 视频详情状态
 
     const networkUploadRef = ref(null);                 // 网络图片上传组件 ref
+    const networkVideoUploadRef = ref(null);            // 网络视频上传组件 ref
     const localUploadRef = ref(null);                   // 本地图片上传组件 ref
 
     // 网络图片上传成功回调
@@ -731,6 +739,7 @@ setup(props,ctx) {
         simpleImage,
         handleResize,
         networkUploadRef,
+        networkVideoUploadRef,
         localUploadRef,
         keywordSeachConfig,
         handleUploadSuccess

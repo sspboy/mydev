@@ -75,6 +75,7 @@
                         :tree-data="treeData"
                         @select="handleSelect"
                         show-icon
+                        class="font_size_12"
                     >
                         <template #icon="{ key, selected }">
                             <FolderOutlined />
@@ -107,8 +108,10 @@
                                     
                                 <!--列表数据 迭代-->
                                 <div v-for="item in Material_Images.confirm_img_list.value" class="confimbox">
+
                                         <a-image v-if="item.material_type == 'photo'" style="height:50px;" :src="item.byte_url" />
                                         <a-image v-if="item.material_type == 'video'" style="height:50px;" :src="item.video_info.video_cover_url" />
+                                        
                                         <p style="margin: 10px 0 0 0;font-size: 12px;">
                                             <a-button type="text" size="small" @click="Material_Images.clear_img_fun(item)"> 
                                             <CloseCircleOutlined />
@@ -122,7 +125,7 @@
                             <!-- 列表 为空状态 -->
                             <div style="height:420px;overflow-x: hidden;overflow-y: auto;padding: 20px 0 0 0;">
                                 <a-list 
-                                    :grid="{ gutter: 6, column: 5 }" 
+                                    :grid="{ gutter: 0, column: 5 }" 
                                     :data-source="PAGEDATA.datalist"
                                     :loading="PAGEDATA.loading"
                                 >
@@ -134,12 +137,16 @@
 
                                                     <!--图片文件 显示方式-->
                                                     <div v-if="item.material_type == 'photo'" class="Listimgbox">
-
+                                                        <div class="floating-badge"><PictureOutlined /> 图片</div>
                                                         <a-image
                                                             :style="Material_Images.material_width(item.photo_info)"
                                                             :src="item.byte_url"
                                                         />
-                                                        
+
+                                                        <div class="material-name" :title="item.materil_name">
+                                                            {{ item.materil_name }}
+                                                        </div>
+
                                                         <p class="img_list_box" style="text-align: center;">
 
                                                             <a-space align="center" size="2" >
@@ -167,11 +174,17 @@
 
                                                     <!--视频 显示方式-->
                                                     <div v-else-if="item.material_type == 'video'" class="Listimgbox">
+                                                        <div class="floating-badge-video"><PlaySquareOutlined />视频</div>
                                                         <a-image
                                                             :height="100"
                                                             :src="item.video_info.video_cover_url"
                                                         />
+
+                                                        <div class="material-name" :title="item.materil_name">
+                                                            {{ item.materil_name }}
+                                                        </div>
                                                         <p class="video_list_box">
+                                                            
                                                             <a-space align="center" size="2">
                                                                 <template #split>
                                                                 <a-divider type="vertical" />
@@ -181,7 +194,7 @@
                                                                         :value="item.material_id"
                                                                         @change="Material_Images.select_img_fun(item)"
                                                                         class="font_size_12" 
-                                                                    >视频</a-checkbox>
+                                                                    ></a-checkbox>
                                                                 </a-typography-link>
                                                                 <a-typography-link>
                                                                     <a href="#" class="font_size_12" @click="showChildvideoDrawer(item)"><EyeOutlined /> 详情</a>
@@ -372,7 +385,7 @@
 <script>
 import { defineComponent,ref,reactive,computed,onMounted,h,watch } from 'vue';
 import{Empty, message} from 'ant-design-vue'
-import { FolderOutlined,HomeOutlined,UserOutlined,CloseOutlined,DeleteOutlined,CloseCircleOutlined,PictureOutlined,EditOutlined,ClearOutlined,EyeOutlined } from '@ant-design/icons-vue';
+import { FolderOutlined,HomeOutlined,UserOutlined,CloseOutlined,DeleteOutlined,CloseCircleOutlined,PictureOutlined,EditOutlined,ClearOutlined,EyeOutlined,PlaySquareOutlined } from '@ant-design/icons-vue';
 import * as TOOL from '@/assets/JS_Model/tool';
 import * as utils from '@/assets/JS_Model/public_model';
 import axios from "axios";
@@ -383,6 +396,7 @@ import nav_pagination from "@/components/nav_pagination.vue";
 export default defineComponent({
    name:'Materialplus',
    components:{
+    PlaySquareOutlined,
     FolderOutlined,
     EditOutlined,
     UserOutlined,
@@ -855,4 +869,20 @@ export default defineComponent({
 .video_list_box{padding: 6px 0 0 0;margin: 4px 0 0 0;width: 100%;height: 28px;overflow: hidden;text-align: left;text-align: center;}
 .img_list_box{padding: 2px;margin: 4px 0 0 0;width: 100%;height: 28px;overflow: hidden;text-align: left;}
 .sucai_url{width: 90%;font-size:12px;background-color: #f2f2f2;padding: 6px;border-radius: 4px;margin: 0 0 20px 0;}
+.material-name {
+    width: 100%;
+    height: 28px;
+    line-height: 28px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
+    font-size: 12px;
+    color: #333;
+    margin-top: 4px;
+}
+/**！！！素材类型---相对定位！！！**/
+.floating-badge {background-color: black;color: #fff;height: 20px;position: absolute;z-index: 100;border-radius: 4px;padding: 0 4px;font-size: 12px;opacity: 0.5}
+.floating-badge-video {background-color:blue;color: #fff;height: 20px;position: absolute;z-index: 100;border-radius: 4px;padding: 0 4px;font-size: 12px;opacity: 0.5}
+
 </style>
