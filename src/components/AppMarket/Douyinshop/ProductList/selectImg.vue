@@ -43,11 +43,11 @@
                     <!--图片上传按钮-->
                     <a-space :size="28">
                         <!--本地上传图片 按钮-->
-                        <a-button type="primary" size="small" @click="showChildrenDrawer">本地上传图片</a-button>
+                        <!-- <a-button type="primary" size="small" @click="showrenDrawer">本地上传图片</a-button> -->
                         <!--上传图片 按钮-->
-                        <a-button size="small" @click="showChildnetDrawer">网络地址上传图片</a-button>
+                        <a-button size="small" @click="shownetDrawer">图片地址上传</a-button>
                         <!--上传视频 按钮-->
-                        <a-button size="small" @click="showChildnetDrawer">上传视频</a-button>
+                        <a-button size="small" @click="showvideouploadDrawer">视频地址上传</a-button>
                         <!--关闭窗口-->
                         <CloseOutlined @click="onClose" />
                     </a-space>
@@ -124,89 +124,94 @@
 
                             <!-- 列表 为空状态 -->
                             <div style="height:420px;overflow-x: hidden;overflow-y: auto;padding: 20px 0 0 0;">
+
                                 <a-list 
                                     :grid="{ gutter: 0, column: 5 }" 
                                     :data-source="PAGEDATA.datalist"
                                     :loading="PAGEDATA.loading"
                                 >
 
-                                        <template #renderItem="{ item }">
-                                            
+                                    <template #renderItem="{ item }">
+                                        
 
-                                            <a-list-item key="item.material_id">
+                                        <a-list-item key="item.material_id">
 
-                                                    <!--图片文件 显示方式-->
-                                                    <div v-if="item.material_type == 'photo'" class="Listimgbox">
-                                                        <div class="floating-badge"><PictureOutlined /> 图片</div>
-                                                        <a-image
-                                                            :style="Material_Images.material_width(item.photo_info)"
-                                                            :src="item.byte_url"
-                                                        />
+                                            <!--图片文件 显示方式-->
+                                            <div v-if="item.material_type == 'photo'" class="Listimgbox">
 
-                                                        <div class="material-name" :title="item.materil_name">
-                                                            {{ item.materil_name }}
-                                                        </div>
+                                                <div class="floating-badge"><PictureOutlined /> 图片</div>
 
-                                                        <p class="img_list_box" style="text-align: center;">
+                                                <a-image
+                                                    :style="Material_Images.material_width(item.photo_info)"
+                                                    :src="item.byte_url"
+                                                />
 
-                                                            <a-space align="center" size="2" >
-                                                                
-                                                                <template #split>
-                                                                    <a-divider type="vertical" />
-                                                                </template>
+                                                <div class="material-name" :title="item.materil_name">
+                                                    {{ item.materil_name }}
+                                                </div>
 
-                                                                <a-typography-link>
-                                                                    <a-checkbox 
-                                                                        :value="item.material_id"
-                                                                        @change="Material_Images.select_img_fun(item)" 
-                                                                    ></a-checkbox>
-                                                                </a-typography-link>
+                                                <p class="img_list_box" style="text-align: center;">
 
-                                                                <a-typography-link>
-                                                                    <a href="#" class="font_size_12" @click="showChildimgDrawer(item)">
-                                                                    <EyeOutlined /> 详情 </a>
-                                                                </a-typography-link>
+                                                    <a-space align="center" size="2" >
+                                                        
+                                                        <template #split>
+                                                            <a-divider type="vertical" />
+                                                        </template>
 
-                                                            </a-space>
-                                                        </p>
+                                                        <a-typography-link>
+                                                            <a-checkbox 
+                                                                :value="item.material_id"
+                                                                @change="Material_Images.select_img_fun(item)" 
+                                                            ></a-checkbox>
+                                                        </a-typography-link>
 
-                                                    </div>
+                                                        <a-typography-link>
+                                                            <a href="#" class="font_size_12" @click="showChildimgDrawer(item)">
+                                                            <EyeOutlined /> 详情 </a>
+                                                        </a-typography-link>
 
-                                                    <!--视频 显示方式-->
-                                                    <div v-else-if="item.material_type == 'video'" class="Listimgbox">
-                                                        <div class="floating-badge-video"><PlaySquareOutlined />视频</div>
-                                                        <a-image
-                                                            :height="100"
-                                                            :src="item.video_info.video_cover_url"
-                                                        />
+                                                    </a-space>
+                                                </p>
 
-                                                        <div class="material-name" :title="item.materil_name">
-                                                            {{ item.materil_name }}
-                                                        </div>
-                                                        <p class="video_list_box">
-                                                            
-                                                            <a-space align="center" size="2">
-                                                                <template #split>
-                                                                <a-divider type="vertical" />
-                                                                </template>
-                                                                <a-typography-link>
-                                                                    <a-checkbox 
-                                                                        :value="item.material_id"
-                                                                        @change="Material_Images.select_img_fun(item)"
-                                                                        class="font_size_12" 
-                                                                    ></a-checkbox>
-                                                                </a-typography-link>
-                                                                <a-typography-link>
-                                                                    <a href="#" class="font_size_12" @click="showChildvideoDrawer(item)"><EyeOutlined /> 详情</a>
-                                                                </a-typography-link>
-                                                            </a-space>
-                                                        </p>
-                                                    </div>
+                                            </div>
 
-                                            </a-list-item>
-                                        </template>
+                                            <!--视频 显示方式-->
+                                            <div v-else-if="item.material_type == 'video'" class="Listimgbox">
+                                                <div class="floating-badge-video"><PlaySquareOutlined />视频</div>
+                                                <a-image
+                                                    :height="100"
+                                                    :src="item.video_info.video_cover_url"
+                                                />
+
+                                                <div class="material-name" :title="item.materil_name">
+                                                    {{ item.materil_name }}
+                                                </div>
+                                                <p class="video_list_box">
+                                                    
+                                                    <a-space align="center" size="2">
+                                                        <template #split>
+                                                        <a-divider type="vertical" />
+                                                        </template>
+                                                        <a-typography-link>
+                                                            <a-checkbox 
+                                                                :value="item.material_id"
+                                                                @change="Material_Images.select_img_fun(item)"
+                                                                class="font_size_12" 
+                                                            ></a-checkbox>
+                                                        </a-typography-link>
+                                                        <a-typography-link>
+                                                            <a href="#" class="font_size_12" @click="showChildvideoDrawer(item)"><EyeOutlined /> 详情</a>
+                                                        </a-typography-link>
+                                                    </a-space>
+                                                </p>
+                                            </div>
+
+                                        </a-list-item>
+
+                                    </template>
 
                                 </a-list>
+
                             </div>
 
                         </a-layout-content>
@@ -228,23 +233,133 @@
         <!--本地上传 抽屉 -->
         <a-drawer v-model:open="childrenDrawer" title="本地上传图片" width="320" :closable="false">
 
-            <a-button type="primary" @click="showChildrenDrawer">This is two-level drawer</a-button>
+            <a-button type="primary" @click="showrenDrawer">关闭</a-button>
 
         </a-drawer>
 
 
-        <!--网络上传 抽屉 -->
-        <a-drawer v-model:open="childnetDrawer" title="网络地址上传图片" width="320" :closable="false">
+        <!--图片地址上传 抽屉 -->
+        <a-drawer v-model:open="childnetDrawer" title="图片地址上传" width="520" :closable="false">
 
-            <a-button type="primary" @click="showChildnetDrawer">This is two-level drawer</a-button>
+            <a-form :model="uploadimglist" ref="netimagesformRef">
+
+                <a-form-item
+                    :name="['folder_value']"
+                    :rules="{
+                        required: true,
+                        message: '文件夹不能为空',
+                        trigger: 'change',
+                        type: 'array',
+                    }"
+                >
+                    <!--联级选择-文件夹-->
+                    <a-cascader
+                        v-model:value="uploadimglist.folder_value"
+                        :options="uploadimglist.netImageFolderOptions"
+                        :load-data="loadNetImageFolder"
+                        placeholder="请选择文件夹"
+                        change-on-select
+                        style="width: 80%;"
+                    />
+
+                </a-form-item>
+
+                <a-form-item
+                    v-for="(domain, index) in uploadimglist.list"
+                    :key="index"
+                    :name="['list', index, 'value']"
+                    :rules="{
+                        required: true,
+                        message: '地址不能为空',
+                        trigger: 'change',
+                    }"
+                >
+                <a-input 
+                    type="text" 
+                    placeholder="输入图片地址"
+                    v-model:value="domain.value"
+                    clearable
+                    autoComplete="off"
+                    style="width: 80%;margin-right: 10px;"
+                >
+                </a-input>
+
+                <MinusCircleOutlined
+                    v-if="uploadimglist.list.length > 1"
+                    class="dynamic-delete-button"
+                    @click="delimaginput(index)"
+                />
+                </a-form-item>
+
+                <a-form-item>
+                <a-button type="dashed" style="width: 80%" @click="addimaginput">
+                    <PlusOutlined />
+                    添加图片地址
+                </a-button>
+            </a-form-item>
+            </a-form>
+
+            <template #footer>
+                <a-space>
+                    <a-button 
+                        type="primary" 
+                        @click="Uploadnetimages"
+                        :loading="netimagesbuttonloadstatus"
+                    >上传</a-button>
+                    <a-button @click="shownetDrawer">取消</a-button>
+                </a-space>
+            </template>
 
         </a-drawer>
 
-        <!--网络上传视频 抽屉 -->
-        <a-drawer v-model:open="childnetDrawer" title="网络地址上传视频" width="320" :closable="false">
+        <!--视频地址上传 抽屉 -->
+        <a-drawer v-model:open="childvideouploadDrawer" title="视频地址上传" width="520" :closable="false">
+            
+            <a-form :model="uploadvideolist" >
 
-            <a-button type="primary" @click="showChildnetDrawer">This is two-level drawer</a-button>
+                  <a-form-item
+                    v-for="(domain, index) in uploadvideolist.list"
+                    :key="index"
+                    :name="['list', index, 'value']"
+                    :rules="{
+                        required: true,
+                        message: '地址不能为空',
+                        trigger: 'change',
+                    }"
+                  >
+                    <a-input 
+                        type="text" 
+                        placeholder="输入视频地址"
+                        v-model:value="domain.value"
+                        clearable
+                        autoComplete="off"
+                        style="width: 80%;margin-right: 10px;"
+                    >
+                    </a-input>
 
+                    <MinusCircleOutlined
+                        v-if="uploadvideolist.list.length > 1"
+                        class="dynamic-delete-button"
+                        @click="delvideoinput(index)"
+                    />
+                  </a-form-item>
+
+                  <a-form-item>
+                    <a-button type="dashed" style="width: 80%" @click="addivideoinput">
+                        <PlusOutlined />
+                        添加视频地址
+                    </a-button>
+                </a-form-item>
+            </a-form>
+
+            <template #footer>
+                <a-space>
+                    <a-button type="primary" @click="Uploadnetvideo">
+                        上传
+                    </a-button>
+                    <a-button @click="showvideouploadDrawer">取消</a-button>
+                </a-space>
+            </template>
         </a-drawer>
 
 
@@ -385,7 +500,20 @@
 <script>
 import { defineComponent,ref,reactive,computed,onMounted,h,watch } from 'vue';
 import{Empty, message} from 'ant-design-vue'
-import { FolderOutlined,HomeOutlined,UserOutlined,CloseOutlined,DeleteOutlined,CloseCircleOutlined,PictureOutlined,EditOutlined,ClearOutlined,EyeOutlined,PlaySquareOutlined } from '@ant-design/icons-vue';
+import {
+    PlusOutlined,
+    MinusCircleOutlined,
+    FolderOutlined,
+    HomeOutlined,
+    UserOutlined,
+    CloseOutlined,
+    DeleteOutlined,
+    CloseCircleOutlined,
+    PictureOutlined,
+    EditOutlined,
+    ClearOutlined,
+    EyeOutlined,
+    PlaySquareOutlined } from '@ant-design/icons-vue';
 import * as TOOL from '@/assets/JS_Model/tool';
 import * as utils from '@/assets/JS_Model/public_model';
 import axios from "axios";
@@ -396,6 +524,8 @@ import nav_pagination from "@/components/nav_pagination.vue";
 export default defineComponent({
    name:'Materialplus',
    components:{
+    PlusOutlined,
+    MinusCircleOutlined,
     PlaySquareOutlined,
     FolderOutlined,
     EditOutlined,
@@ -441,8 +571,8 @@ export default defineComponent({
 
         const tool = new TOOL.TOOL()            // 工具方法
         const API = new utils.A_Patch()         // 请求接口地址合集
-        const childrenDrawer = ref(false);      // 本地上传抽屉状态
-        const childnetDrawer = ref(false);      // 网络上传抽屉状态
+
+
         const childimgDrawer = ref(false);      // 图片详情状态
         const childvideoDrawer = ref(false);    // 视频详情状态
 
@@ -456,13 +586,8 @@ export default defineComponent({
         };
 
         // 显示本地上传--按钮
-        const showChildrenDrawer = () => {
+        const showrenDrawer = () => {
             childrenDrawer.value = !childrenDrawer.value;
-        };
-
-        // 显示网络上传--按钮
-        const showChildnetDrawer = () => {
-            childnetDrawer.value = !childnetDrawer.value;
         };
 
         // 显示图片详情--按钮
@@ -768,7 +893,6 @@ export default defineComponent({
             }
         }
 
-
         // 请求商品列表接口数据
         const loadproductData = async(data) => {
 
@@ -833,19 +957,173 @@ export default defineComponent({
         // 【查询组件 回调方法】========================================结束
 
 
+        // 【图片地址上传】======================= 开始
+        // 异步加载联级选择器子文件夹
+        const loadNetImageFolder = (selectedOptions) => {
+
+            const targetOption = selectedOptions[selectedOptions.length - 1];
+
+            targetOption.loading = true;
+            
+            const folderId = targetOption.value;
+            
+            tool.Http_.post(API.AppSrtoreAPI.material.getfolder, {
+                
+                "folder_id": folderId,
+                "page_num": 1,
+                "page_size": 10
+
+            }).then((res) => {
+                const child_folder_list = res.data.data.folder_info.child_folder;
+                
+                if (child_folder_list.length > 0) {
+                    targetOption.children = child_folder_list.map(obj => ({
+                        value: String(obj.folder_id),
+                        label: obj.folder_name,
+                        isLeaf: true
+                    }));
+                    
+                    // 检查子文件夹是否还有子文件夹
+                    const checks = targetOption.children.map(child => {
+                        return tool.Http_.post(API.AppSrtoreAPI.material.getfolder, {
+                            "folder_id": child.value,
+                            "page_num": 1,
+                            "page_size": 10
+                        }).then((childRes) => {
+                            const grandChildren = childRes.data.data.folder_info.child_folder;
+                            child.isLeaf = grandChildren.length === 0;
+                        });
+                    });
+                    
+                    Promise.all(checks).then(() => {
+                        targetOption.loading = false;
+                        uploadimglist.netImageFolderOptions = [...uploadimglist.netImageFolderOptions];
+                    });
+                } else {
+                    targetOption.isLeaf = true;
+                    targetOption.loading = false;
+                    uploadimglist.netImageFolderOptions = [...uploadimglist.netImageFolderOptions];
+                }
+            });
+        };
+        
+        const childnetDrawer = ref(false);// 图片地址上传抽屉--按钮状态
+        const netimagesbuttonloadstatus = ref(false);// 按钮load状态
+        const shownetDrawer = () => {// 抽屉关闭
+            childnetDrawer.value = !childnetDrawer.value;
+        };
+        // 图片地址上传列表
+        const netimagesformRef = ref()// 表单验证
+        const uploadimglist=reactive({
+            list:[{value:''}],
+            folder_value:[], // 文件夹id
+            netImageFolderOptions:[{ // 文件夹联级选项
+               value: '0',
+               label: '素材库',
+               isLeaf: false,
+            }]
+        })
+        // 添加输入地址input
+        const addimaginput=()=>{
+            uploadimglist.list.push({value:''})
+        }
+        // 删除网络图片地址
+        const delimaginput=(index)=>{
+            uploadimglist.list.splice(index, 1)
+        }
+        // 图片上传
+        const Uploadnetimages=()=>{
+
+            netimagesbuttonloadstatus.value = true;
+
+            // 验证表单
+            netimagesformRef.value.validate().then(() => {// 通过
+                
+                console.log('素材地址列表',uploadimglist.list)
+                console.log('文件夹id',uploadimglist.folder_value)
+
+                // 文件夹id
+
+                // 图片地址列表
+                
+                // axios.post(API.AppSrtoreAPI.material.bacthuploadmaterial,{
+                //     "folder_id": "0",
+                //     "pic_list": []
+                // }).then((res)=>{
+                    
+                //     console.log(res)
+                //     netimagesbuttonloadstatus.value = false;
+
+                // }).catch((error)=>{
+
+                //     console.log('error', error);
+                //     netimagesbuttonloadstatus.value = false;
+
+                // })
+
+
+            }).catch(error => {// 不通过
+                
+                console.log('error', error);
+                netimagesbuttonloadstatus.value = false;
+
+            });
+
+        }
+        // 【图片地址上传】======================= 结束
+
+
+
+        // 【视频地址上传】======================= 开始
+        const childvideouploadDrawer = ref(false);   // 视频地址上传抽屉--按钮状态
+        const showvideouploadDrawer = () => {// 视频地址上传--关闭方法
+            childvideouploadDrawer.value = !childvideouploadDrawer.value;
+        };
+        // 视频地址上传列表
+        const uploadvideolist=reactive({
+            list:[{value:''}]
+        })
+        // 添加输入地址input
+        const addivideoinput=()=>{
+            uploadvideolist.list.push({value:''})
+        }
+        // 删除网络图片地址
+        const delvideoinput=(index)=>{
+            uploadvideolist.list.splice(index, 1)
+        }
+        // 视频上传
+        const Uploadnetvideo=()=>{
+
+            console.log(uploadvideolist.list)
+
+            // 验证表单
+
+            // 通过
+
+            // 不通过
+
+        }
+        // 【视频地址上传】======================= 结束
+
+
+
+        // 【本地文件上传】======================= 开始
+        const childrenDrawer = ref(false);      // 本地上传抽屉状态
+        // 【本地文件上传】======================= 结束
 
         return{
             props,
             PAGEDATA,
             childrenDrawer,
-            childnetDrawer,
             childimgDrawer,
             childvideoDrawer,
             onClose,
-            showChildrenDrawer,
-            showChildnetDrawer,
+            showrenDrawer,
+            
+            
             showChildimgDrawer,
             showChildvideoDrawer,
+            
             Material_Images,
             expandedKeys,
             selectedKeys,
@@ -853,7 +1131,28 @@ export default defineComponent({
             onLoadData,
             page_turning,
             handleSelect,
-            simpleImage
+            simpleImage,
+
+            // 图片地址上传-start
+            loadNetImageFolder,
+            childnetDrawer,
+            netimagesbuttonloadstatus,
+            shownetDrawer,
+            netimagesformRef,
+            uploadimglist,
+            addimaginput,
+            delimaginput,
+            Uploadnetimages,
+            // 图片地址上传-end
+
+            // 视频地址上传-start
+            childvideouploadDrawer,
+            showvideouploadDrawer,
+            uploadvideolist,
+            addivideoinput,
+            delvideoinput,
+            Uploadnetvideo
+            // 视频地址上传-end
         }
     }
 })
@@ -865,7 +1164,7 @@ export default defineComponent({
 .footerStyle{text-align: center;background-color: #fff;}
 .confimImg{text-align: left;padding: 10px 0 10px 0;margin: 0 0 10px 0;height:300px;width: 100%;overflow-x: auto;overflow-y: auto;border-bottom: 1px #f2f2f2 solid;}
 .confimbox{width: 60px;height: 60px;margin: 10px 20px 30px 20px;padding: 4px; float: left;border: 1px #f2f2f2 solid;border-radius: 4px;text-align: center;}
-.Listimgbox{border: 1px solid #f2f2f2; border-radius: 6px;padding: 10px 4px 4px 4px;}
+.Listimgbox{border: 1px solid #f2f2f2; border-radius: 6px;padding: 10px 4px 4px 4px;width: 100%;}
 .video_list_box{padding: 6px 0 0 0;margin: 4px 0 0 0;width: 100%;height: 28px;overflow: hidden;text-align: left;text-align: center;}
 .img_list_box{padding: 2px;margin: 4px 0 0 0;width: 100%;height: 28px;overflow: hidden;text-align: left;}
 .sucai_url{width: 90%;font-size:12px;background-color: #f2f2f2;padding: 6px;border-radius: 4px;margin: 0 0 20px 0;}
