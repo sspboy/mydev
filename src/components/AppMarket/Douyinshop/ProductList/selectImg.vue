@@ -95,9 +95,9 @@
                             <div class="confimImg">
 
                                 <p style="padding: 0 0 0 20px;">
-                                    已选择图片 
+                                    已选择素材
                                     <a-tag :bordered="false">{{ Material_Images.confirm_img_list.value.length }}</a-tag>
-                                    张 ------ 
+                                    个 ------ 
                                     <a href="#" @click="Material_Images.clear_confirm_img_list"><ClearOutlined />清空</a>
                                 </p>
 
@@ -241,13 +241,26 @@
         <!--图片地址上传 抽屉 -->
         <a-drawer v-model:open="childnetDrawer" title="图片地址上传" width="520" :closable="false">
 
+            <a-alert
+                type="info"
+                class="font_size_12"
+                style="margin-bottom: 20px;"
+            >
+                <template #description>
+                    <div>   
+                    1、素材上传成功后不会立即显示，需要后台审核1分钟内会在文件夹中会显示.
+                    2、素材审核通过后，才能被正常使用.
+                    </div>
+                </template>
+            </a-alert>
+
             <a-form :model="uploadimglist" ref="netimagesformRef">
 
                 <a-form-item
                     :name="['folder_value']"
                     :rules="{
                         required: true,
-                        message: '文件夹不能为空',
+                        message: '素材文件夹不能为空',
                         trigger: 'change',
                         type: 'array',
                     }"
@@ -259,7 +272,7 @@
                         :load-data="loadNetImageFolder"
                         placeholder="请选择文件夹"
                         change-on-select
-                        style="width: 80%;"
+                        style="width: 94%;"
                     />
 
                 </a-form-item>
@@ -268,11 +281,10 @@
                     v-for="(domain, index) in uploadimglist.list"
                     :key="index"
                     :name="['list', index, 'value']"
-                    :rules="{
-                        required: true,
-                        message: '地址不能为空',
-                        trigger: 'change',
-                    }"
+                    :rules="[
+                        {required: true,message: '图片地址不能为空',trigger: 'change'},
+                        { pattern: /^http/, message: '图片地址必须以 http 开头', trigger: 'change' }
+                    ]"
                 >
                 <a-input 
                     type="text" 
@@ -280,7 +292,7 @@
                     v-model:value="domain.value"
                     clearable
                     autoComplete="off"
-                    style="width: 80%;margin-right: 10px;"
+                    style="width: 94%;margin-right: 10px;"
                 >
                 </a-input>
 
@@ -292,7 +304,7 @@
                 </a-form-item>
 
                 <a-form-item>
-                <a-button type="dashed" style="width: 80%" @click="addimaginput">
+                <a-button type="dashed" style="width: 94%" @click="addimaginput">
                     <PlusOutlined />
                     添加图片地址
                 </a-button>
@@ -315,17 +327,49 @@
         <!--视频地址上传 抽屉 -->
         <a-drawer v-model:open="childvideouploadDrawer" title="视频地址上传" width="520" :closable="false">
             
-            <a-form :model="uploadvideolist" >
+            <a-alert
+                type="info"
+                class="font_size_12"
+                style="margin-bottom: 20px;"
+            >
+                <template #description>
+                    <div>   
+                    1、素材上传成功后不会立即显示，需要后台审核1分钟内会在文件夹中会显示.
+                    2、素材审核通过后，才能被正常使用.
+                    </div>
+                </template>
+            </a-alert>
+
+            <a-form :model="uploadvideolist" ref="videoformRef">
+
+                <a-form-item
+                    :name="['folder_value']"
+                    :rules="{
+                        required: true,
+                        message: '素材文件夹不能为空',
+                        trigger: 'change',
+                        type: 'array',
+                    }"
+                >
+                    <!--联级选择-文件夹-->
+                    <a-cascader
+                        v-model:value="uploadvideolist.folder_value"
+                        :options="uploadvideolist.videoFolderOptions"
+                        :load-data="loadNetImageFolder"
+                        placeholder="请选择文件夹"
+                        change-on-select
+                        style="width: 94%;"
+                    />
+                </a-form-item>
 
                   <a-form-item
                     v-for="(domain, index) in uploadvideolist.list"
                     :key="index"
                     :name="['list', index, 'value']"
-                    :rules="{
-                        required: true,
-                        message: '地址不能为空',
-                        trigger: 'change',
-                    }"
+                    :rules="[
+                        {required: true,message: '视频地址不能为空',trigger: 'change'},
+                        { pattern: /^http/, message: '视频地址必须以 http 开头', trigger: 'change' }
+                        ]"
                   >
                     <a-input 
                         type="text" 
@@ -333,7 +377,7 @@
                         v-model:value="domain.value"
                         clearable
                         autoComplete="off"
-                        style="width: 80%;margin-right: 10px;"
+                        style="width: 94%;margin-right: 10px;"
                     >
                     </a-input>
 
@@ -345,7 +389,7 @@
                   </a-form-item>
 
                   <a-form-item>
-                    <a-button type="dashed" style="width: 80%" @click="addivideoinput">
+                    <a-button type="dashed" style="width: 94%" @click="addivideoinput">
                         <PlusOutlined />
                         添加视频地址
                     </a-button>
@@ -354,7 +398,7 @@
 
             <template #footer>
                 <a-space>
-                    <a-button type="primary" @click="Uploadnetvideo">
+                    <a-button type="primary" :loading="videobuttonloadstatus" @click="Uploadnetvideo">
                         上传
                     </a-button>
                     <a-button @click="showvideouploadDrawer">取消</a-button>
@@ -603,6 +647,7 @@ export default defineComponent({
         
         // 显示视频详情--按钮
         const showChildvideoDrawer = (item) => {
+
             childvideoDrawer.value = !childvideoDrawer.value;
 
             if(childvideoDrawer.value){// 添加详情信息
@@ -971,9 +1016,10 @@ export default defineComponent({
                 
                 "folder_id": folderId,
                 "page_num": 1,
-                "page_size": 10
+                "page_size": 1000
 
             }).then((res) => {
+
                 const child_folder_list = res.data.data.folder_info.child_folder;
                 
                 if (child_folder_list.length > 0) {
@@ -999,17 +1045,19 @@ export default defineComponent({
                         targetOption.loading = false;
                         uploadimglist.netImageFolderOptions = [...uploadimglist.netImageFolderOptions];
                     });
+
                 } else {
+
                     targetOption.isLeaf = true;
                     targetOption.loading = false;
                     uploadimglist.netImageFolderOptions = [...uploadimglist.netImageFolderOptions];
                 }
             });
         };
-        
         const childnetDrawer = ref(false);// 图片地址上传抽屉--按钮状态
         const netimagesbuttonloadstatus = ref(false);// 按钮load状态
         const shownetDrawer = () => {// 抽屉关闭
+            uploadimglist.folder_value = ['0']
             childnetDrawer.value = !childnetDrawer.value;
         };
         // 图片地址上传列表
@@ -1025,7 +1073,12 @@ export default defineComponent({
         })
         // 添加输入地址input
         const addimaginput=()=>{
-            uploadimglist.list.push({value:''})
+            var list_number = uploadimglist.list.length;
+            if(list_number <= 49){
+                uploadimglist.list.push({value:''})
+            }else{
+                tool.Fun_.message('info','图片上传数量最多不超过50！')
+            }
         }
         // 删除网络图片地址
         const delimaginput=(index)=>{
@@ -1039,32 +1092,53 @@ export default defineComponent({
             // 验证表单
             netimagesformRef.value.validate().then(() => {// 通过
                 
-                console.log('素材地址列表',uploadimglist.list)
-                console.log('文件夹id',uploadimglist.folder_value)
-
-                // 文件夹id
-
                 // 图片地址列表
-                
-                // axios.post(API.AppSrtoreAPI.material.bacthuploadmaterial,{
-                //     "folder_id": "0",
-                //     "pic_list": []
-                // }).then((res)=>{
+                let image_list = uploadimglist.list.map((item)=>{
+                    return item.value
+                })
+
+                let folder_id = uploadimglist.folder_value.at(-1)// 文件夹id
+            
+                // 图片地址列表
+                axios.post(API.AppSrtoreAPI.material.bacthuploadmaterial,{
+                    "folder_id": folder_id,
+                    "pic_list": image_list
+                }).then((res)=>{
+
+                    // console.log(res)
+
+                    let code = res.data.code;
+
+                    if(code == 10000){ //上传成功
+
+                        
+                        tool.Fun_.message('success','图片上传成功！')
+
+                    }else{// 上传失败
+
+                        tool.Fun_.message('',res.data.sub_msg)
                     
-                //     console.log(res)
-                //     netimagesbuttonloadstatus.value = false;
+                    }
+                    
+                    childnetDrawer.value = false;// 关闭抽屉
 
-                // }).catch((error)=>{
+                    netimagesbuttonloadstatus.value = false; // 按钮load状态
 
-                //     console.log('error', error);
-                //     netimagesbuttonloadstatus.value = false;
+                }).catch((error)=>{ // 服务异常
 
-                // })
+                    // console.log('error', error);
+
+                    tool.Fun_.message('error','服务异常！')
+                    
+                    netimagesbuttonloadstatus.value = false;
+
+                })
 
 
             }).catch(error => {// 不通过
                 
                 console.log('error', error);
+                
                 netimagesbuttonloadstatus.value = false;
 
             });
@@ -1075,17 +1149,31 @@ export default defineComponent({
 
 
         // 【视频地址上传】======================= 开始
-        const childvideouploadDrawer = ref(false);   // 视频地址上传抽屉--按钮状态
+        const childvideouploadDrawer = ref(false);// 视频地址上传抽屉--按钮状态
+        const videobuttonloadstatus = ref(false);// 按钮load状态
+        const videoformRef = ref()// 表单验证
         const showvideouploadDrawer = () => {// 视频地址上传--关闭方法
             childvideouploadDrawer.value = !childvideouploadDrawer.value;
         };
         // 视频地址上传列表
         const uploadvideolist=reactive({
-            list:[{value:''}]
+            list:[{value:''}],
+            folder_value:['0'], // 文件夹id
+            videoFolderOptions:[{ // 文件夹联级选项
+               value: '0',
+               label: '素材库',
+               isLeaf: false,
+            }]
         })
         // 添加输入地址input
         const addivideoinput=()=>{
-            uploadvideolist.list.push({value:''})
+            var list_number = uploadvideolist.list.length;
+            console.log(list_number)
+            if(list_number <= 49){
+                uploadvideolist.list.push({value:''})
+            }else{
+                tool.Fun_.message('info','视频上传数量最多不超过50！')
+            }
         }
         // 删除网络图片地址
         const delvideoinput=(index)=>{
@@ -1094,13 +1182,62 @@ export default defineComponent({
         // 视频上传
         const Uploadnetvideo=()=>{
 
-            console.log(uploadvideolist.list)
+            videobuttonloadstatus.value = true;
 
             // 验证表单
+            videoformRef.value.validate().then(() => {// 通过
 
-            // 通过
+                // 视频地址列表
+                let image_list = uploadvideolist.list.map((item)=>{
+                    return {"name":"视频_","url":item.value}
+                })
 
-            // 不通过
+                let folder_id = uploadvideolist.folder_value.at(-1)// 文件夹id
+
+                // 图片地址列表
+                axios.post(API.AppSrtoreAPI.material.batchuploadvideo,{
+                    "folder_id": folder_id,
+                    "video_list": image_list
+                }).then((res)=>{
+
+                    // console.log(res)
+
+                    let code = res.data.code;
+
+                    if(code == 10000){ //上传成功
+
+                        videobuttonloadstatus.value = false; // 按钮load状态
+
+                        childvideouploadDrawer.value = false;// 关闭抽屉
+
+                        tool.Fun_.message('success','视频上传成功！')
+
+                    }else{// 上传失败
+
+                        tool.Fun_.message('error',res.data.sub_msg)
+                        videobuttonloadstatus.value = false; // 按钮load状态
+
+                    }
+
+
+                }).catch((error)=>{ // 服务异常
+
+                    console.log('error', error);
+
+                    tool.Fun_.message('error','服务异常！')
+
+                    videobuttonloadstatus.value = false;// 按钮load状态
+
+
+                })
+            
+            }).catch(error=>{// 不通过
+
+                console.log('error', error);
+                videobuttonloadstatus.value = false;// 按钮load状态
+            
+            })
+            
 
         }
         // 【视频地址上传】======================= 结束
@@ -1148,6 +1285,8 @@ export default defineComponent({
             // 视频地址上传-start
             childvideouploadDrawer,
             showvideouploadDrawer,
+            videobuttonloadstatus,
+            videoformRef,
             uploadvideolist,
             addivideoinput,
             delvideoinput,

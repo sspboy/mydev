@@ -818,7 +818,8 @@
         <a-affix :offset-bottom="1">
             <div style="width: 950px;margin: 0 auto;text-align: center;padding: 10px 0 0 0;">
                 <a-space align="end" style="height: 100%;">
-                    <a-button type="primary" @click="handleOk" :loading="PAGEDATA.upload_product_loading">提交</a-button>
+                    <a-button type="primary" @click="handleOk" :loading="PAGEDATA.upload_product_loading">发布到线上售卖</a-button>
+                    <a-button @click="console.log('放入草稿')">放入草稿箱</a-button>
                     <a-button @click="closed">取消</a-button>
                 </a-space>
             </div>
