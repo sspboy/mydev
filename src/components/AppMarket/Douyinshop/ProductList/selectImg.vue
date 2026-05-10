@@ -124,6 +124,9 @@
 
                             <!-- 列表 为空状态 -->
                             <div style="height:420px;overflow-x: hidden;overflow-y: auto;padding: 20px 0 0 0;">
+                                
+
+                                <a-checkbox-group  v-model:value="PAGEDATA.check_value" style="width: 100%;height: 100%;">
 
                                 <a-list 
                                     :grid="{ gutter: 0, column: 5 }" 
@@ -211,7 +214,7 @@
                                     </template>
 
                                 </a-list>
-
+                                </a-checkbox-group>
                             </div>
 
                         </a-layout-content>
@@ -219,8 +222,18 @@
                     </a-checkbox-group>
 
                     <!-- 翻页 -->
-                    <a-layout-footer class="footerStyle">          
-                        <nav_pagination :fandata="PAGEDATA" v-on:complete="page_turning"/>
+                    <a-layout-footer class="footerStyle">
+                        <a-row>
+                            <a-col :span="4">
+                                <a-checkbox 
+                                    style="margin-top: 4px;" 
+                                    v-model:checked="checked_status"
+                                    @change="onCheckAllChange">全选</a-checkbox>
+                            </a-col>
+                            <a-col :span="20">
+                                <nav_pagination :fandata="PAGEDATA" v-on:complete="page_turning"/>
+                            </a-col>
+                        </a-row>     
                     </a-layout-footer>
 
                 </a-layout>
@@ -610,6 +623,7 @@ export default defineComponent({
                     "folder_id":0
                 }
             ]),
+            check_value:ref([])
 
         })
 
@@ -977,6 +991,31 @@ export default defineComponent({
         }
 
         // 【翻页-组件 回调方法】========================================开始
+        const checked_status = ref(false)// 全选状态绑定值
+        // 全选方法
+        const onCheckAllChange=(e)=>{
+            
+            var checked = e.target.checked
+
+            this.SelectMaterial.checked_status.value = checked;
+
+            if (checked) {
+                // 全选素材list
+                this.PAGEDATA.datalist.forEach(item => {
+                    var material_id = item.material_id;
+                    // 判断是否在数组中
+                    if(!this.PAGEDATA.check_value.includes(material_id)){
+                        this.PAGEDATA.check_value.push(material_id)
+                    }
+                    if(!this.PAGEDATA.confirm_img_list.includes(material_id)){ 
+                        this.PAGEDATA.confirm_img_list.push(material_id)
+                    }
+                });
+            } else {
+                this.PAGEDATA.check_value.length = 0;
+                this.PAGEDATA.confirm_img_list.length = 0;
+            }
+        }
         // 翻页查询条件
         const navData=ref({
             "folder_id":0,//默认文件夹id
@@ -1257,6 +1296,8 @@ export default defineComponent({
             onClose,
             showrenDrawer,
             
+            checked_status, // 全选状态
+            onCheckAllChange, // 全选列表
             
             showChildimgDrawer,
             showChildvideoDrawer,
