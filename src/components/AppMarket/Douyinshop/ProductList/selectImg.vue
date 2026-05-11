@@ -121,7 +121,6 @@
 
                             </div>
 
-
                             <!-- 列表 为空状态 -->
                             <div style="height:420px;overflow-x: hidden;overflow-y: auto;padding: 20px 0 0 0;">
                                 
@@ -132,6 +131,7 @@
                                     :grid="{ gutter: 0, column: 5 }" 
                                     :data-source="PAGEDATA.datalist"
                                     :loading="PAGEDATA.loading"
+                                    style="width:100%;height: 100%;"
                                 >
 
                                     <template #renderItem="{ item }">
@@ -226,7 +226,7 @@
                         <a-row>
                             <a-col :span="4">
                                 <a-checkbox 
-                                    style="margin-top: 4px;" 
+                                    style="margin-top: 4px;float: left;" 
                                     v-model:checked="checked_status"
                                     @change="onCheckAllChange">全选</a-checkbox>
                             </a-col>
@@ -775,6 +775,8 @@ export default defineComponent({
             clear_confirm_img_list:()=>{
                 Material_Images.confirm_img_list.value = [];
                 Material_Images.cunt_img_num = 0;
+                checked_status.value = false; // 取消素材全选状态
+                PAGEDATA.check_value.length = 0; // 取消列表勾选状态
             },
 
             // 素材抽屉--确认提交按钮
@@ -844,6 +846,7 @@ export default defineComponent({
 
         // 点击菜单===》异步加载菜单
         const onLoadData = treeNode => {
+
             return new Promise(resolve => {
 
                 // 如果存在子菜单 跳过
@@ -992,30 +995,38 @@ export default defineComponent({
 
         // 【翻页-组件 回调方法】========================================开始
         const checked_status = ref(false)// 全选状态绑定值
+
         // 全选方法
         const onCheckAllChange=(e)=>{
             
             var checked = e.target.checked
 
-            this.SelectMaterial.checked_status.value = checked;
+            checked_status.value = checked;
+            
 
             if (checked) {
+
                 // 全选素材list
-                this.PAGEDATA.datalist.forEach(item => {
+                PAGEDATA.datalist.forEach(item => {
+
                     var material_id = item.material_id;
+
                     // 判断是否在数组中
-                    if(!this.PAGEDATA.check_value.includes(material_id)){
-                        this.PAGEDATA.check_value.push(material_id)
+                    if(!PAGEDATA.check_value.includes(material_id)){
+                        PAGEDATA.check_value.push(material_id)
                     }
-                    if(!this.PAGEDATA.confirm_img_list.includes(material_id)){ 
-                        this.PAGEDATA.confirm_img_list.push(material_id)
+                    if(!Material_Images.confirm_img_list.value.includes(item)){ 
+                        Material_Images.confirm_img_list.value.push(item)
                     }
                 });
             } else {
-                this.PAGEDATA.check_value.length = 0;
-                this.PAGEDATA.confirm_img_list.length = 0;
+
+                PAGEDATA.check_value.length = 0;
+                Material_Images.confirm_img_list.value.length = 0;
+
             }
         }
+
         // 翻页查询条件
         const navData=ref({
             "folder_id":0,//默认文件夹id
@@ -1341,7 +1352,7 @@ export default defineComponent({
 .headerStyle{text-align: left;background-color: #fff;height: 64px;line-height: 64px;}
 .contentStyle{text-align: center;background-color: #fff;height: 100%;}
 .siderStyle{background-color: #fff;overflow: auto;padding: 10px 10px 10px 0;width: 400px;}
-.footerStyle{text-align: center;background-color: #fff;}
+.footerStyle{text-align: center;background-color: #fff;padding: 0 0 0 20px;}
 .confimImg{text-align: left;padding: 10px 0 10px 0;margin: 0 0 10px 0;height:300px;width: 100%;overflow-x: auto;overflow-y: auto;border-bottom: 1px #f2f2f2 solid;}
 .confimbox{width: 60px;height: 60px;margin: 10px 20px 30px 20px;padding: 4px; float: left;border: 1px #f2f2f2 solid;border-radius: 4px;text-align: center;}
 .Listimgbox{border: 1px solid #f2f2f2; border-radius: 6px;padding: 10px 4px 4px 4px;width: 100%;}

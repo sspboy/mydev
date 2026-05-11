@@ -22,7 +22,11 @@
 
                 <a-tabs v-model:activeKey="activeKey" @change="refesh_stock_number(activeKey)">
 
-                    <a-tab-pane key="1" tab="基础信息">
+                    <template #leftExtra >
+                        <div style="margin: 0 40px 0 10px;font-size: 18px;font-weight: b;">新建商品</div>
+                    </template>
+
+                    <a-tab-pane key="1" tab="主图类目">
                         <!--基本信息-->
                         <a-row>
                             <!----主图--pic-->
@@ -75,88 +79,15 @@
                             >
                                 <a-row :gutter="[16,0]">
 
-                                    <a-col :span="24">
+                                    <a-col :span="14">
                                         <a-form-item label="商品标题" name="name">
                                             <a-input v-model:value="formState.name" autoComplete="off" placeholder="输入商品标题" show-count :maxlength="30" />
                                         </a-form-item>
                                     </a-col>
 
-                                    <a-col :span="8">
-                                        <a-form-item 
-                                            label="商品类型" 
-                                            name="product_type"
-                                        >
-                                            <a-select v-model:value="formState.product_type" placeholder="选择类型">
-                                                <a-select-option value="0">普通</a-select-option>
-                                                <a-select-option value="3">虚拟</a-select-option>
-                                                <a-select-option value="3">玉石闪购</a-select-option>
-                                                <a-select-option value="3">云闪购</a-select-option>
-                                            </a-select>
-                                        </a-form-item>
-                                    </a-col>
-
-                                    <a-col :span="8">
-                                        <a-form-item 
-                                            label="支付方式" 
-                                            name="pay_type"
-                                        >
-                                            <a-select v-model:value="formState.pay_type" placeholder="选择支付方式">
-                                                <a-select-option value="0">货到付款</a-select-option>
-                                                <a-select-option value="1">在线支付</a-select-option>
-                                                <a-select-option value="2">货到付款+在线支付</a-select-option>
-                                            </a-select>
-                                        </a-form-item>
-                                    </a-col>
-                                    
-                                    <a-col :span="8">
-                                        <a-form-item 
-                                            label="库存类型" 
-                                            name="reduce_type"
-                                        >
-                                            <a-select v-model:value="formState.reduce_type" placeholder="选择方式">
-                                                <a-select-option value="1">拍下减库存</a-select-option>
-                                                <a-select-option value="2">付款减库存</a-select-option>
-                                            </a-select>
-                                        </a-form-item>
-                                    </a-col>
-
-                                    <a-col :span="8">
-                                        <a-form-item
-                                            label="客服电话"
-                                            name="mobile"
-                                            
-                                        >
-                                            <a-input v-model:value="formState.mobile" placeholder="输入客服电话"/>
-                                        </a-form-item>
-                                    </a-col>
-
-                                    <a-col :span="8">
-                                        <a-form-item
-                                            label="提交方式"
-                                            name="commit"
-                                        >
-                                            <a-select v-model:value="formState.commit" placeholder="选择方式">
-                                                <a-select-option value="true">提交线上售卖</a-select-option>
-                                                <a-select-option value="false">放入草稿箱</a-select-option>
-                                            </a-select>
-                                        </a-form-item>
-                                    </a-col>
-
-                                    <a-col :span="8">
-                                        <a-form-item
-                                            label="运费模板"
-                                            name="freight_id"
-                                        >
-                                            <a-input-group compact>
-                                                <a-input v-model:value="formState.freight_id.name" placeholder="选择运费模板" disabled style="width: calc(74%);padding: 5.5px;" />
-                                                <a-button class="font_size_12" @click="PAGEDATA.chang_freighttemplate">选择</a-button>
-                                            </a-input-group>
-                                        </a-form-item>                                    
-                                    </a-col>
-
                                     <!--非必填信息-->
 
-                                    <a-col :span="8">
+                                    <a-col :span="10">
                                         <a-form-item
                                             label="导购标题"
                                             name="short_product_name"
@@ -166,99 +97,6 @@
                                             show-count :maxlength="24" 
                                             placeholder="输入商品导购短标题"
                                             />
-                                        </a-form-item>
-                                    </a-col>
-
-                                    <a-col :span="8">
-                                        <a-form-item
-                                            label="推荐语"
-                                            name="recommend_remark"
-                                        >
-                                            <a-input v-model:value="formState.recommend_remark" 
-                                            autoComplete="off" 
-                                            show-count :maxlength="30" 
-                                            placeholder="输入商品推荐语"
-                                            />
-                                        </a-form-item>
-                                    </a-col>
-                                    <a-col :span="8">
-                                        <a-form-item
-                                            label="商家备注"
-                                            name="remark"
-                                        >
-                                            <a-input v-model:value="formState.remark" autoComplete="off" placeholder="商家可见备注"  show-count :maxlength="30" />
-                                        </a-form-item>
-                                    </a-col>
-                                    <a-col :span="8">
-                                        <a-form-item
-                                            label="尺码模板"
-                                            name="size_info_template_id"
-                                        >
-                                            <a-input-group compact>
-                                                <a-input v-model:value="formState.size_info_template_id.name" placeholder="请选择尺码模板" disabled style="width: calc(74%);padding: 5.5px;" />
-                                                <a-button @click="PAGEDATA.chang_sizetemplate">选择</a-button>
-                                            </a-input-group>
-                                        </a-form-item>                                    
-                                    </a-col>
-                                    <a-col :span="8" >
-                                        <a-form-item 
-                                            label="售后服务" 
-                                            name="after_sale_service"
-                                        >
-                                            <a-select v-model:value="formState.after_sale_service" placeholder="选择方式">
-                                                <a-select-option value="1">支持7天无理由</a-select-option>
-                                                <a-select-option value="0">不支持7天无理由</a-select-option>
-                                            </a-select>
-                                        </a-form-item>
-                                    </a-col>
-                                    <a-col :span="8">
-                                        <a-form-item 
-                                            label="发货模式" 
-                                            name="presell_type"
-                                        >
-                                            <a-select v-model:value="formState.presell_type" placeholder="选择方式">
-                                                <a-select-option value="0">现货发货</a-select-option>
-                                            </a-select>
-                                        </a-form-item>
-
-                                    </a-col>
-                                    <a-col :span="8">
-                                        <a-form-item
-                                            label="最少购买"
-                                            name="minimum_per_order"
-                                        >
-                                            <a-input-number placeholder="用户每次下单最少限购件数"
-                                            style="width: calc(100%);"
-                                             v-model:value="formState.minimum_per_order"
-                                            :min="1" :max="1000000" />
-
-                                        </a-form-item>
-                                    </a-col>
-                                    <a-col :span="8">
-                                        <a-form-item
-                                            label="最多购买"
-                                            name="maximum_per_order"
-                                        >
-                                            <a-input-number 
-                                                placeholder="用户每次下单最多限购件数" 
-                                                style="width: calc(100%);" 
-                                                v-model:value="formState.maximum_per_order" 
-                                                :min="1" :max="1000000" 
-                                                />
-
-                                        </a-form-item>
-                                    </a-col>
-                                    <a-col :span="8">
-                                        <a-form-item
-                                            label="累计限购"
-                                            name="limit_per_buyer"
-                                        >
-                                            <a-input-number 
-                                                placeholder="每个用户累计限购件数" 
-                                                style="width: calc(100%);"
-                                                v-model:value="formState.limit_per_buyer" 
-                                                :min="1" :max="1000000" />
-
                                         </a-form-item>
                                     </a-col>
                                     
@@ -474,11 +312,12 @@
 
                     </a-tab-pane>
 
-                    <a-tab-pane key="0" tab="图片视频">
+                    <a-tab-pane key="0" tab="基础信息">
 
                         <a-row>
                             <!--白底图 -- white_back_ground_pic_url -->
                             <a-col :span="24">
+
                                 <a-divider orientation="left" orientation-margin="0px">白底图</a-divider>
                                 
                                 <div style="width: 100%;height:120px;">
@@ -574,6 +413,191 @@
                                     </p>
                                 </div>
                             </a-col>
+
+                            <!-- 基础信息 -->
+                             <a-form
+                                ref="formRef"
+                                name="ProductInfo"
+                                :model="formState"
+                                :rules="rules"
+                            >
+                                <a-row :gutter="[16,0]">
+
+                                    <a-col :span="8">
+                                        <a-form-item 
+                                            label="商品类型" 
+                                            name="product_type"
+                                        >
+                                            <a-select v-model:value="formState.product_type" placeholder="选择类型">
+                                                <a-select-option value="0">普通</a-select-option>
+                                                <a-select-option value="3">虚拟</a-select-option>
+                                                <a-select-option value="3">玉石闪购</a-select-option>
+                                                <a-select-option value="3">云闪购</a-select-option>
+                                            </a-select>
+                                        </a-form-item>
+                                    </a-col>
+
+                                    <a-col :span="8">
+                                        <a-form-item 
+                                            label="支付方式" 
+                                            name="pay_type"
+                                        >
+                                            <a-select v-model:value="formState.pay_type" placeholder="选择支付方式">
+                                                <a-select-option value="0">货到付款</a-select-option>
+                                                <a-select-option value="1">在线支付</a-select-option>
+                                                <a-select-option value="2">货到付款+在线支付</a-select-option>
+                                            </a-select>
+                                        </a-form-item>
+                                    </a-col>
+                                    
+                                    <a-col :span="8">
+                                        <a-form-item 
+                                            label="库存类型" 
+                                            name="reduce_type"
+                                        >
+                                            <a-select v-model:value="formState.reduce_type" placeholder="选择方式">
+                                                <a-select-option value="1">拍下减库存</a-select-option>
+                                                <a-select-option value="2">付款减库存</a-select-option>
+                                            </a-select>
+                                        </a-form-item>
+                                    </a-col>
+
+                                    <a-col :span="8">
+                                        <a-form-item
+                                            label="客服电话"
+                                            name="mobile"
+                                            
+                                        >
+                                            <a-input v-model:value="formState.mobile" placeholder="输入客服电话"/>
+                                        </a-form-item>
+                                    </a-col>
+
+                                    <!-- <a-col :span="8">
+                                        <a-form-item
+                                            label="提交方式"
+                                            name="commit"
+                                        >
+                                            <a-select v-model:value="formState.commit" placeholder="选择方式">
+                                                <a-select-option value="true">提交线上售卖</a-select-option>
+                                                <a-select-option value="false">放入草稿箱</a-select-option>
+                                            </a-select>
+                                        </a-form-item>
+                                    </a-col> -->
+
+                                    <a-col :span="8">
+                                        <a-form-item
+                                            label="运费模板"
+                                            name="freight_id"
+                                        >
+                                            <a-input-group compact>
+                                                <a-input v-model:value="formState.freight_id.name" placeholder="选择运费模板" disabled style="width: calc(74%);padding: 5.5px;" />
+                                                <a-button class="font_size_12" @click="PAGEDATA.chang_freighttemplate">选择</a-button>
+                                            </a-input-group>
+                                        </a-form-item>                                    
+                                    </a-col>
+
+                                    <a-col :span="8">
+                                        <a-form-item
+                                            label="推荐语"
+                                            name="recommend_remark"
+                                        >
+                                            <a-input v-model:value="formState.recommend_remark" 
+                                            autoComplete="off" 
+                                            show-count :maxlength="30" 
+                                            placeholder="输入商品推荐语"
+                                            />
+                                        </a-form-item>
+                                    </a-col>
+
+                                    <a-col :span="8">
+                                        <a-form-item
+                                            label="商家备注"
+                                            name="remark"
+                                        >
+                                            <a-input v-model:value="formState.remark" autoComplete="off" placeholder="商家可见备注"  show-count :maxlength="30" />
+                                        </a-form-item>
+                                    </a-col>
+
+                                    <a-col :span="8">
+                                        <a-form-item
+                                            label="尺码模板"
+                                            name="size_info_template_id"
+                                        >
+                                            <a-input-group compact>
+                                                <a-input v-model:value="formState.size_info_template_id.name" placeholder="请选择尺码模板" disabled style="width: calc(74%);padding: 5.5px;" />
+                                                <a-button @click="PAGEDATA.chang_sizetemplate">选择</a-button>
+                                            </a-input-group>
+                                        </a-form-item>                                    
+                                    </a-col>
+
+                                    <a-col :span="8" >
+                                        <a-form-item 
+                                            label="售后服务" 
+                                            name="after_sale_service"
+                                        >
+                                            <a-select v-model:value="formState.after_sale_service" placeholder="选择方式">
+                                                <a-select-option value="1">支持7天无理由</a-select-option>
+                                                <a-select-option value="0">不支持7天无理由</a-select-option>
+                                            </a-select>
+                                        </a-form-item>
+                                    </a-col>
+
+                                    <a-col :span="8">
+                                        <a-form-item 
+                                            label="发货模式" 
+                                            name="presell_type"
+                                        >
+                                            <a-select v-model:value="formState.presell_type" placeholder="选择方式">
+                                                <a-select-option value="0">现货发货</a-select-option>
+                                            </a-select>
+                                        </a-form-item>
+
+                                    </a-col>
+
+                                    <a-col :span="8">
+                                        <a-form-item
+                                            label="最少购买"
+                                            name="minimum_per_order"
+                                        >
+                                            <a-input-number placeholder="用户每次下单最少限购件数"
+                                            style="width: calc(100%);"
+                                             v-model:value="formState.minimum_per_order"
+                                            :min="1" :max="1000000" />
+
+                                        </a-form-item>
+                                    </a-col>
+
+                                    <a-col :span="8">
+                                        <a-form-item
+                                            label="最多购买"
+                                            name="maximum_per_order"
+                                        >
+                                            <a-input-number 
+                                                placeholder="用户每次下单最多限购件数" 
+                                                style="width: calc(100%);" 
+                                                v-model:value="formState.maximum_per_order" 
+                                                :min="1" :max="1000000" 
+                                                />
+
+                                        </a-form-item>
+                                    </a-col>
+
+                                    <a-col :span="8">
+                                        <a-form-item
+                                            label="累计限购"
+                                            name="limit_per_buyer"
+                                        >
+                                            <a-input-number 
+                                                placeholder="每个用户累计限购件数" 
+                                                style="width: calc(100%);"
+                                                v-model:value="formState.limit_per_buyer" 
+                                                :min="1" :max="1000000" />
+
+                                        </a-form-item>
+                                    </a-col>
+
+                                </a-row>
+                             </a-form>
 
                         </a-row>
 
@@ -863,6 +887,7 @@ export default defineComponent({
     // ✅ 必须添加 emits 声明:指定该组件可能会触发的事件
     emits: ['add_call_back'],
     setup(props,ctx) {
+        
         const tool = new TOOL.TOOL()            // 工具方法
         const TO = new TABLE.TableOperate()     // 表格操作方法
         const API = new utils.A_Patch()         // 请求接口地址合集
@@ -1159,6 +1184,7 @@ export default defineComponent({
                     trigger: 'change',
             }]
         }
+
         // 基础信息表单数据
         const formState = reactive({
             product_type:'0',               // 商品类别
@@ -1583,6 +1609,7 @@ export default defineComponent({
             cate_name:ref([]),          // 分类
 
             predict_status:ref(false),  // 预测按钮状态
+
             select_loading:ref(true),  // 预测选项状态
 
             cate_value:ref(undefined),  // 选中分类
@@ -1597,9 +1624,7 @@ export default defineComponent({
             // 表单数据绑定:
             form_ref:ref(),
 
-            format_formRef:reactive({
-
-            }),
+            format_formRef:reactive({}),
 
             // 类目列表转换
             get_cate_list:(obj)=>{

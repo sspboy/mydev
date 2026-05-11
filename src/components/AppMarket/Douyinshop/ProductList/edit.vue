@@ -27,6 +27,10 @@
           
           <a-tabs v-model:activeKey="activeKey">
 
+            <template #leftExtra >
+                <div style="margin: 0 40px 0 10px;font-size: 18px;font-weight: bold;">编辑商品</div>
+            </template>
+
             <a-tab-pane key="1" tab="主图类目">
 
               <a-row>

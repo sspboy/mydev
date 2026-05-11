@@ -68,7 +68,6 @@ const API = new utils.A_Patch()// 请求接口
                 duration: 2,
                 maxCount: 3,
             })
-            console.log(message)
             message[type](msg)
         },
         // 加载js文件
