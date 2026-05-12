@@ -147,17 +147,17 @@
                         <a-divider orientation="left" orientation-margin="0px">
                             商品属性
                             <a-button 
-                            type="dashed"
-                            size="small"
-                            style="margin-left: 10px;"
-                            @click="CATE.Ceck_format"
+                                type="dashed"
+                                size="small"
+                                style="margin-left: 10px;"
+                                @click="CATE.Ceck_format"
                             >智能预测填充属性
                             </a-button>
                             <a-button 
-                            type="dashed"
-                            size="small"
-                            style="margin-left: 10px;"
-                            @click="CATE.Clear_format"
+                                type="dashed"
+                                size="small"
+                                style="margin-left: 10px;"
+                                @click="CATE.Clear_format"
                             >清空属性
                             </a-button>
                         </a-divider>
@@ -165,11 +165,137 @@
                         <a-form :ref="CATE.form_ref" :model="CATE.format_formRef">
 
                             <a-row v-if="CATE.format.value.length !== 0" loading="true" :gutter="[16,6]">
+                                
+                                <template v-for="item in CATE.format.value">
 
-                                <a-col v-for="item in CATE.format.value" :span="6">
+                                    <!--度量衡-多选-->
+                                    <template v-if="item.type == 'multi_value_measure'">
+
+                                         <a-col :span="24" style="margin-bottom: 14px;">
+                                            
+                                            <!-- 内层嵌套 row -->
+                                             <p>面料材质 <span v-show="item.required ==1" style="color: red;">*必填</span></p>
+
+                                            <a-row :gutter="[16,6]">
+                                                
+                                                <a-col :span="6">
+                                                    <!-- 吊牌 开始-->
+                                                    <!--洗水标上传 开始
+                                                        available    是否可用	true-可用，false-不可用
+                                                        required     是否必填	true-必填，false-选填
+                                                    -->
+                                                    <template v-if="item.property_pic_rule.available == true">
+
+                                                        <!-- <p>水洗标/吊牌图</p> -->
+                                                        <div class="cursor Add_shui_img" v-if="CATE.category_property_pics.value == undefined" 
+                                                            @click="console.log('点击上传水洗标')">
+                                                            <a-flex justify="center" align="center" style="height: 100%;font-size: 12px;">
+                                                            + 水洗标/吊牌
+                                                            </a-flex>
+                                                        </div>
+
+                                                    </template>
+                                                    <!--吊牌 结束-->
+                                                </a-col>
+
+                                                <!--多材质列表 开始-->
+                                                <a-col :span="6" v-for="(olist, dIndex) in CATE.format_formRef[item.property_id]">
+
+                                                    <a-form-item 
+                                                        :name="[item.property_id, dIndex, 'value']"
+                                                        :rules="[{ required: true, message: item.property_name + '不能为空！',trigger: 'change',}]"
+                                                    >
+
+                                                        <a-select
+                                                            v-model:value="olist.value"
+                                                            placeholder="请选择材质"
+                                                            style="width: 100%"
+                                                            allow-clear
+                                                            show-search
+                                                            :filter-option="filterOption"
+                                                            :options="item.options"
+                                                            :field-names="{
+                                                                label: 'name',
+                                                                value: 'value_id',
+                                                            }"
+                                                            @focus="CATE.material_change(CATE.format_formRef[item.property_id],item.options)"
+                                                        >
+
+                                                            <template #dropdownRender="{ menuNode: menu }">
+                                                                <v-nodes :vnodes="menu" />
+                                                                <a-divider style="margin: 4px 0" />
+                                                                <a-space style="padding: 4px 8px">
+                                                                <a-input ref="inputRef" 
+                                                                    v-model:value="CATE.diy_name.value" 
+                                                                    placeholder="自定义面料"
+                                                                    autoComplete="off"
+                                                                />
+                                                                <a-button type="text" @click="CATE.addItem(item.options)">
+                                                                    <template #icon><PlusOutlined /></template>添加
+                                                                </a-button>
+                                                                </a-space>
+                                                            </template>
+
+                                                        </a-select>
+
+                                                    </a-form-item>
+
+                                                    <a-form-item
+                                                        :name="[item.property_id, dIndex, 'percentage']"
+                                                        :rules="[{ required: true, message:'数值不能为空！',trigger: 'change',}]"
+                                                    >
+                                                        <a-space-compact block size="small">
+                                                            
+                                                            <a-input-number
+                                                                v-model:value="olist.percentage"
+                                                                placeholder="输入百分比"
+                                                                suffix="%"
+                                                                :min="0"
+                                                                :max="100"
+                                                                addon-after="%"
+                                                                style="width: 100%;"
+                                                            ></a-input-number>
+
+                                                            <!--删除按钮-->
+                                                            <a-button
+                                                                v-show="CATE.format_formRef[item.property_id].length > 1"
+                                                                type="dashed"
+                                                                @click="CATE.material_del(dIndex,CATE.format_formRef[item.property_id])"
+                                                            >删除</a-button>
+                                                        </a-space-compact>
+
+                                                    </a-form-item>
+
+                                                </a-col>
+                                                <!--多材质列表 结束-->
+
+                                                <!--添加材质 开始-->
+                                                <a-col :span="6">
+                                                    <div class="cursor Add_shui_img" " 
+                                                        @click="CATE.add_limit(CATE.format_formRef[item.property_id],item.multi_select_max)">
+                                                        <a-flex justify="center" align="center" style="height: 100%;font-size: 12px;">
+                                                        添加材质
+                                                        </a-flex>
+                                                    </div>
+                                                </a-col>
+                                                <!--添加材质 结束-->
+                                            </a-row>
+                                        </a-col>
+                                        
+
+                                        
+
+                                        
+
+
+                                    </template>
+                                </template>
+
+
+                                <template v-for="item in CATE.format.value" >
                                     
-                                    <!--输入文本 required-->
-                                    <div v-if="item.type == 'text'">
+                                    <!--文本-->
+                                    <a-col :span="6" v-if="item.type == 'text'">
                                         <p>
                                             {{ item.property_name }}
                                             <span v-if="item.required ==1" style="color: red;">--必填</span>
@@ -195,17 +321,21 @@
                                             />
                                             </a-form-item>
                                         </p>
-                                    </div>
+                                    </a-col>
 
                                     <!--单选-->
-                                    <div v-if="item.type == 'select'">
+                                    <a-col :span="6" v-else-if="item.type == 'select'">
+
                                         <p>
                                             {{ item.property_name }}
                                             <span v-if="item.required ==1" style="color: red;">--必填</span>
                                         </p>
 
                                         <p v-if="item.required ==1">
-                                            <a-form-item :name="item.property_id" :rules="[{ required: true, message: item.property_name + '不能为空！',trigger: 'change',}]">
+                                            <a-form-item 
+                                                :name="item.property_id" 
+                                                :rules="[{ required: true, message: item.property_name + '不能为空！',trigger: 'change',}]"
+                                            >
                                                 <a-select
                                                     ref="select"
                                                     v-model:value="CATE.format_formRef[item.property_id]"
@@ -216,6 +346,20 @@
                                                     <a-select-option v-for="opt in item.options" :value="opt.value_id" >
                                                         {{ opt.name }}
                                                     </a-select-option>
+                                                    <template #dropdownRender="{ menuNode: menu }" v-if="item.diy_type==1">
+                                                        <v-nodes :vnodes="menu" />
+                                                        <a-divider style="margin: 4px 0" />
+                                                        <a-space style="padding: 4px 8px">
+                                                        <a-input ref="inputRef" 
+                                                            v-model:value="CATE.diy_name.value" 
+                                                            placeholder="自定义面料"
+                                                            autoComplete="off"
+                                                        />
+                                                        <a-button type="text" @click="CATE.addItem(item.options)">
+                                                            <template #icon><PlusOutlined /></template>添加
+                                                        </a-button>
+                                                        </a-space>
+                                                    </template>
                                                 </a-select>
                                             </a-form-item>
                                         </p>
@@ -232,13 +376,29 @@
                                                     <a-select-option v-for="opt in item.options" :value="opt.value_id" >
                                                         {{ opt.name }}
                                                     </a-select-option>
+                                                    <template #dropdownRender="{ menuNode: menu }" v-if="item.diy_type==1">
+                                                        <v-nodes :vnodes="menu" />
+                                                        <a-divider style="margin: 4px 0" />
+                                                        <a-space style="padding: 4px 8px">
+                                                        <a-input ref="inputRef" 
+                                                            v-model:value="CATE.diy_name.value" 
+                                                            placeholder="自定义面料"
+                                                            autoComplete="off"
+                                                        />
+                                                        <a-button type="text" @click="CATE.addItem(item.options)">
+                                                            <template #icon><PlusOutlined /></template>添加
+                                                        </a-button>
+                                                        </a-space>
+                                                    </template>
                                                 </a-select>
                                             </a-form-item>
                                         </p>
-                                    </div>
+
+
+                                    </a-col>
 
                                     <!--多选-->
-                                    <div v-if="item.type == 'multi_select' || item.type == 'multi_value_measure'">
+                                    <a-col :span="6" v-else-if="item.type == 'multi_select'">
                                         <p>
                                             {{ item.property_name }}
                                             <span v-if="item.required ==1" style="color: red;">--必填</span>
@@ -260,7 +420,20 @@
                                                 <a-select-option v-for="opt in item.options" :value="opt.value_id" :disabled="opt.disabled">
                                                     {{ opt.name }}
                                                 </a-select-option>
-
+                                                <template #dropdownRender="{ menuNode: menu }" v-if="item.diy_type==1">
+                                                    <v-nodes :vnodes="menu" />
+                                                    <a-divider style="margin: 4px 0" />
+                                                    <a-space style="padding: 4px 8px">
+                                                    <a-input ref="inputRef" 
+                                                        v-model:value="CATE.diy_name.value" 
+                                                        placeholder="自定义面料"
+                                                        autoComplete="off"
+                                                    />
+                                                    <a-button type="text" @click="CATE.addItem(item.options)">
+                                                        <template #icon><PlusOutlined /></template>添加
+                                                    </a-button>
+                                                    </a-space>
+                                                </template>
                                             </a-select>
                                         </a-form-item>
                                         </p>
@@ -279,27 +452,44 @@
                                                 <a-select-option v-for="opt in item.options" :value="opt.value_id" :disabled="opt.disabled">
                                                     {{ opt.name }}
                                                 </a-select-option>
+                                                <template #dropdownRender="{ menuNode: menu }" v-if="item.diy_type==1">
+                                                    <v-nodes :vnodes="menu" />
+                                                    <a-divider style="margin: 4px 0" />
+                                                    <a-space style="padding: 4px 8px">
+                                                    <a-input ref="inputRef" 
+                                                        v-model:value="CATE.diy_name.value" 
+                                                        placeholder="自定义面料"
+                                                        autoComplete="off"
+                                                    />
+                                                    <a-button type="text" @click="CATE.addItem(item.options)">
+                                                        <template #icon><PlusOutlined /></template>添加
+                                                    </a-button>
+                                                    </a-space>
+                                                </template>
                                             </a-select>
                                             </a-form-item>
                                         </p>
-                                    </div>
+                                    </a-col>
+
+                                    <!--度量衡-单选-->
 
                                     <!--时间戳-->
-                                    <div v-if="item.type == 'timestamp'">
+                                    <a-col :span="6" v-else-if="item.type == 'timestamp'">
                                         <p>
                                             {{ item.property_name }}
                                             <span v-if="item.required ==1" style="color: red;">--必填</span>
                                         </p>
-                                    </div>
+                                    </a-col>
 
                                     <!--时间段-->
-                                    <div v-if="item.type == 'timerange'">
+                                    <a-col :span="6" v-else-if="item.type == 'timerange'">
                                         <p>
                                             {{ item.property_name }}
                                             <span v-if="item.required ==1" style="color: red;">--必填</span>
                                         </p>
-                                    </div>
-                                </a-col>
+                                    </a-col>
+
+                                </template>
                                 
                             </a-row>
 
@@ -308,6 +498,7 @@
                             </p>
 
                         </a-form>
+
                         </div>
 
                     </a-tab-pane>
@@ -317,10 +508,8 @@
                         <a-row>
                             <!--白底图 -- white_back_ground_pic_url -->
                             <a-col :span="24">
-
-                                <a-divider orientation="left" orientation-margin="0px">白底图</a-divider>
                                 
-                                <div style="width: 100%;height:120px;">
+                                <div style="width: 100%;height:120px;margin: 20px 0 0 0;">
 
                                     <p class="img_pic" v-for="item in whiteimg_Fun.PicList.value">
 
@@ -339,8 +528,8 @@
                                         class="cursor Add_img"
                                         v-if="whiteimg_Fun.PicList.value < 1"
                                     >
-                                        <a-flex justify="center" align="center" style="height: 100%;">
-                                            +
+                                        <a-flex justify="center" align="center" style="height: 100%;" class="font_size_12">
+                                            + 白底图
                                         </a-flex>
                                     </p>
 
@@ -471,18 +660,6 @@
                                             <a-input v-model:value="formState.mobile" placeholder="输入客服电话"/>
                                         </a-form-item>
                                     </a-col>
-
-                                    <!-- <a-col :span="8">
-                                        <a-form-item
-                                            label="提交方式"
-                                            name="commit"
-                                        >
-                                            <a-select v-model:value="formState.commit" placeholder="选择方式">
-                                                <a-select-option value="true">提交线上售卖</a-select-option>
-                                                <a-select-option value="false">放入草稿箱</a-select-option>
-                                            </a-select>
-                                        </a-form-item>
-                                    </a-col> -->
 
                                     <a-col :span="8">
                                         <a-form-item
@@ -844,7 +1021,7 @@
                 <a-space align="end" style="height: 100%;">
                     <a-button type="primary" @click="handleOk" :loading="PAGEDATA.upload_product_loading">发布到线上售卖</a-button>
                     <a-button @click="console.log('放入草稿')">放入草稿箱</a-button>
-                    <a-button @click="closed">取消</a-button>
+                    <a-button @click="closed">关闭</a-button>
                 </a-space>
             </div>
         </a-affix>
@@ -865,7 +1042,12 @@ import * as TABLE from '@/assets/JS_Model/TableOperate';
 import * as utils from '@/assets/JS_Model/public_model';
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue' // 描述详情富媒体
 import '@wangeditor/editor/dist/css/style.css' // 引入富媒体编辑器样式 css
-import { checkboxGroupProps } from 'ant-design-vue/es/checkbox';
+
+// 商品管理->编辑操作方法
+// import {
+//     PicFun,
+//     Longimg_Fun
+// } from '@/assets/douyinshop/productmanagement/Add';
 
 // 组件引用=====开始
 export default defineComponent({
@@ -875,11 +1057,24 @@ export default defineComponent({
         DeleteOutlined,
         MinusOutlined,
         MinusCircleOutlined,
-        selectimg:defineAsyncComponent(() => import('@/components/AppMarket/Douyinshop/ProductList/selectImg.vue')),//素材组件
         Editor, // 详情编辑
         Toolbar, // 编辑工具栏
+        selectimg:defineAsyncComponent(() => import('@/components/AppMarket/Douyinshop/ProductList/selectImg.vue')),//素材组件
         selectFreightid:defineAsyncComponent(() => import('@/components/AppMarket/Douyinshop/templatefreight/selectFreightId.vue')),// 运费模板组件
         selectsizetemplateid:defineAsyncComponent(() => import('@/components/AppMarket/Douyinshop/templateSize/selectsizetemplateid.vue')),// 尺码模板组件
+        format_cp:defineAsyncComponent(()=>import('@/components/AppMarket/Douyinshop/ProductList/edit_component/format_cp.vue')),// 商品属性组件
+        // 产品属性>面料属性》多选组件
+        VNodes:defineComponent({
+            props: {
+                vnodes: {
+                    type: Object,
+                    required: true,
+                },
+            },
+            render() {
+            return this.vnodes;
+            },
+        })
     },
     props: {
         data:{typr:Object}
@@ -894,10 +1089,7 @@ export default defineComponent({
         const simpleImage = Empty.PRESENTED_IMAGE_SIMPLE;// 默认为空图标
         const buttonload = ref(true)            // 新建按钮loading状态；
         const activeKey = ref('1');             // 默认选项卡
-
-        // 分类信息初始化
-        onMounted(() => {})
-
+        
         // 添加商品配置
         const PAGEDATA=reactive({
 
@@ -947,6 +1139,7 @@ export default defineComponent({
             // 上传按钮状态
             upload_product_loading:ref(false)
         })
+
 
         // 主图对象
         const Pic_Fun = {
@@ -1616,8 +1809,6 @@ export default defineComponent({
 
             options:ref([]),            // 分类选项
 
-            
-
             // 商品属性结构数据：：渲染表单格式
             format:ref([]),
 
@@ -1625,6 +1816,62 @@ export default defineComponent({
             form_ref:ref(),
 
             format_formRef:reactive({}),
+
+            // 吊牌
+            category_property_pics:ref(undefined),
+
+            // 自定义【面料材质】的名称
+            diy_name:ref(),
+
+            // 添加自定义【面料材质】name -方法
+            addItem:(op) => {
+
+                var diy_name = CATE.diy_name.value; // 自定义名称
+                if(diy_name == undefined){
+                    tool.Fun_.message('error','自定义值不能为空')
+                }else{
+                    op.unshift({
+                        name: diy_name,
+                        value: op.length + 1 + '',
+                        value_id:op.length + 1,
+                        value_text:false // 自定义值标识
+                    });
+                }
+
+                CATE.diy_name.value = undefined;
+            },
+            // 对选度量衡添加限制-不超过
+            add_limit:(data_list,maxnumber)=>{
+                if(data_list.length >= maxnumber){
+                    tool.Fun_.message('error','超过最大限制数量了，最多10个选项。')
+                }else{
+                    data_list.push({value:undefined, percentage:undefined})
+                }
+            },
+            // 删除面料材质属性
+            material_del:(index,data)=>{
+                data.splice(index,1)
+            },
+
+            // 变化选项时禁选
+            material_change:(select_data,data)=>{
+                var s_list = [] // 选中的id
+                select_data.forEach(item=>{
+                if(item.value !== undefined){
+                    s_list.push(item.value)
+                }
+                })
+                // 设置下拉选中的值禁用
+                data.forEach(item=>{
+                if(s_list.includes(item.value)){
+                    item.disabled = true; // 禁用
+                }else{
+                    item.disabled = false;// 启用
+
+                }
+                })
+
+            },
 
             // 类目列表转换
             get_cate_list:(obj)=>{
@@ -1649,14 +1896,13 @@ export default defineComponent({
 
                 targetOption.loading = true; // load options
                 
-                // const res = await axios.post(API.AppSrtoreAPI.dou_product.cate, {"cid":cid})
-
                 axios.post(API.AppSrtoreAPI.dou_product.cate, {"cid":cid}).then(res=>{
                     targetOption.loading = false;
                     targetOption.children = CATE.get_cate_list(res.data.data)
                     CATE.options.value = [...CATE.options.value]
                 })
             },
+
             // 请求属性:加载到列表
             loadFormat:async()=>{
 
@@ -1667,7 +1913,7 @@ export default defineComponent({
                     "category_leaf_id":cate_id
                 })
 
-                var data_list = res.data.data.data;
+                var data_list = res.data.data.data; // 属性值列表
 
                 Object.keys(CATE.format_formRef).forEach(key => delete CATE.format_formRef[key]); // 清空
 
@@ -1687,16 +1933,38 @@ export default defineComponent({
                     }
                     // 无品牌添加结束
 
-                    var type = obj.type;
+                    var type = obj.type; // 属性标签
 
-                    if(type == 'select' || type == 'multi_select' || type == 'multi_value_measure'){
+                    if(type == 'select'){// 单选
 
                         CATE.format_formRef[obj.property_id] = undefined;
 
-                    }else if(type == 'text'){
+                    }else if(type == 'multi_select'){ // 多选
+
+                        CATE.format_formRef[obj.property_id] = undefined;
+
+                    }else if(type == 'text'){ // 文本
 
                         CATE.format_formRef[obj.property_id] = undefined;
                     
+                    }else if(type == 'multi_value_measure'){// 度量衡-多选-材质属性
+
+                        console.log(obj,type)
+
+                        CATE.format_formRef[obj.property_id] = [];
+
+                    }else if(type =='measure'){// 度量衡-单选
+
+                        CATE.format_formRef[obj.property_id] = undefined;
+
+                    }else if(type =='timestamp'){// - 时间戳timestamp
+
+                        CATE.format_formRef[obj.property_id] = undefined;
+
+                    }else if(type =='timerange'){// - 时间段timerange
+
+                        CATE.format_formRef[obj.property_id] = undefined;
+
                     }
 
                 })
@@ -1704,6 +1972,7 @@ export default defineComponent({
                 CATE.format.value = res.data.data.data;
 
             },
+
             // 多选-禁用超过限制选项
             dis_ops:(item, data)=>{
 
@@ -1742,6 +2011,7 @@ export default defineComponent({
                     }
                 }
             },
+
             // 获取多选属性值
             select_name:(v_id,op)=>{
                 var r_name = ''
@@ -1795,32 +2065,39 @@ export default defineComponent({
 
                 return res
             },
-            // 转移属性格式
+
+            // 获取属性时候-转义属性格式：：提交上传商品
             de_format_detail:(item, data)=>{
+
                 let property_id = item.property_id;
                 let type = item.type; // 类别
                 let result_value = data; // 选中的值
                 let multi_select_max = item.multi_select_max;
                 let options = item.options; // 选项
                 let diy_type = item.diy_type; // 是否支撑自定义
-
+                console.log(type)
                 // 文本 text
                 if(type == 'text'){
+
                     var result = [{"value":0,"name":result_value,"diy_type":diy_type}]
-                    console.log(result)
                     return result
+
                 }else if(type == 'select'){// 单选 select
+
                     // 单选 [{"value":data,"name":v_name,"diy_type":diy_type}]
                     var v_name = ''
                     options.forEach((obj,index)=>{
                         if(obj.value_id == data){v_name = obj.name}
                     })
+
                     var result = [{"value":data,"name":v_name,"diy_type":diy_type}]
+
                     return result
 
-                }else if(type == 'multi_select' || type == 'multi_value_measure'){
-                    // 多选// 迭代选中值
+                }else if(type == 'multi_select'){ // 多选
+
                     var res_lisr = []
+
                     // 如果不是数组类型转换为数组
                     if(!Array.isArray(result_value)){result_value = [result_value]}
                     result_value.forEach((obj,index)=>{
@@ -1828,9 +2105,19 @@ export default defineComponent({
                         var r_obj = {"value":obj,"name":r_name,"diy_type":diy_type}
                         res_lisr.push(r_obj)
                     })
+
                     return res_lisr
 
+                }else if(type == 'multi_value_measure'){// 度量衡-多选-材质属性
+                    console.log(item, data)
+                }else if(type =='measure'){// 度量衡-单选
+
+                }else if(type =='timestamp'){// - 时间戳timestamp
+
+                }else if(type =='timerange'){// - 时间段timerange
+
                 }
+
             },
             // 类目预测
             Check_Cate:async(formdata)=>{
@@ -1894,6 +2181,7 @@ export default defineComponent({
                     CATE.select_loading.value = false; // 下拉禁用状态停止
 
                 }else{
+
                     tool.Fun_.message('error', '预测分类失败，请更换主图或标题！');
                     CATE.predict_status.value = false;
                     return false
@@ -2252,6 +2540,11 @@ export default defineComponent({
 
         }
 
+        // 表单选择框---》搜索方法；
+        const filterOption = (input, option) => {
+            return option.name.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+        };
+
         return{
             PAGEDATA,
             Pic_Fun,whiteimg_Fun,Longimg_Fun,video_Fun,        // 主图,白底图,长图,视频
@@ -2276,7 +2569,7 @@ export default defineComponent({
             rules,
             selectfreight_callback,
             selectsizetemplate_callback,
-            
+            filterOption
         }
     }
 })
@@ -2284,7 +2577,7 @@ export default defineComponent({
 </script>
 <style scoped>
 .content{padding: 0;margin: 20px 0 0 0;background: '#fff';overflow-y: auto;overflow-x: hidden;height: 90vh;}
-.img_pic{height: 100px;width: 100px;background-color: #f2f2f2;border: 1px silver solid; border-radius: 4px;margin: 0 10px 0 0;float: left;padding: 10px;}
+.img_pic{height: 100px;width: 100px;border: 1px silver solid; border-radius: 4px;margin: 0 10px 0 0;float: left;padding: 10px;}
 .img_3_4_pic{height: 132px;width: 99px;background-color: #f2f2f2;border: 1px silver solid; border-radius: 4px;margin: 0 10px 0 0;float: left;padding: 10px;text-align: center;}
 .Add_img{height: 100px;width: 100px;background-color: #fff;border: 1px silver dotted; border-radius: 4px;margin: 0 10px 0 0;float: left;text-align: center;}
 .Add_img :hover{color: #2600ff;border:1px #2600ff dotted;border-radius: 4px;}
@@ -2292,5 +2585,7 @@ export default defineComponent({
 .Add_3_4_img :hover{color: #2600ff;border:1px #2600ff dotted;border-radius: 4px;}
 .add_btn_class{width: 40px; margin:0 0 0 20px;}
 /* .ant-form-item{margin-bottom: 0px ! important} */
+.Add_shui_img{height: 90px;width: 100%;background-color: #fff;border: 1px silver dotted; border-radius: 4px;margin: 0 10px 0 0;float: left;text-align: center;}
+.Add_shui_img :hover{color: #2600ff;border:1px #2600ff dotted;border-radius: 4px;}
  
 </style>

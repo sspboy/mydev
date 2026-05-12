@@ -199,77 +199,77 @@ PS：支持新建、编辑====》场景使用
             <!--单选-->
             <a-col :span="6" v-if="item.type == 'select'">
                 <p>
-                {{ item.property_name }} 
-                <span v-show="item.required ==1" style="color: red;">*必填</span>
+                    {{ item.property_name }} 
+                    <span v-show="item.required ==1" style="color: red;">*必填</span>
                 </p>
 
                 <p v-if="item.required == 1">
-                <a-form-item
-                    :name="item.property_id"
-                    :rules="[{ required: true, message: item.property_name + '不能为空！',trigger: 'change',}]"
-                >
-                <a-select
-                    :placeholder="'请选择-' + item.property_name"
-                    allow-clear
-                    :options="item.options"
-                    v-model:value="formdata.format_form_data[item.property_id]" 
-                    style="width: 100%;"
-                    :field-names="{
-                        label: 'name',
-                        value: 'value_id',
-                    }"
-                >
-                    <template #dropdownRender="{ menuNode: menu }" v-if="item.diy_type==1">
-                        <v-nodes :vnodes="menu" />
-                        <a-divider style="margin: 4px 0" />
-                        <a-space style="padding: 4px 8px">
-                        <a-input ref="inputRef" 
-                            v-model:value="insetpagedata.format.diy_name.value" 
-                            placeholder="自定义面料"
-                            autoComplete="off"
-                        />
-                        <a-button type="text" @click="insetpagedata.format.addItem(item.options)">
-                            <template #icon><PlusOutlined /></template>添加
-                        </a-button>
-                        </a-space>
-                    </template>
-            
-                </a-select>
-                </a-form-item>
+                    <a-form-item
+                        :name="item.property_id"
+                        :rules="[{ required: true, message: item.property_name + '不能为空！',trigger: 'change',}]"
+                    >
+                    <a-select
+                        :placeholder="'请选择-' + item.property_name"
+                        allow-clear
+                        :options="item.options"
+                        v-model:value="formdata.format_form_data[item.property_id]" 
+                        style="width: 100%;"
+                        :field-names="{
+                            label: 'name',
+                            value: 'value_id',
+                        }"
+                    >
+                        <template #dropdownRender="{ menuNode: menu }" v-if="item.diy_type==1">
+                            <v-nodes :vnodes="menu" />
+                            <a-divider style="margin: 4px 0" />
+                            <a-space style="padding: 4px 8px">
+                            <a-input ref="inputRef" 
+                                v-model:value="insetpagedata.format.diy_name.value" 
+                                placeholder="自定义面料"
+                                autoComplete="off"
+                            />
+                            <a-button type="text" @click="insetpagedata.format.addItem(item.options)">
+                                <template #icon><PlusOutlined /></template>添加
+                            </a-button>
+                            </a-space>
+                        </template>
+                
+                    </a-select>
+                    </a-form-item>
                 </p>
 
                 <p v-else>
-                <a-form-item
-                    :name="item.property_id"
-                >
-                <a-select
-                    :placeholder="'请选择-' + item.property_name"
-                    allow-clear
-                    :options="item.options"
-                    v-model:value="formdata.format_form_data[item.property_id]" 
-                    style="width: 100%;"
-                    :field-names="{
-                        label: 'name',
-                        value: 'value_id',
-                    }"
-                >
-                    <template #dropdownRender="{ menuNode: menu }" v-if="item.diy_type==1">
-                        <v-nodes :vnodes="menu" />
-                        <a-divider style="margin: 4px 0" />
-                        <a-space style="padding: 4px 8px">
-                        <a-input ref="inputRef" 
-                            v-model:value="insetpagedata.format.diy_name.value" 
-                            placeholder="自定义面料"
-                            autoComplete="off"
-                        />
-                        <a-button type="text" @click="insetpagedata.format.addItem(item.options)">
-                            <template #icon><PlusOutlined /></template>添加
-                        </a-button>
-                        </a-space>
-                    </template>
-            
-                </a-select>
-                </a-form-item>
+                    <a-form-item
+                        :name="item.property_id"
+                    >
+                    <a-select
+                        :placeholder="'请选择-' + item.property_name"
+                        allow-clear
+                        :options="item.options"
+                        v-model:value="formdata.format_form_data[item.property_id]" 
+                        style="width: 100%;"
+                        :field-names="{
+                            label: 'name',
+                            value: 'value_id',
+                        }"
+                    >
+                        <template #dropdownRender="{ menuNode: menu }" v-if="item.diy_type==1">
+                            <v-nodes :vnodes="menu" />
+                            <a-divider style="margin: 4px 0" />
+                            <a-space style="padding: 4px 8px">
+                            <a-input ref="inputRef" 
+                                v-model:value="insetpagedata.format.diy_name.value" 
+                                placeholder="自定义面料"
+                                autoComplete="off"
+                            />
+                            <a-button type="text" @click="insetpagedata.format.addItem(item.options)">
+                                <template #icon><PlusOutlined /></template>添加
+                            </a-button>
+                            </a-space>
+                        </template>
+                
+                    </a-select>
+                    </a-form-item>
                 </p>
                 
             </a-col>
