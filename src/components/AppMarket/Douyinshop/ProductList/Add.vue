@@ -171,7 +171,7 @@
                                     <!--度量衡-多选-->
                                     <template v-if="item.type == 'multi_value_measure'">
 
-                                         <a-col :span="24" style="margin-bottom: 14px;">
+                                         <a-col :span="24" style="margin-bottom: 10px;">
                                             
                                             <!-- 内层嵌套 row -->
                                              <p>面料材质 <span v-show="item.required ==1" style="color: red;">*必填</span></p>
@@ -244,7 +244,7 @@
                                                         :name="[item.property_id, dIndex, 'percentage']"
                                                         :rules="[{ required: true, message:'数值不能为空！',trigger: 'change',}]"
                                                     >
-                                                        <a-space-compact block size="small">
+                                                        <a-space-compact block size="middle">
                                                             
                                                             <a-input-number
                                                                 v-model:value="olist.percentage"
@@ -260,6 +260,7 @@
                                                             <a-button
                                                                 v-show="CATE.format_formRef[item.property_id].length > 1"
                                                                 type="dashed"
+                                                                style="margin-left: 10px;"
                                                                 @click="CATE.material_del(dIndex,CATE.format_formRef[item.property_id])"
                                                             >删除</a-button>
                                                         </a-space-compact>
@@ -274,21 +275,16 @@
                                                     <div class="cursor Add_shui_img" " 
                                                         @click="CATE.add_limit(CATE.format_formRef[item.property_id],item.multi_select_max)">
                                                         <a-flex justify="center" align="center" style="height: 100%;font-size: 12px;">
-                                                        添加材质
+                                                        + 添加材质
                                                         </a-flex>
                                                     </div>
                                                 </a-col>
                                                 <!--添加材质 结束-->
                                             </a-row>
                                         </a-col>
-                                        
-
-                                        
-
-                                        
-
 
                                     </template>
+
                                 </template>
 
 
@@ -471,7 +467,154 @@
                                         </p>
                                     </a-col>
 
-                                    <!--度量衡-单选-->
+                                    <!--度量衡 单选 measure 多值输入-->
+                                    <a-col 
+                                        v-else-if="item.type == 'measure' && item.measure_templates[0].value_modules.length>1" 
+                                        :span="12">
+
+                                        <p>
+                                            {{ item.property_name }} 
+                                            <span v-show="item.required ==1" style="color: red;">*必填</span>
+                                        </p>
+
+                                        <p v-if="item.required == 1">
+                                            <a-space >
+
+                                            <template v-for="(items, key) in CATE.format_formRef[item.property_id]">
+                                                <a-form-item 
+                                                    :name="[item.property_id, items.module_id, 'unit_name']"
+                                                    :rules="[{ required: true, message: item.property_name + '不能为空！',trigger: 'change',}]"
+                                                    style="padding: 0;margin: 0;width: 100%"
+                                                >
+                                                    <a-input-number
+                                                        v-model:value="items.unit_name"
+                                                        autoComplete="off"
+                                                        :placeholder="'输入-'+ items.prefix"
+
+                                                    >
+                                                        <template  #addonAfter v-if="items.unit_id != undefined">
+                                                            <a-select 
+                                                            :options="items.op"
+                                                            v-model:value="items.unit_id"
+                                                            style="width: 60px;"
+                                                            :field-names="{
+                                                                label: 'unit_name',
+                                                                value: 'unit_id',
+                                                            }"
+                                                            >
+                                                            </a-select>
+                                                        </template>
+                                                    </a-input-number>
+                                                </a-form-item>
+                                            </template>
+                                            </a-space>
+                                        </p>
+
+                                        <p v-else>
+
+                                            <a-space >
+                                            <template v-for="(items, key) in CATE.format_formRef[item.property_id]">
+                                                <a-form-item 
+                                                    :name="[item.property_id, items.module_id, 'unit_name']"
+                                                    style="padding: 0;margin: 0;width: 100%"
+                                                >
+                                                    <a-input-number
+                                                        v-model:value="items.unit_name"
+                                                        autoComplete="off" 
+                                                        :placeholder="'输入-'+ items.prefix"
+                                                    >
+                                                        <template  #addonAfter v-if="items.unit_id != undefined">
+                                                            <a-select 
+                                                            :options="items.op"
+                                                            v-model:value="items.unit_id"
+                                                            style="width: 60px;"
+                                                            :field-names="{
+                                                                label: 'unit_name',
+                                                                value: 'unit_id',
+                                                            }"
+                                                            >
+                                                            </a-select>
+                                                        </template>
+                                                </a-input-number>
+                                                </a-form-item>
+                                            </template>
+                                            </a-space>
+                                        </p>
+                                    </a-col>
+
+                                    <!--度量衡 单选 measure 单值输入-->
+                                    <a-col 
+                                        v-else-if="item.type == 'measure' && item.measure_templates[0].value_modules.length == 1" 
+                                        :span="6">
+                                        <p>
+                                            {{ item.property_name }} 
+                                            <span v-show="item.required ==1" style="color: red;">*必填</span>
+                                        </p>
+
+                                        <p v-if="item.required == 1"><!--迭代 多度量衡 输入值 必填-->
+
+                                            <template v-for="(items,key) in CATE.format_formRef[item.property_id]">
+
+                                                <a-form-item 
+                                                    :name="[item.property_id, items.module_id, 'unit_name']"
+                                                    :rules="[{ required: true, message: item.property_name + '不能为空！',trigger: 'change',}]"
+                                                >
+
+                                                    <a-input-number
+                                                        v-model:value="items.unit_name" 
+                                                        :placeholder="'输入-'"
+                                                    >
+                                                        <template  #addonAfter>
+                                                            <a-select 
+                                                            :options="items.op"
+                                                            v-model:value="items.unit_id"
+                                                            style="width: 60px;"
+                                                            :field-names="{
+                                                                label: 'unit_name',
+                                                                value: 'unit_id',
+                                                            }"
+                                                            >
+                                                            </a-select>
+                                                        </template>
+                                                    </a-input-number>
+                                                
+                                                </a-form-item>
+                                                
+                                            </template>
+                                        </p>
+
+                                        <p v-else><!--迭代 多度量衡 输入值 非必填-->
+
+                                            <template v-for="(items,key) in CATE.format_formRef[item.property_id]">
+
+                                                <a-form-item 
+                                                    :name="[item.property_id, items.module_id, 'unit_name']"
+                                                >
+                                                    <a-input-number
+                                                        v-model:value="items.unit_name" 
+                                                        :placeholder="'输入-'"
+                                                    >
+                                                        <template  #addonAfter>
+                                                            <a-select 
+                                                            :options="items.op"
+                                                            v-model:value="items.unit_id"
+                                                            style="width: 60px;"
+                                                            :field-names="{
+                                                                label: 'unit_name',
+                                                                value: 'unit_id',
+                                                            }"
+                                                            >
+                                                            </a-select>
+                                                        </template>
+                                                    </a-input-number>
+                                                
+                                                </a-form-item>
+                                                
+                                            </template>
+
+                                        </p>
+
+                                    </a-col>
 
                                     <!--时间戳-->
                                     <a-col :span="6" v-else-if="item.type == 'timestamp'">
@@ -1949,9 +2092,7 @@ export default defineComponent({
                     
                     }else if(type == 'multi_value_measure'){// 度量衡-多选-材质属性
 
-                        console.log(obj,type)
-
-                        CATE.format_formRef[obj.property_id] = [];
+                        CATE.format_formRef[obj.property_id] = [{}];
 
                     }else if(type =='measure'){// 度量衡-单选
 
@@ -2062,6 +2203,8 @@ export default defineComponent({
 
                     return false
                 })
+                
+                console.log('属性', res) // 打印获取去的商品属性
 
                 return res
             },
@@ -2109,12 +2252,25 @@ export default defineComponent({
                     return res_lisr
 
                 }else if(type == 'multi_value_measure'){// 度量衡-多选-材质属性
-                    console.log(item, data)
+
+                    // item参数参考值 data：获取值；
+                    console.log('面料材质多选', item, data)
+                    var result = CATE.de_m_v_m(item, data) // 转义数据格式-返回给-提交对象de_m_v_m方法
+                    
+
                 }else if(type =='measure'){// 度量衡-单选
+
+                    // 单值 重量等
+
+                    // 多值 长宽高等
 
                 }else if(type =='timestamp'){// - 时间戳timestamp
 
+                      // 时间戳：面条(24814) — 生产日期
+
                 }else if(type =='timerange'){// - 时间段timerange
+
+                    // 时间段：阿胶块(28948) — 生产日期
 
                 }
 
@@ -2257,7 +2413,57 @@ export default defineComponent({
                 Object.keys(CATE.format_formRef).forEach(key=>{
                     CATE.format_formRef[key] = undefined
                 })
+            },
+            // 度量衡多选-上传商品json-转义
+            de_m_v_m:(item, data)=>{
+                // item参数参考值 data：获取值；
+                // 我们将data选中得值id+百分比转义为提交新建商品得json数据格式
+
+                var resultList = []
+                data.forEach(obj=>{
+                    obj.diy_type = 1
+                    obj.value = 0
+                    let name_text = ''// 中文字符串名称
+                    let percentage = obj.percentage + '%'; // 百分比
+                    obj.name = name_text + percentage; // 例如："name": "亚麻10%",
+                    // measure_info 
+
+                })
+
+                let value_modules_list = item.measure_templates.value_modules;
+
+                // module_id
+                // value
+                // unit_id
+                // unit_name
+                
+                let demo = {
+                    "measure_info": {
+                        "values": [
+                        {
+                            "module_id": 466,
+                            "value": "亚麻",
+                            "unit_id": 0
+                        },
+                        {
+                            "module_id": 467,
+                            "unit_name": "%",
+                            "unit_id": 15,
+                            "value": "10"
+                        }
+                        ],
+                        "template_id": 208,
+                        "value_name": "亚麻10%"
+                    },
+                    "diy_type": 1,
+                    "name": "亚麻10%",
+                    "value": 0
+                }
+
+
             }
+
+
         }
 
         // 描述详情
