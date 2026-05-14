@@ -16,9 +16,19 @@
         </a-layout-sider>
         <!--左侧 菜单组件  结束-->
 
+
+        <a-layout-sider style="height: 100%;padding: 6px 4px 0 0;">
+          <p>图片操作区域</p>
+          <a-button type="">选择本地图片</a-button>
+          <a-button type="">选择素材库图片</a-button>
+        </a-layout-sider>
+
+
         <a-layout-content class="content_border" >
 
           <h1>白底图</h1>
+
+          <p>图片控制区域</p>
 
         </a-layout-content>
 

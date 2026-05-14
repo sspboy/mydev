@@ -2176,6 +2176,7 @@ export default defineComponent({
                     return false
                 }
             },
+
             // 获取属性
             get_format: async()=>{
 
@@ -2256,7 +2257,7 @@ export default defineComponent({
                     // item参数参考值 data：获取值；
                     console.log('面料材质多选', item, data)
                     var result = CATE.de_m_v_m(item, data) // 转义数据格式-返回给-提交对象de_m_v_m方法
-                    
+                    return result
 
                 }else if(type =='measure'){// 度量衡-单选
 
@@ -2275,6 +2276,7 @@ export default defineComponent({
                 }
 
             },
+
             // 类目预测
             Check_Cate:async(formdata)=>{
                 
@@ -2343,6 +2345,7 @@ export default defineComponent({
                     return false
                 }
             },
+
             // 迭代预测类目选项obj
             de_cate_detaile:(obj)=>{
 
@@ -2380,6 +2383,7 @@ export default defineComponent({
 
                 return cate_obj
             },
+
             // 预测属性：填充到页面
             Ceck_format:async()=>{
 
@@ -2408,62 +2412,66 @@ export default defineComponent({
                     })
                 })
             },
+
             // 清空商品属性
             Clear_format:()=>{
                 Object.keys(CATE.format_formRef).forEach(key=>{
                     CATE.format_formRef[key] = undefined
                 })
             },
+
             // 度量衡多选-上传商品json-转义
             de_m_v_m:(item, data)=>{
+
                 // item参数参考值 data：获取值；
                 // 我们将data选中得值id+百分比转义为提交新建商品得json数据格式
 
                 var resultList = []
+                let template_id = item.measure_templates[0].template_id;// 模板id
+                let value_modules_list = item.measure_templates[0].value_modules; // 输入值的模板
+                // console.log(value_modules_list)
+
                 data.forEach(obj=>{
-                    obj.diy_type = 1
-                    obj.value = 0
-                    let name_text = ''// 中文字符串名称
+
+                    var n_obj = {}
+                    let value_id = obj.value;// 选中的材质id
                     let percentage = obj.percentage + '%'; // 百分比
-                    obj.name = name_text + percentage; // 例如："name": "亚麻10%",
-                    // measure_info 
 
-                })
+                    // 从 options 中查找对应的 name
+                    let selected = item.options.find(opt => opt.value_id === value_id)
+                    let name_text = selected?.name || '';
+                    let name = name_text + percentage; // 例如："name": "亚麻10%",
+                    // 第一层级
+                    n_obj.diy_type = 1;
+                    n_obj.value = 0;
+                    n_obj.name =  name;
 
-                let value_modules_list = item.measure_templates.value_modules;
-
-                // module_id
-                // value
-                // unit_id
-                // unit_name
-                
-                let demo = {
-                    "measure_info": {
+                    // 第二层级measure_info      
+                    n_obj.measure_info = {
                         "values": [
                         {
-                            "module_id": 466,
-                            "value": "亚麻",
+                            "module_id": value_modules_list[0].module_id,
+                            "value": name_text,
                             "unit_id": 0
                         },
                         {
-                            "module_id": 467,
-                            "unit_name": "%",
-                            "unit_id": 15,
-                            "value": "10"
+                            "module_id": value_modules_list[1].module_id,
+                            "unit_name": value_modules_list[1].units[0].unit_name,
+                            "unit_id": value_modules_list[1].units[0].unit_id,
+                            "value": obj.percentage + ''
                         }
                         ],
-                        "template_id": 208,
-                        "value_name": "亚麻10%"
-                    },
-                    "diy_type": 1,
-                    "name": "亚麻10%",
-                    "value": 0
-                }
+                        "template_id": template_id,
+                        "value_name": name
+                    }
 
+                    resultList.push(n_obj)
+                })
+
+                console.log(resultList)
+                return resultList
 
             }
-
-
         }
 
         // 描述详情

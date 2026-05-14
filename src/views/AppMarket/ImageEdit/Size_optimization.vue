@@ -50,7 +50,7 @@
 
             <!-- 1:1 设置 -->
             <div class="panel-section" v-if="cropMode === 'square'">
-              <h3>边长设置（像素）</h3>
+              <p>边长设置（像素）</p>
               <a-input-number
                 v-model:value="squareSize"
                 :min="100"
@@ -65,7 +65,7 @@
 
             <!-- 3:4 尺寸选择 -->
             <div class="panel-section" v-if="cropMode === 'ratio34'">
-              <h3>尺寸选择</h3>
+              <p>尺寸选择</p>
               <a-radio-group v-model:value="ratio34Size" size="small" @change="onRatio34SizeChange">
                 <a-radio-button value="large" class="font_size_12" title="900×1200">大</a-radio-button>
                 <a-radio-button value="medium" class="font_size_12" title="750×1000">中</a-radio-button>

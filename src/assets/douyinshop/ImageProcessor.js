@@ -9,6 +9,16 @@ class ImageProcessor {
 
     constructor() {
         this.cropper = null;
+        this.outputOptions = {};
+    }
+
+    /**
+     * 设置裁剪输出尺寸
+     * @param {number} width - 目标宽度
+     * @param {number} height - 目标高度
+     */
+    setCropBoxData(width, height) {
+        this.outputOptions = { width, height };
     }
 
     /**
@@ -17,39 +27,39 @@ class ImageProcessor {
      * @returns {string} HTML 模板字符串
      */
     _buildTemplate(options = {}) {
-    const {
-        aspectRatio = NaN,
-        initialCoverage = 0.8
-    } = options;
+        const {
+            aspectRatio = NaN,
+            initialCoverage = 0.8
+        } = options;
 
-    const aspectRatioAttr = Number.isFinite(aspectRatio) && aspectRatio > 0
-        ? `aspect-ratio="${aspectRatio}"`
-        : '';
-    const initialCoverageAttr = `initial-coverage="${initialCoverage}"`;
+        const aspectRatioAttr = Number.isFinite(aspectRatio) && aspectRatio > 0
+            ? `aspect-ratio="${aspectRatio}"`
+            : '';
+        const initialCoverageAttr = `initial-coverage="${initialCoverage}"`;
 
-    return (
-        // ===== 关键修改 1：cropper-canvas 添加 style="width:100%;height:100%;display:block;" =====
-        '<cropper-canvas background style="width:100%;height:100%;display:block;">'
-        // ===== 关键修改 2：cropper-image 添加 style="width:100%;height:100%;object-fit:contain;" =====
-        + '<cropper-image style="width:100%;height:100%;object-fit:contain;" rotatable scalable skewable translatable></cropper-image>'
-        + '<cropper-shade hidden></cropper-shade>'
-        + '<cropper-handle action="select" plain></cropper-handle>'
-        + `<cropper-selection ${initialCoverageAttr} ${aspectRatioAttr} movable resizable zoomable keyboard>`
-        + '<cropper-grid role="grid" bordered covered></cropper-grid>'
-        + '<cropper-crosshair centered></cropper-crosshair>'
-        + '<cropper-handle action="move" theme-color="rgba(255, 255, 255, 0.35)"></cropper-handle>'
-        + '<cropper-handle action="n-resize"></cropper-handle>'
-        + '<cropper-handle action="e-resize"></cropper-handle>'
-        + '<cropper-handle action="s-resize"></cropper-handle>'
-        + '<cropper-handle action="w-resize"></cropper-handle>'
-        + '<cropper-handle action="ne-resize"></cropper-handle>'
-        + '<cropper-handle action="nw-resize"></cropper-handle>'
-        + '<cropper-handle action="se-resize"></cropper-handle>'
-        + '<cropper-handle action="sw-resize"></cropper-handle>'
-        + '</cropper-selection>'
-        + '</cropper-canvas>'
-    );
-}
+        return (
+            // ===== 关键修改 1：cropper-canvas 添加 style="width:100%;height:100%;display:block;" =====
+            '<cropper-canvas background style="width:100%;height:100%;display:block;">'
+            // ===== 关键修改 2：cropper-image 添加 style="width:100%;height:100%;object-fit:contain;" =====
+            + '<cropper-image style="width:100%;height:100%;object-fit:contain;" rotatable scalable skewable translatable></cropper-image>'
+            + '<cropper-shade hidden></cropper-shade>'
+            + '<cropper-handle action="select" plain></cropper-handle>'
+            + `<cropper-selection ${initialCoverageAttr} ${aspectRatioAttr} movable resizable zoomable keyboard>`
+            + '<cropper-grid role="grid" bordered covered></cropper-grid>'
+            + '<cropper-crosshair centered></cropper-crosshair>'
+            + '<cropper-handle action="move" theme-color="rgba(255, 255, 255, 0.35)"></cropper-handle>'
+            + '<cropper-handle action="n-resize"></cropper-handle>'
+            + '<cropper-handle action="e-resize"></cropper-handle>'
+            + '<cropper-handle action="s-resize"></cropper-handle>'
+            + '<cropper-handle action="w-resize"></cropper-handle>'
+            + '<cropper-handle action="ne-resize"></cropper-handle>'
+            + '<cropper-handle action="nw-resize"></cropper-handle>'
+            + '<cropper-handle action="se-resize"></cropper-handle>'
+            + '<cropper-handle action="sw-resize"></cropper-handle>'
+            + '</cropper-selection>'
+            + '</cropper-canvas>'
+        );
+    }
 
     /**
      * 初始化 Cropper
@@ -113,7 +123,7 @@ class ImageProcessor {
     async getCroppedCanvas(options = {}) {
         const selection = this.cropper?.getCropperSelection();
         if (!selection) return null;
-        return selection.$toCanvas(options);
+        return selection.$toCanvas({ ...this.outputOptions, ...options });
     }
 
     /**
@@ -232,6 +242,7 @@ export function createSquareCropper(imageElement, sideLength = 800) {
         aspectRatio: 1,
         initialCoverage: 0.8
     });
+    processor.setCropBoxData(sideLength, sideLength);
     return processor;
 }
 
@@ -254,6 +265,7 @@ export function create34Cropper(imageElement, size = 'medium') {
         aspectRatio: preset.ratio,
         initialCoverage: 0.8
     });
+    processor.setCropBoxData(preset.width, preset.height);
     return processor;
 }
 
