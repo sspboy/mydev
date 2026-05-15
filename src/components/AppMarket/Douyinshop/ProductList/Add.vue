@@ -482,12 +482,12 @@
 
                                             <template v-for="(items, key) in CATE.format_formRef[item.property_id]">
                                                 <a-form-item 
-                                                    :name="[item.property_id, items.module_id, 'unit_name']"
+                                                    :name="[item.property_id, items.module_id, 'value']"
                                                     :rules="[{ required: true, message: item.property_name + '不能为空！',trigger: 'change',}]"
                                                     style="padding: 0;margin: 0;width: 100%"
                                                 >
                                                     <a-input-number
-                                                        v-model:value="items.unit_name"
+                                                        v-model:value="items.value"
                                                         autoComplete="off"
                                                         :placeholder="'输入-'+ items.prefix"
 
@@ -515,11 +515,11 @@
                                             <a-space >
                                             <template v-for="(items, key) in CATE.format_formRef[item.property_id]">
                                                 <a-form-item 
-                                                    :name="[item.property_id, items.module_id, 'unit_name']"
+                                                    :name="[item.property_id, items.module_id, 'value']"
                                                     style="padding: 0;margin: 0;width: 100%"
                                                 >
                                                     <a-input-number
-                                                        v-model:value="items.unit_name"
+                                                        v-model:value="items.value"
                                                         autoComplete="off" 
                                                         :placeholder="'输入-'+ items.prefix"
                                                     >
@@ -556,12 +556,12 @@
                                             <template v-for="(items,key) in CATE.format_formRef[item.property_id]">
 
                                                 <a-form-item 
-                                                    :name="[item.property_id, items.module_id, 'unit_name']"
+                                                    :name="[item.property_id, items.module_id, 'value']"
                                                     :rules="[{ required: true, message: item.property_name + '不能为空！',trigger: 'change',}]"
                                                 >
 
                                                     <a-input-number
-                                                        v-model:value="items.unit_name" 
+                                                        v-model:value="items.value" 
                                                         :placeholder="'输入-'"
                                                     >
                                                         <template  #addonAfter>
@@ -588,16 +588,16 @@
                                             <template v-for="(items,key) in CATE.format_formRef[item.property_id]">
 
                                                 <a-form-item 
-                                                    :name="[item.property_id, items.module_id, 'unit_name']"
+                                                    :name="[item.property_id, items.module_id, 'value']"
                                                 >
                                                     <a-input-number
-                                                        v-model:value="items.unit_name" 
+                                                        v-model:value="items.value" 
                                                         :placeholder="'输入-'"
                                                     >
                                                         <template  #addonAfter>
                                                             <a-select 
                                                             :options="items.op"
-                                                            v-model:value="items.unit_id"
+                                                            v-model:value="items.value"
                                                             style="width: 60px;"
                                                             :field-names="{
                                                                 label: 'unit_name',
@@ -2096,7 +2096,24 @@ export default defineComponent({
 
                     }else if(type =='measure'){// 度量衡-单选
 
-                        CATE.format_formRef[obj.property_id] = undefined;
+                        const measure_Data= {} // 绑定表单dui像
+
+                        obj.measure_templates[0].value_modules.forEach(item=>{
+                            var mo_obj = {}
+                            mo_obj.module_id = item.module_id;
+                            mo_obj.prefix = item.prefix;
+                            mo_obj.suffix = item.suffix;
+                            mo_obj.value = '';
+                            if(item.units.length >0){
+                                mo_obj.unit_id = item.units[0].unit_id;
+                                mo_obj.op = item.units;
+                            }
+                            measure_Data[item.module_id] = mo_obj;
+
+                        })
+
+
+                        CATE.format_formRef[obj.property_id] = measure_Data;
 
                     }else if(type =='timestamp'){// - 时间戳timestamp
 
@@ -2219,7 +2236,8 @@ export default defineComponent({
                 let multi_select_max = item.multi_select_max;
                 let options = item.options; // 选项
                 let diy_type = item.diy_type; // 是否支撑自定义
-                console.log(type)
+
+
                 // 文本 text
                 if(type == 'text'){
 
@@ -2255,21 +2273,30 @@ export default defineComponent({
                 }else if(type == 'multi_value_measure'){// 度量衡-多选-材质属性
 
                     // item参数参考值 data：获取值；
-                    console.log('面料材质多选', item, data)
+                    // console.log('面料材质多选', item, data)
                     var result = CATE.de_m_v_m(item, data) // 转义数据格式-返回给-提交对象de_m_v_m方法
                     return result
 
                 }else if(type =='measure'){// 度量衡-单选
 
-                    // 单值 重量等
-
-                    // 多值 长宽高等
+                    let value_modules = item.measure_templates[0].value_modules;
+                    if(value_modules.length == 1){// 单值 
+                        var result = CATE.de_m_v_one(item, data) // 转义数据格式-返回给-提交对象de_m_v_m方法
+                        return result
+                    }else if(value_modules.length > 1){ // 多值-长宽高等
+                        var result = CATE.de_m_v_more(item, data) // 转义数据格式-返回给-提交对象de_m_v_m方法
+                        return result
+                    }
 
                 }else if(type =='timestamp'){// - 时间戳timestamp
 
-                      // 时间戳：面条(24814) — 生产日期
+                    console.log('时间戳',item, data)
+
+                    // 时间戳：面条(24814) — 生产日期
 
                 }else if(type =='timerange'){// - 时间段timerange
+
+                    console.log('时间段',item, data)
 
                     // 时间段：阿胶块(28948) — 生产日期
 
@@ -2420,7 +2447,7 @@ export default defineComponent({
                 })
             },
 
-            // 度量衡多选-上传商品json-转义
+            // 度量衡 多选-上传商品json-转义
             de_m_v_m:(item, data)=>{
 
                 // item参数参考值 data：获取值；
@@ -2468,10 +2495,84 @@ export default defineComponent({
                     resultList.push(n_obj)
                 })
 
-                console.log(resultList)
+                // console.log(resultList)
                 return resultList
 
+            },
+
+            // 度量衡 单选 单值- 上传商品json-转义
+            de_m_v_one:(item, data)=>{
+
+                var resultList = []
+                let value_modules = item.measure_templates[0].value_modules;
+                let template_id = item.measure_templates[0].template_id;// 模板id
+                let module_id = Object.keys(data)[0];
+                let obj = data[module_id]
+                console.log('度量衡-单选-单值',obj)
+
+                let selected = obj.op.find(opt => opt.unit_id === obj.unit_id)
+
+                let unit_name = selected?.unit_name || '';
+
+                // console.log('度量衡-单选-单值',unit_name)
+
+                let name = obj.value + unit_name;  // 选中的材质id
+
+                let n_obj = {
+                            "measure_info": {
+                                "template_id": template_id,
+                                "values": [
+                                    {
+                                    "module_id": module_id,
+                                    "prefix": obj.prefix,
+                                    "suffix": obj.suffix,
+                                    "value": obj.value,
+                                    "unit_id": obj.unit_id,
+                                    "unit_name": unit_name
+                                    }
+                                ]
+                            },
+                            "value": 0,
+                            "diy_type": 1,
+                            "name": name
+                        }
+                resultList.push(n_obj)
+
+                return resultList
+            },
+
+            // 度量衡 单选 多值-上传商品json-转义
+            de_m_v_more:(item, data)=>{
+
+                console.log('度量衡-单选-多值',item,data)
+
+                var resultList = []
+                let value_modules = item.measure_templates[0].value_modules;
+                let demo = [
+                        {
+                            "measure_info": {
+                            "template_id": 126,
+                            "values": [
+                                {
+                                "module_id": 185,
+                                "prefix": "",
+                                "suffix": "-",
+                                "value": "300",
+                                "unit_id": 38,
+                                "unit_name": "cm"
+                                }
+                            ]
+                            },
+                            "value": 0,
+                            "diy_type": 1,
+                            "name": "300cm-"
+                        }
+                    ]
+                return resultList
             }
+            // 水洗标-吊牌图片
+
+
         }
 
         // 描述详情
