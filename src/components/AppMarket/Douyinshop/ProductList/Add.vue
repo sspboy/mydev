@@ -128,18 +128,6 @@
                                 PS:需要填写【标题】、【主图】后获取系统推荐的类目、以及属性;
                             </span>
 
-
-                            <!-- <a-cascader
-                                style="width:70% ;margin-left: 10px;"
-                                v-model:value="CATE.cate_name.value"
-                                :options="CATE.options.value"
-                                :load-data="CATE.loadData"
-                                @change="CATE.loadFormat"
-                                :allowClear="false"
-                                placeholder="选择分类"
-                            /> -->
-
-
                         </p>
 
 
@@ -186,9 +174,18 @@
                                                     -->
                                                     <template v-if="item.property_pic_rule.available == true">
 
+                                                        <div v-if="CATE.category_property_pics.value != undefined" class="cursor call_shui_img">
+                                                            <a-image style="height:78px;" :src="CATE.category_property_pics.value"></a-image>
+                                                            <span class="clear_shui_img">
+                                                                <a-button type="text" size="small" @click="CATE.clear_img"> 
+                                                                    <DeleteOutlined />
+                                                                </a-button>
+                                                            </span>
+                                                        </div>
+
                                                         <!-- <p>水洗标/吊牌图</p> -->
-                                                        <div class="cursor Add_shui_img" v-if="CATE.category_property_pics.value == undefined" 
-                                                            @click="console.log('点击上传水洗标')">
+                                                        <div class="cursor Add_shui_img" v-else-if="CATE.category_property_pics.value == undefined" 
+                                                            @click="PAGEDATA.change_material_type('tag_img')"">
                                                             <a-flex justify="center" align="center" style="height: 100%;font-size: 12px;">
                                                             + 水洗标/吊牌
                                                             </a-flex>
@@ -287,6 +284,9 @@
 
                                 </template>
 
+                                <!--必填属性-->
+
+                                <!--非必填属性-->
 
                                 <template v-for="item in CATE.format.value" >
                                     
@@ -650,7 +650,7 @@
 
                         <a-row>
                             <!--白底图 -- white_back_ground_pic_url -->
-                            <a-col :span="24">
+                            <a-col :span="4">
                                 
                                 <div style="width: 100%;height:120px;margin: 20px 0 0 0;">
 
@@ -677,52 +677,13 @@
                                     </p>
 
                                 </div>
-                            </a-col>
-
-                            <!--3比4长图 -- long_pic_url -->
-                            <a-col :span="16">
-                                <a-divider 
-                                    orientation="left" 
-                                    orientation-margin="0px"
-                                >
-                                    3:4长图 
-                                </a-divider>
-
-                                <div style="width: 100%;height: 160px;">
-
-                                    <p class="img_3_4_pic" v-for="(item,index) in Longimg_Fun.PicList.value">
-                                        
-                                        <a-image :height="110" :src="item.byte_url" />
-
-                                        <span style="display:block;margin: 16px 0 0 0;width: 100%;text-align: center;">
-                                            <a-button type="text" size="small" @click="Longimg_Fun.del(index)"> 
-                                                <DeleteOutlined />
-                                            </a-button>
-                                        </span>
-                                    </p>
-
-
-                                    <!--添加按钮-->
-                                    <p 
-                                        @click="PAGEDATA.change_material_type('long_img_List')" 
-                                        class="cursor Add_3_4_img"
-                                        v-if="Longimg_Fun.PicList.value.length < 5"
-                                    >
-                                        <a-flex justify="center" align="center" style="height: 100%;">
-                                            +
-                                        </a-flex>
-                                    </p>
-
-                                </div>
 
                             </a-col>
 
                             <!--视频 -- material_video_id -->
-                            <a-col :span="8">
+                            <a-col :span="4">
 
-                                <a-divider orientation="left" orientation-margin="0px">视频</a-divider>
-
-                                <div style="width: 100%;height:120px;">
+                                <div style="width: 100%;height:120px;margin: 20px 0 0 0;">
 
                                     <p class="img_3_4_pic" v-for="item in video_Fun.PicList.value">
                                         <a-image :height="110" :src="item.video_info.video_cover_url" />
@@ -736,190 +697,224 @@
                                     <!--添加按钮-->
                                     <p 
                                         @click="PAGEDATA.change_material_type('video_info')" 
-                                        class="cursor Add_3_4_img"
+                                        class="cursor Add_3_4_img font_size_12"
                                         v-if="video_Fun.PicList.value.length < 1"
                                     >
-                                        <a-flex justify="center" align="center" style="height: 100%;">
-                                            +
+                                        <a-flex justify="center" align="center" style="height: 100%;" class="font_size_12">
+                                            + 视频
                                         </a-flex>
                                     </p>
                                 </div>
                             </a-col>
 
-                            <!-- 基础信息 -->
-                             <a-form
-                                ref="formRef"
-                                name="ProductInfo"
-                                :model="formState"
-                                :rules="rules"
-                            >
-                                <a-row :gutter="[16,0]">
+                            <!--3比4长图 -- long_pic_url -->
+                            <a-col :span="16">
+                                
+                                <div style="width: 100%;height: 160px;margin: 20px 0 0 0;">
 
-                                    <a-col :span="8">
-                                        <a-form-item 
-                                            label="商品类型" 
-                                            name="product_type"
-                                        >
-                                            <a-select v-model:value="formState.product_type" placeholder="选择类型">
-                                                <a-select-option value="0">普通</a-select-option>
-                                                <a-select-option value="3">虚拟</a-select-option>
-                                                <a-select-option value="3">玉石闪购</a-select-option>
-                                                <a-select-option value="3">云闪购</a-select-option>
-                                            </a-select>
-                                        </a-form-item>
-                                    </a-col>
+                                    <p class="img_3_4_pic" v-for="(item,index) in Longimg_Fun.PicList.value">
+                                        
+                                        <a-image :height="80" :src="item.byte_url" />
 
-                                    <a-col :span="8">
-                                        <a-form-item 
-                                            label="支付方式" 
-                                            name="pay_type"
-                                        >
-                                            <a-select v-model:value="formState.pay_type" placeholder="选择支付方式">
-                                                <a-select-option value="0">货到付款</a-select-option>
-                                                <a-select-option value="1">在线支付</a-select-option>
-                                                <a-select-option value="2">货到付款+在线支付</a-select-option>
-                                            </a-select>
-                                        </a-form-item>
-                                    </a-col>
-                                    
-                                    <a-col :span="8">
-                                        <a-form-item 
-                                            label="库存类型" 
-                                            name="reduce_type"
-                                        >
-                                            <a-select v-model:value="formState.reduce_type" placeholder="选择方式">
-                                                <a-select-option value="1">拍下减库存</a-select-option>
-                                                <a-select-option value="2">付款减库存</a-select-option>
-                                            </a-select>
-                                        </a-form-item>
-                                    </a-col>
+                                        <span style="display:block;margin: 16px 0 0 0;width: 100%;text-align: center;">
+                                            <a-button type="text" size="small" @click="Longimg_Fun.del(index)"> 
+                                                <DeleteOutlined />
+                                            </a-button>
+                                        </span>
+                                    </p>
 
-                                    <a-col :span="8">
-                                        <a-form-item
-                                            label="客服电话"
-                                            name="mobile"
-                                            
-                                        >
-                                            <a-input v-model:value="formState.mobile" placeholder="输入客服电话"/>
-                                        </a-form-item>
-                                    </a-col>
 
-                                    <a-col :span="8">
-                                        <a-form-item
-                                            label="运费模板"
-                                            name="freight_id"
-                                        >
-                                            <a-input-group compact>
-                                                <a-input v-model:value="formState.freight_id.name" placeholder="选择运费模板" disabled style="width: calc(74%);padding: 5.5px;" />
-                                                <a-button class="font_size_12" @click="PAGEDATA.chang_freighttemplate">选择</a-button>
-                                            </a-input-group>
-                                        </a-form-item>                                    
-                                    </a-col>
+                                    <!--添加按钮-->
+                                    <p 
+                                        @click="PAGEDATA.change_material_type('long_img_List')" 
+                                        class="cursor Add_3_4_img font_size_12"
+                                        v-if="Longimg_Fun.PicList.value.length < 5"
+                                    >
+                                        <a-flex justify="center" align="center" style="height: 100%;" class="font_size_12">
+                                            + 3:4长图
+                                        </a-flex>
+                                    </p>
 
-                                    <a-col :span="8">
-                                        <a-form-item
-                                            label="推荐语"
-                                            name="recommend_remark"
-                                        >
-                                            <a-input v-model:value="formState.recommend_remark" 
-                                            autoComplete="off" 
-                                            show-count :maxlength="30" 
-                                            placeholder="输入商品推荐语"
-                                            />
-                                        </a-form-item>
-                                    </a-col>
+                                </div>
 
-                                    <a-col :span="8">
-                                        <a-form-item
-                                            label="商家备注"
-                                            name="remark"
-                                        >
-                                            <a-input v-model:value="formState.remark" autoComplete="off" placeholder="商家可见备注"  show-count :maxlength="30" />
-                                        </a-form-item>
-                                    </a-col>
+                            </a-col>
 
-                                    <a-col :span="8">
-                                        <a-form-item
-                                            label="尺码模板"
-                                            name="size_info_template_id"
-                                        >
-                                            <a-input-group compact>
-                                                <a-input v-model:value="formState.size_info_template_id.name" placeholder="请选择尺码模板" disabled style="width: calc(74%);padding: 5.5px;" />
-                                                <a-button @click="PAGEDATA.chang_sizetemplate">选择</a-button>
-                                            </a-input-group>
-                                        </a-form-item>                                    
-                                    </a-col>
-
-                                    <a-col :span="8" >
-                                        <a-form-item 
-                                            label="售后服务" 
-                                            name="after_sale_service"
-                                        >
-                                            <a-select v-model:value="formState.after_sale_service" placeholder="选择方式">
-                                                <a-select-option value="1">支持7天无理由</a-select-option>
-                                                <a-select-option value="0">不支持7天无理由</a-select-option>
-                                            </a-select>
-                                        </a-form-item>
-                                    </a-col>
-
-                                    <a-col :span="8">
-                                        <a-form-item 
-                                            label="发货模式" 
-                                            name="presell_type"
-                                        >
-                                            <a-select v-model:value="formState.presell_type" placeholder="选择方式">
-                                                <a-select-option value="0">现货发货</a-select-option>
-                                            </a-select>
-                                        </a-form-item>
-
-                                    </a-col>
-
-                                    <a-col :span="8">
-                                        <a-form-item
-                                            label="最少购买"
-                                            name="minimum_per_order"
-                                        >
-                                            <a-input-number placeholder="用户每次下单最少限购件数"
-                                            style="width: calc(100%);"
-                                             v-model:value="formState.minimum_per_order"
-                                            :min="1" :max="1000000" />
-
-                                        </a-form-item>
-                                    </a-col>
-
-                                    <a-col :span="8">
-                                        <a-form-item
-                                            label="最多购买"
-                                            name="maximum_per_order"
-                                        >
-                                            <a-input-number 
-                                                placeholder="用户每次下单最多限购件数" 
-                                                style="width: calc(100%);" 
-                                                v-model:value="formState.maximum_per_order" 
-                                                :min="1" :max="1000000" 
-                                                />
-
-                                        </a-form-item>
-                                    </a-col>
-
-                                    <a-col :span="8">
-                                        <a-form-item
-                                            label="累计限购"
-                                            name="limit_per_buyer"
-                                        >
-                                            <a-input-number 
-                                                placeholder="每个用户累计限购件数" 
-                                                style="width: calc(100%);"
-                                                v-model:value="formState.limit_per_buyer" 
-                                                :min="1" :max="1000000" />
-
-                                        </a-form-item>
-                                    </a-col>
-
-                                </a-row>
-                             </a-form>
+                            
 
                         </a-row>
+
+                        <!-- 基础信息 -->
+                        <a-form
+                        ref="formRef"
+                        name="ProductInfo"
+                        :model="formState"
+                        :rules="rules"
+                    >
+                        <a-row :gutter="[16,0]">
+
+                            <a-col :span="8">
+                                <a-form-item 
+                                    label="商品类型" 
+                                    name="product_type"
+                                >
+                                    <a-select v-model:value="formState.product_type" placeholder="选择类型">
+                                        <a-select-option value="0">普通</a-select-option>
+                                        <a-select-option value="3">虚拟</a-select-option>
+                                        <a-select-option value="3">玉石闪购</a-select-option>
+                                        <a-select-option value="3">云闪购</a-select-option>
+                                    </a-select>
+                                </a-form-item>
+                            </a-col>
+
+                            <a-col :span="8">
+                                <a-form-item 
+                                    label="支付方式" 
+                                    name="pay_type"
+                                >
+                                    <a-select v-model:value="formState.pay_type" placeholder="选择支付方式">
+                                        <a-select-option value="0">货到付款</a-select-option>
+                                        <a-select-option value="1">在线支付</a-select-option>
+                                        <a-select-option value="2">货到付款+在线支付</a-select-option>
+                                    </a-select>
+                                </a-form-item>
+                            </a-col>
+                            
+                            <a-col :span="8">
+                                <a-form-item 
+                                    label="库存类型" 
+                                    name="reduce_type"
+                                >
+                                    <a-select v-model:value="formState.reduce_type" placeholder="选择方式">
+                                        <a-select-option value="1">拍下减库存</a-select-option>
+                                        <a-select-option value="2">付款减库存</a-select-option>
+                                    </a-select>
+                                </a-form-item>
+                            </a-col>
+
+                            <a-col :span="8">
+                                <a-form-item
+                                    label="客服电话"
+                                    name="mobile"
+                                    
+                                >
+                                    <a-input v-model:value="formState.mobile" placeholder="输入客服电话"/>
+                                </a-form-item>
+                            </a-col>
+
+                            <a-col :span="8">
+                                <a-form-item
+                                    label="运费模板"
+                                    name="freight_id"
+                                >
+                                    <a-input-group compact>
+                                        <a-input v-model:value="formState.freight_id.name" placeholder="选择运费模板" disabled style="width: calc(74%);padding: 5.5px;" />
+                                        <a-button class="font_size_12" @click="PAGEDATA.chang_freighttemplate">选择</a-button>
+                                    </a-input-group>
+                                </a-form-item>                                    
+                            </a-col>
+
+                            <a-col :span="8">
+                                <a-form-item
+                                    label="推荐语"
+                                    name="recommend_remark"
+                                >
+                                    <a-input v-model:value="formState.recommend_remark" 
+                                    autoComplete="off" 
+                                    show-count :maxlength="30" 
+                                    placeholder="输入商品推荐语"
+                                    />
+                                </a-form-item>
+                            </a-col>
+
+                            <a-col :span="8">
+                                <a-form-item
+                                    label="商家备注"
+                                    name="remark"
+                                >
+                                    <a-input v-model:value="formState.remark" autoComplete="off" placeholder="商家可见备注"  show-count :maxlength="30" />
+                                </a-form-item>
+                            </a-col>
+
+                            <a-col :span="8">
+                                <a-form-item
+                                    label="尺码模板"
+                                    name="size_info_template_id"
+                                >
+                                    <a-input-group compact>
+                                        <a-input v-model:value="formState.size_info_template_id.name" placeholder="请选择尺码模板" disabled style="width: calc(74%);padding: 5.5px;" />
+                                        <a-button @click="PAGEDATA.chang_sizetemplate">选择</a-button>
+                                    </a-input-group>
+                                </a-form-item>                                    
+                            </a-col>
+
+                            <a-col :span="8" >
+                                <a-form-item 
+                                    label="售后服务" 
+                                    name="after_sale_service"
+                                >
+                                    <a-select v-model:value="formState.after_sale_service" placeholder="选择方式">
+                                        <a-select-option value="1">支持7天无理由</a-select-option>
+                                        <a-select-option value="0">不支持7天无理由</a-select-option>
+                                    </a-select>
+                                </a-form-item>
+                            </a-col>
+
+                            <a-col :span="8">
+                                <a-form-item 
+                                    label="发货模式" 
+                                    name="presell_type"
+                                >
+                                    <a-select v-model:value="formState.presell_type" placeholder="选择方式">
+                                        <a-select-option value="0">现货发货</a-select-option>
+                                    </a-select>
+                                </a-form-item>
+
+                            </a-col>
+
+                            <a-col :span="8">
+                                <a-form-item
+                                    label="最少购买"
+                                    name="minimum_per_order"
+                                >
+                                    <a-input-number placeholder="用户每次下单最少限购件数"
+                                    style="width: calc(100%);"
+                                        v-model:value="formState.minimum_per_order"
+                                    :min="1" :max="1000000" />
+
+                                </a-form-item>
+                            </a-col>
+
+                            <a-col :span="8">
+                                <a-form-item
+                                    label="最多购买"
+                                    name="maximum_per_order"
+                                >
+                                    <a-input-number 
+                                        placeholder="用户每次下单最多限购件数" 
+                                        style="width: calc(100%);" 
+                                        v-model:value="formState.maximum_per_order" 
+                                        :min="1" :max="1000000" 
+                                        />
+
+                                </a-form-item>
+                            </a-col>
+
+                            <a-col :span="8">
+                                <a-form-item
+                                    label="累计限购"
+                                    name="limit_per_buyer"
+                                >
+                                    <a-input-number 
+                                        placeholder="每个用户累计限购件数" 
+                                        style="width: calc(100%);"
+                                        v-model:value="formState.limit_per_buyer" 
+                                        :min="1" :max="1000000" />
+
+                                </a-form-item>
+                            </a-col>
+
+                        </a-row>
+                        </a-form>
 
                     </a-tab-pane>
 
@@ -1185,6 +1180,7 @@ import * as TABLE from '@/assets/JS_Model/TableOperate';
 import * as utils from '@/assets/JS_Model/public_model';
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue' // 描述详情富媒体
 import '@wangeditor/editor/dist/css/style.css' // 引入富媒体编辑器样式 css
+import { CATE } from '@/assets/douyinshop/productmanagement/Add';
 
 // 商品管理->编辑操作方法
 // import {
@@ -1258,6 +1254,8 @@ export default defineComponent({
                     DES.add_img(data)
                 }else if(type == 'spec_img'){           // 添加规格图片
                     SPECS.add_img(data)
+                }else if(type == 'tag_img'){            // 添加吊牌水洗标
+                    CATE.add_img(data)
                 }
             },
             // 变更添加素材类型
@@ -1960,7 +1958,7 @@ export default defineComponent({
 
             format_formRef:reactive({}),
 
-            // 吊牌
+            // 吊牌-水洗标
             category_property_pics:ref(undefined),
 
             // 自定义【面料材质】的名称
@@ -2065,6 +2063,7 @@ export default defineComponent({
 
                     // 添加品牌无品牌选项
                     var property_name = obj.property_name
+
                     if(property_name == '品牌'){
                         var No_brand_obj = {
                             "value_id": 596120136,
@@ -2095,6 +2094,8 @@ export default defineComponent({
                         CATE.format_formRef[obj.property_id] = [{}];
 
                     }else if(type =='measure'){// 度量衡-单选
+                        
+                        console.log(obj)
 
                         const measure_Data= {} // 绑定表单dui像
 
@@ -2111,7 +2112,6 @@ export default defineComponent({
                             measure_Data[item.module_id] = mo_obj;
 
                         })
-
 
                         CATE.format_formRef[obj.property_id] = measure_Data;
 
@@ -2506,9 +2506,9 @@ export default defineComponent({
                 var resultList = []
                 let value_modules = item.measure_templates[0].value_modules;
                 let template_id = item.measure_templates[0].template_id;// 模板id
-                let module_id = Object.keys(data)[0];
+                let module_id = parseInt(Object.keys(data)[0]);
                 let obj = data[module_id]
-                console.log('度量衡-单选-单值',obj)
+                // console.log('度量衡-单选-单值',obj)
 
                 let selected = obj.op.find(opt => opt.unit_id === obj.unit_id)
 
@@ -2526,7 +2526,7 @@ export default defineComponent({
                                     "module_id": module_id,
                                     "prefix": obj.prefix,
                                     "suffix": obj.suffix,
-                                    "value": obj.value,
+                                    "value": String(obj.value),
                                     "unit_id": obj.unit_id,
                                     "unit_name": unit_name
                                     }
@@ -2535,7 +2535,8 @@ export default defineComponent({
                             "value": 0,
                             "diy_type": 1,
                             "name": name
-                        }
+                }
+
                 resultList.push(n_obj)
 
                 return resultList
@@ -2569,9 +2570,17 @@ export default defineComponent({
                         }
                     ]
                 return resultList
-            }
+            },
             // 水洗标-吊牌图片
-
+            add_img:(data)=>{
+                var img_byte_url = data[0].byte_url
+                CATE.category_property_pics.value = img_byte_url
+                console.log(CATE.category_property_pics.value)
+            },
+            // 清除水洗标-吊牌图片
+            clear_img:()=>{
+                CATE.category_property_pics.value = undefined;
+            }
 
         }
 
@@ -2893,14 +2902,16 @@ export default defineComponent({
 <style scoped>
 .content{padding: 0;margin: 20px 0 0 0;background: '#fff';overflow-y: auto;overflow-x: hidden;height: 90vh;}
 .img_pic{height: 100px;width: 100px;border: 1px silver solid; border-radius: 4px;margin: 0 10px 0 0;float: left;padding: 10px;}
-.img_3_4_pic{height: 132px;width: 99px;background-color: #f2f2f2;border: 1px silver solid; border-radius: 4px;margin: 0 10px 0 0;float: left;padding: 10px;text-align: center;}
+.img_3_4_pic{height: 100px;width: 100px;border: 1px silver solid; border-radius: 4px;margin: 0 10px 0 0;float: left;padding: 10px;text-align: center;}
 .Add_img{height: 100px;width: 100px;background-color: #fff;border: 1px silver dotted; border-radius: 4px;margin: 0 10px 0 0;float: left;text-align: center;}
 .Add_img :hover{color: #2600ff;border:1px #2600ff dotted;border-radius: 4px;}
-.Add_3_4_img{height: 132px;width: 99px;background-color: #fff;border: 1px silver dotted; border-radius: 4px;margin: 0 10px 0 0;float: left;text-align: center;}
+.Add_3_4_img{height: 100px;width: 100px;background-color: #fff;border: 1px silver dotted; border-radius: 4px;margin: 0 10px 0 0;float: left;text-align: center;}
 .Add_3_4_img :hover{color: #2600ff;border:1px #2600ff dotted;border-radius: 4px;}
 .add_btn_class{width: 40px; margin:0 0 0 20px;}
 /* .ant-form-item{margin-bottom: 0px ! important} */
 .Add_shui_img{height: 90px;width: 100%;background-color: #fff;border: 1px silver dotted; border-radius: 4px;margin: 0 10px 0 0;float: left;text-align: center;}
 .Add_shui_img :hover{color: #2600ff;border:1px #2600ff dotted;border-radius: 4px;}
- 
+.call_shui_img{height: 90px;width: 100%;background-color: #fff;border: 1px silver dotted; border-radius: 4px;margin: 0 10px 0 0;float: left;text-align: center;padding: 4px 0 0 0;}
+.clear_shui_img{margin: 0 0 0 6px;}
+
 </style>

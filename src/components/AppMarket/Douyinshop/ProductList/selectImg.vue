@@ -122,7 +122,7 @@
                             </div>
 
                             <!-- 列表 为空状态 -->
-                            <div style="height:420px;overflow-x: hidden;overflow-y: auto;padding: 20px 0 0 0;">
+                            <div style="height:480px;overflow-x: hidden;overflow-y: auto;padding: 20px 0 0 0;">
                                 
 
                                 <a-checkbox-group  v-model:value="PAGEDATA.check_value" style="width: 100%;height: 100%;">
@@ -140,7 +140,7 @@
                                         <a-list-item key="item.material_id">
 
                                             <!--图片文件 显示方式-->
-                                            <div v-if="item.material_type == 'photo'" class="Listimgbox">
+                                            <a-card v-if="item.material_type == 'photo'" size="small" class="Listimgbox" hoverable>
 
                                                 <div class="floating-badge"><PictureOutlined /> 图片</div>
 
@@ -176,10 +176,10 @@
                                                     </a-space>
                                                 </p>
 
-                                            </div>
+                                            </a-card>
 
                                             <!--视频 显示方式-->
-                                            <div v-else-if="item.material_type == 'video'" class="Listimgbox">
+                                            <a-card v-else-if="item.material_type == 'video'" size="small" class="Listimgbox" hoverable>
                                                 <div class="floating-badge-video"><PlaySquareOutlined />视频</div>
                                                 <a-image
                                                     :height="100"
@@ -207,7 +207,7 @@
                                                         </a-typography-link>
                                                     </a-space>
                                                 </p>
-                                            </div>
+                                            </a-card>
 
                                         </a-list-item>
 
@@ -1355,7 +1355,7 @@ export default defineComponent({
 .footerStyle{text-align: center;background-color: #fff;padding: 0 0 0 20px;}
 .confimImg{text-align: left;padding: 10px 0 10px 0;margin: 0 0 10px 0;height:300px;width: 100%;overflow-x: auto;overflow-y: auto;border-bottom: 1px #f2f2f2 solid;}
 .confimbox{width: 60px;height: 60px;margin: 10px 20px 30px 20px;padding: 4px; float: left;border: 1px #f2f2f2 solid;border-radius: 4px;text-align: center;}
-.Listimgbox{border: 1px solid #f2f2f2; border-radius: 6px;padding: 10px 4px 4px 4px;width: 100%;}
+.Listimgbox{border: 1px solid #f2f2f2; border-radius: 6px;margin:0px 10px 10px 0;width: 100%;}
 .video_list_box{padding: 6px 0 0 0;margin: 4px 0 0 0;width: 100%;height: 28px;overflow: hidden;text-align: left;text-align: center;}
 .img_list_box{padding: 2px;margin: 4px 0 0 0;width: 100%;height: 28px;overflow: hidden;text-align: left;}
 .sucai_url{width: 90%;font-size:12px;background-color: #f2f2f2;padding: 6px;border-radius: 4px;margin: 0 0 20px 0;}

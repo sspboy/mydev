@@ -765,7 +765,7 @@ export default defineComponent({
                     data.value = spec_res_obj.data // 列表内容
 
                     productdata.obj = responese.data.data
-                    // console.log('商品详情',productdata.obj)
+                    console.log('商品详情',productdata.obj)
 
 
                 },1000)
@@ -914,9 +914,6 @@ export default defineComponent({
                 }
                 pic_3_4.list = pic_3_4_list
             }
-
-
-
 
         })
 

@@ -968,6 +968,7 @@ export class Insetpagedata {
 
     // 尺码模板=加载->回填数据
     size_info={
+        // 没有考虑id为None的情况
         load:async(id)=>{
 
             // 请求id获取名称
@@ -979,7 +980,8 @@ export class Insetpagedata {
             })
 
             var size_data = res.data.data;
-            var name = JSON.parse(size_data.component_template_info_list[0].component_data).title;
+            console.log(id)
+            var name = JSON.parse(size_data?.component_template_info_list[0].component_data).title;
             return name
         }
     }
