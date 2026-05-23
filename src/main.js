@@ -9,6 +9,7 @@ import 'css-doodle' // css 特效模块
 // import 'vue3-video-play/dist/style.css' // 引入视频css
 import VueLazyLoad from 'vue3-lazyload' // 引入图片懒加载组件
 
+
 // 页面标题设置---开始
 router.beforeEach((to, from, next) => {
   /* 路由发生变化修改页面title */
@@ -24,10 +25,6 @@ router.beforeEach((to, from, next) => {
 window.__VUE_PROD_DEVTOOLS__ = false;
 window.__VUE_PROD_HYDRATION_MISMATCH_DETAILS__ = false;
 // 定义特性标志==禁止控制台警告 结束
-
-
-
-
 
 // 初始化项项目
 const app = createApp(App);

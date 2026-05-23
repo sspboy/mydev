@@ -306,7 +306,7 @@
             </a-card>
           </div>
           </a-col>
-                      <a-col :span="4">
+          <a-col :span="4">
             <div class="gutter-box">
             <a-card hoverable>
               <template #cover>
@@ -351,6 +351,45 @@
       <!--内容右侧 开始-->
       <a-layout-sider style="background-color: #fff;margin: 0 0 0 0;" width='300px'>
 
+
+        <div class="RightMiniBox">
+          <h4>
+            AI标题自动优化托管 - 已开启
+            <a-switch 
+              checked-children="开" 
+              un-checked-children="关"  
+              @click="load_ai_title"
+              />
+          </h4>
+          <div class="font_size_12">
+            商品类目、卖点、热词优化。
+            提升商品曝光度！
+          </div>
+          <div class="font_size_12 cursor right_tips">
+
+            <div ref="Aititle" id="aititle"></div>
+
+          </div>
+        </div>
+
+        <div class="RightMiniBox">
+          <h4>
+            AI生图/生视频托管
+            <a-switch 
+              checked-children="开" 
+              un-checked-children="关"
+              @click="load_ai_img_video" 
+            />
+          </h4>
+          <div class="font_size_12">
+            自动生成1:1/3:4主图和商品视频
+            无需制作素材！
+          </div>
+          <div class="font_size_12 cursor right_tips">
+            <div ref="Aiimgvideo" id="aiimgvideo"></div>
+          </div>
+        </div>
+
         <div class="RightMiniBox">
           <h4><QuestionCircleFilled style="color:dimgray;"/> 帮助中心</h4>
           <div class="font_size_12" style="padding: 8px 0 0 0;">
@@ -361,13 +400,6 @@
             </a-row>
           </div>
         </div>
-
-        <!-- <div class="RightMiniBox">
-          <h4>在线客服</h4>
-          <div class="font_size_12">
-            信息内容
-          </div>
-        </div> -->
 
         <div class="RightMiniBox">
           <h4> <InfoCircleFilled style="color:dimgray;"/> 联系我们 </h4>
@@ -405,6 +437,7 @@ import menu_head from "@/components/layout/menu_head.vue";
 // 组件引用=====结束
 import * as TOOL from '@/assets/JS_Model/tool';
 import * as utils from '@/assets/JS_Model/public_model';
+// 平台组件库引用
 
 export default {
     name:'introduction',
@@ -424,6 +457,7 @@ export default {
         RightOutlined
     },
     setup() {
+
       const router = useRouter() // 路由
 
       const API = new utils.A_Patch()         // 请求接口地址合集
@@ -433,6 +467,9 @@ export default {
       const innerHeight = ref(window.innerHeight-100);// 初始化表格高度
 
       const store = useStore();// 共享数据
+
+      const Aititle = ref(null)     // ai标题托管容器
+      const Aiimgvideo = ref(null)  // ai生图托管容器
 
       const PAGEDATA = computed(()=>{
 
@@ -559,6 +596,42 @@ export default {
         Functionde.LoadPageDATA() // 加载诊断数据信息
       }, 1000);
 
+      // 标题托管组件调用
+      // 抖店组件SDK初始化----开始
+      // 获取token、shopid、shopName
+      const load_ai_title = ()=>{
+        var token_obj = JSON.parse(localStorage.getItem('MCtoken'));
+        const shop_id = store.state.member.message.shop.id;
+        const shop_name = store.state.member.message.shop.shop_name;
+        var token = token_obj[shop_id].token
+        console.log(shop_id,shop_name, token)
+        ecopen.bixi(Aititle.value, {
+                "appId":'583',
+                "shopId":shop_id,
+                "token":token,
+                "componentId": 502,
+                "extra": {},
+        })
+      }
+      
+      // AI生图/生视频托管组件调用
+      const load_ai_img_video=()=>{
+        var token_obj = JSON.parse(localStorage.getItem('MCtoken'));
+        const shop_id = store.state.member.message.shop.id;
+        const shop_name = store.state.member.message.shop.shop_name;
+        var token = token_obj[shop_id].token
+        ecopen.bixi(Aiimgvideo.value, {
+                "appId":'583',
+                "shopId":shop_id,
+                "token":token,
+                "componentId": 509,
+                "extra": {},
+        })
+      }
+
+      // 抖店组件SDK初始化----结束
+      
+
       // 会员信息
 
       // 帮助中心
@@ -572,7 +645,11 @@ export default {
           innerHeight,
           QualityTask,
           Functionde,
-          router
+          router,
+          load_ai_title,
+          Aititle,
+          load_ai_img_video,
+          Aiimgvideo
         }
     },
 }

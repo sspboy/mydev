@@ -35,6 +35,15 @@
         <div ref="myDiv" id="mytest"></div>
 
       </div>
+
+      <div @click="load_AI_title">AI标题自动优化托管</div>
+      <div @click="console.log('')">AI生图/生主图视频托管</div>
+
+      <div class="font_size_12 cursor right_tips">
+
+        <div ref="Aititle" id="aititle"></div>
+
+      </div>
           
 
     </div>
@@ -52,7 +61,6 @@ import { useRouter } from "vue-router"; // 导入路由
 // 方法引用
 import * as utils from '@/assets/JS_Model/public_model';
 import * as TOOL from '@/assets/JS_Model/tool';
-
 
 export default defineComponent({
 
@@ -76,29 +84,38 @@ export default defineComponent({
     
     const tool = new TOOL.TOOL()   // 工具方法
     const API = new utils.A_Patch()// 请求接口
-    const router = useRouter();     // 初始化路由方法
-    const store = useStore();       // 共享数据
+    const router = useRouter();    // 初始化路由方法
+    const store = useStore();      // 共享数据
+    const myDiv = ref(null)        // 消息通知容器
+    const Aititle = ref(null)     // ai标题托管容器
 
-    const myDiv = ref(null)         // 消息通知容器
+    const shopid=ref(undefined);// 店铺id
+    const appId=ref('583');// 应用id
+    const token=ref(undefined);// 前端token
     
     onBeforeMount(async () => {
 
       // 共享会员数据刷新
       await store.dispatch('member/get').then(()=>{
-        
-        if(store.state.member.message.user_data === 'NOT_Login_Power'){// 未登录提示
+
+        // 未登录提示
+        if(store.state.member.message.user_data === 'NOT_Login_Power'){
               router.push('/pleaselogin')// 权限提示页面 点击去登录
         }
 
         var s = store.state.member.message.shop.id;//店铺id
-
+        shopid.value = s;
+        
         tool.mc_token.resh_mc_token(s).then((res)=>{
             var token_obj = JSON.parse(localStorage.getItem('MCtoken'));//前端插件token对象
             var t = token_obj[s].token // 前端插件token
+            token.value = t
             // 多店铺
             Load_MessagePlus(s,t) // 加载消息组件
         })
+      
       })
+
     })
     
 
@@ -137,24 +154,46 @@ export default defineComponent({
             });
 
             ecopen.bixi(myDiv.value, {
-                "appId":"583",
-                "shopId":shop_id,
-                "token":token,
+                // "appId":"583",
+                // "shopId":shop_id,
+                // "token":token,
                 "componentId": 317,
                 "extra": {},
             })
 
           })
+
       } catch (e) {
+
           console.error(e)
+
       }
+    }
+
+    // 调用AI标题托管组件
+    const load_AI_title = () =>{
+
+        console.log('标题托管', shopid.value,appId.value,token.value)
+        ecopen.bixi(Aititle.value, {
+                "appId":appId.value,
+                "shopId":shopid.value,
+                "token":token.value,
+                "componentId": 502,
+                "extra": {},
+        })
+    }
+    // 调用AI生图/视频托管组件
+    const load_AI_img_video = () =>{
+
     }
 
     return{
       myDiv,
+      Aititle,
       store,
       props,
-      Login_out
+      Login_out,
+      load_AI_title
     }
   }
 })
