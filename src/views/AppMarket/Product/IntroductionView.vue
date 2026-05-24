@@ -352,7 +352,7 @@
       <a-layout-sider style="background-color: #fff;margin: 0 0 0 0;" width='300px'>
 
 
-        <div class="RightMiniBox">
+        <div class="RightMiniBox" v-expose="exposure('block_view','1')">
           <h4>
             AI标题自动优化托管 - 已开启
             <a-switch 
@@ -361,7 +361,7 @@
               @click="load_ai_title"
               />
           </h4>
-          <div class="font_size_12">
+          <div class="font_size_12" style="margin: 16px 0 10px 0;">
             商品类目、卖点、热词优化。
             提升商品曝光度！
           </div>
@@ -378,13 +378,20 @@
             <a-switch 
               checked-children="开" 
               un-checked-children="关"
+              :loading="true"
               @click="load_ai_img_video" 
             />
           </h4>
-          <div class="font_size_12">
+
+          <div class="font_size_12" style="margin-top: 16px;">
             自动生成1:1/3:4主图和商品视频
             无需制作素材！
           </div>
+
+          <div style="margin-top: 16px;">
+            <a-button>查看优化记录</a-button>
+          </div>
+          
           <div class="font_size_12 cursor right_tips">
             <div ref="Aiimgvideo" id="aiimgvideo"></div>
           </div>
@@ -465,9 +472,7 @@ export default {
       const tool = new TOOL.TOOL()            // 工具方法
 
       const innerHeight = ref(window.innerHeight-100);// 初始化表格高度
-
       const store = useStore();// 共享数据
-
       const Aititle = ref(null)     // ai标题托管容器
       const Aiimgvideo = ref(null)  // ai生图托管容器
 
@@ -592,29 +597,48 @@ export default {
         }
 
       }
+
       setTimeout(() => {
-        Functionde.LoadPageDATA() // 加载诊断数据信息
+        Functionde.LoadPageDATA() // 异步加载加载诊断数据信息
       }, 1000);
 
-      // 标题托管组件调用
+      // 埋点事件上报==异步操作数据
+      const exposure = (eventName,params)=>{
+
+        setTimeout(()=>{
+          try {
+            store.report(eventName, params)// 上报点击时间
+          }catch(e) {
+            console.log('加载AI标题托管-数据埋点上报错',e)
+          }
+        },3000)
+        
+      }
+
+
       // 抖店组件SDK初始化----开始
-      // 获取token、shopid、shopName
+      // 标题托管组件调用===抽屉调用
       const load_ai_title = ()=>{
+        // 获取token、shopid、shopName
         var token_obj = JSON.parse(localStorage.getItem('MCtoken'));
         const shop_id = store.state.member.message.shop.id;
         const shop_name = store.state.member.message.shop.shop_name;
         var token = token_obj[shop_id].token
-        console.log(shop_id,shop_name, token)
+        // console.log(shop_id,shop_name, token)
         ecopen.bixi(Aititle.value, {
                 "appId":'583',
                 "shopId":shop_id,
                 "token":token,
                 "componentId": 502,
-                "extra": {},
+                "extra": {}
         })
+        
+        // 上报埋点==点击上报
+        exposure('bu_general_click', '1')
+
       }
       
-      // AI生图/生视频托管组件调用
+      // AI生图/生视频托管组件===抽屉调用
       const load_ai_img_video=()=>{
         var token_obj = JSON.parse(localStorage.getItem('MCtoken'));
         const shop_id = store.state.member.message.shop.id;
@@ -629,8 +653,30 @@ export default {
         })
       }
 
-      // 抖店组件SDK初始化----结束
+
+
+      // 查询SEO状态
+      const Get_title_SEO_status = ()=>{
+        console.log(API.dou_product.getSeoTrusteeshipStrategy)
+      }
+
+      // 开关操作 开启/关闭生图/生视频状态 AI托管
+      const Operation_Material_Hosting_Switch = ()=>{
+        console.log(API.dou_product.updateMaterialHostingSwitch)
+      }
+
+      // 查询 生图/生视频状态 AI托管状态
+      const Get_Shop_Hosting_Info = ()=>{
+        console.log(API.dou_product.getShopHostingInfo)
+      }
       
+      // 查询下架商品列表及其处理建议
+      const Get_Product_Suggestion_List = ()=>{
+        console.log(API.dou_product.getProductSuggestionList)
+      }
+
+      // 抖店组件SDK初始化----结束
+
 
       // 会员信息
 
@@ -649,7 +695,9 @@ export default {
           load_ai_title,
           Aititle,
           load_ai_img_video,
-          Aiimgvideo
+          Aiimgvideo,
+          exposure,
+
         }
     },
 }

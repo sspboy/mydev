@@ -36,16 +36,6 @@
 
       </div>
 
-      <div @click="load_AI_title">AI标题自动优化托管</div>
-      <div @click="console.log('')">AI生图/生主图视频托管</div>
-
-      <div class="font_size_12 cursor right_tips">
-
-        <div ref="Aititle" id="aititle"></div>
-
-      </div>
-          
-
     </div>
 </template>
 
@@ -81,7 +71,6 @@ export default defineComponent({
 
   setup(props){
 
-    
     const tool = new TOOL.TOOL()   // 工具方法
     const API = new utils.A_Patch()// 请求接口
     const router = useRouter();    // 初始化路由方法
@@ -152,7 +141,7 @@ export default defineComponent({
                 "componentId": 317,
                 "extra": {}
             });
-
+            
             ecopen.bixi(myDiv.value, {
                 // "appId":"583",
                 // "shopId":shop_id,
@@ -160,6 +149,9 @@ export default defineComponent({
                 "componentId": 317,
                 "extra": {},
             })
+            
+            // 全局挂在埋点上报方法
+            store.report = ecopen.__internal_tea__(shop_id);
 
           })
 
@@ -170,22 +162,7 @@ export default defineComponent({
       }
     }
 
-    // 调用AI标题托管组件
-    const load_AI_title = () =>{
 
-        console.log('标题托管', shopid.value,appId.value,token.value)
-        ecopen.bixi(Aititle.value, {
-                "appId":appId.value,
-                "shopId":shopid.value,
-                "token":token.value,
-                "componentId": 502,
-                "extra": {},
-        })
-    }
-    // 调用AI生图/视频托管组件
-    const load_AI_img_video = () =>{
-
-    }
 
     return{
       myDiv,
@@ -193,7 +170,6 @@ export default defineComponent({
       store,
       props,
       Login_out,
-      load_AI_title
     }
   }
 })

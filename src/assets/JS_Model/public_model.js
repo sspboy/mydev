@@ -161,6 +161,10 @@ export class A_Patch{
             "brand":"api/douyin/product/brandlist",             // 商品品牌
             "format":"api/douyin/product/getformat",            // 商品属性
             "format_recommend":"api/douyin/product/getformatrecommend",// 属性推荐
+            "getSeoTrusteeshipStrategy":"api/douyin/product/getSeoTrusteeshipStrategy",// 查询AI标题SEO托管状态
+            "updateMaterialHostingSwitch":"api/douyin/product/updateMaterialHostingSwitch",// 开启/关闭生图托管状态
+            "getShopHostingInfo":"api/douyin/product/getShopHostingInfo",// 查询商家是否已开启AI生图托管
+            "getProductSuggestionList":"api/douyin/product/getProductSuggestionList"// 查询下架商品列表及其处理建议
         },
         // 运费模板
         freight:{
@@ -186,7 +190,8 @@ export class A_Patch{
         // 店铺工具接口
         shoptool:{
             "Mctoken":"api/douyin/order/getMCToken",  // 前端token
-            "MessagePlus_SDK":"http://lf1-fe.ecombdstatic.com/obj/ecom-fe-open-public/component/index.js" // 消息组件SDK地址
+            "MessagePlus_SDK":"http://lf1-fe.ecombdstatic.com/obj/ecom-fe-open-public/component/index.js", // 消息组件SDK地址
+
         }
     }
 }

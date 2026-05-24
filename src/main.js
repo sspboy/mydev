@@ -9,6 +9,12 @@ import 'css-doodle' // css 特效模块
 // import 'vue3-video-play/dist/style.css' // 引入视频css
 import VueLazyLoad from 'vue3-lazyload' // 引入图片懒加载组件
 
+// 方法引用
+import * as utils from '@/assets/JS_Model/public_model';
+import * as TOOL from '@/assets/JS_Model/tool';
+    const tool = new TOOL.TOOL()   // 工具方法
+    const API = new utils.A_Patch()// 请求接口
+
 
 // 页面标题设置---开始
 router.beforeEach((to, from, next) => {
@@ -26,8 +32,35 @@ window.__VUE_PROD_DEVTOOLS__ = false;
 window.__VUE_PROD_HYDRATION_MISMATCH_DETAILS__ = false;
 // 定义特性标志==禁止控制台警告 结束
 
+
 // 初始化项项目
 const app = createApp(App);
+// ======================
+// 全局注册曝光指令 v-expose 开始
+// ======================
+app.directive('expose', {
+  mounted(el, binding) {
+    const observer = new IntersectionObserver((entries) => {
+      const entry = entries[0]
+      if (entry.isIntersecting) {
+        // 触发曝光
+        if (typeof binding.value === 'function') {
+          binding.value()
+        }
+        observer.unobserve(el) // 只触发一次
+      }
+    }, { threshold: 0.1 })
+
+    observer.observe(el)
+    el._observer = observer
+  },
+  unmounted(el) {
+    el._observer?.unobserve(el)
+  }
+})
+// ======================
+// 全局注册曝光指令 v-expose 结束
+// ======================
 app.use(store)  // 初始化Vuex 数据状态共享
 app.use(Antd)   // 加载ant design UI框架
 app.use(router) // 加载路由
