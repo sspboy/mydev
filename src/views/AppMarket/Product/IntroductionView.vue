@@ -250,12 +250,58 @@
 
         </a-row>
 
+        <!--无曝光下架商品诊断-->
+        <a-row :gutter="[12, 0]" class=" cursor">
+          <a-col :span="8" >
+            <a-badge-ribbon 
+            class="font_size_12"
+            text="长期无曝光" 
+            :color="Aititlecolor" 
+            >
+            <a-card 
+              title="建议下架商品" 
+              size="small"
+              style="margin: 16px 0 10px 0;"
+              class="font_size_12"
+            >建议下架商品</a-card>
+            </a-badge-ribbon>
+          </a-col>
+          <a-col :span="8" >
+            <a-badge-ribbon 
+              class="font_size_12"
+              text="超过建议下架期限" 
+              :color="Aititlecolor" 
+            >
+            <a-card 
+              title="已强制下架商品" 
+              size="small"
+              style="margin: 16px 0 10px 0;"
+              class="font_size_12"
+            >建议下架商品</a-card>
+            </a-badge-ribbon>
+          </a-col>
+          <a-col :span="8">
+            <a-badge-ribbon 
+              class="font_size_12"
+              text="建议优化" 
+              :color="Aititlecolor" 
+            >
+            <a-card 
+              title="潜力商品" 
+              size="small"
+              style="margin: 16px 0 10px 0;"
+              class="font_size_12"
+            >建议下架商品</a-card>
+            </a-badge-ribbon>
+          </a-col>
+        </a-row>
+
                 
 
         <!-- Comfyui-AI-list -->
         <a-row :gutter="[12, 12]" style="padding: 14px 0 0 0;">
 
-          <a-col :span="4">
+          <a-col :span="3">
             <div class="gutter-box">
 
             <a-card hoverable>
@@ -269,7 +315,7 @@
           </div>
           </a-col>
 
-          <a-col :span="4">
+          <a-col :span="3">
             <div class="gutter-box">
             <a-card hoverable>
               <template #cover>
@@ -282,7 +328,7 @@
           </div>
           </a-col>
 
-          <a-col :span="4">
+          <a-col :span="3">
             <div class="gutter-box">
             <a-card hoverable>
               <template #cover>
@@ -294,7 +340,7 @@
             </a-card>
           </div>
           </a-col>
-          <a-col :span="4">
+          <a-col :span="3">
             <div class="gutter-box">
             <a-card hoverable>
               <template #cover>
@@ -306,7 +352,7 @@
             </a-card>
           </div>
           </a-col>
-          <a-col :span="4">
+          <a-col :span="3">
             <div class="gutter-box">
             <a-card hoverable>
               <template #cover>
@@ -318,7 +364,7 @@
             </a-card>
           </div>
           </a-col>
-          <a-col :span="4">
+          <a-col :span="3">
             <div class="gutter-box">
             <a-card hoverable>
               <template #cover>
@@ -357,7 +403,7 @@
             :color="Aititlecolor" 
             v-expose="exposure('block_view','1')">
             <a-card 
-              title=" AI标题自动优化托管" 
+              title="AI标题自动优化托管" 
               size="small"
               style="margin: 16px 0 10px 0;"
               class="font_size_12"
@@ -387,7 +433,6 @@
             class="font_size_12" 
             style="margin:16px 0 16px 0;"
             v-expose="exposure('block_view','6')">
-          
             自动生成1:1/3:4主图和商品视频
             无需制作素材！
           </p>
@@ -402,12 +447,13 @@
               :loading="Aiimgvideo.button_1_1_loading"
               @click="Aiimgvideo.switch_1_1_img"
             />
+
             主图视频
             <a-switch 
               checked-children="开" 
               un-checked-children="关"
-              v-model:checked="Aiimgvideo.img_3_4"
-              :loading="Aiimgvideo.button_3_4_loading"
+              v-model:checked="Aiimgvideo.videostatus"
+              :loading="Aiimgvideo.button_video_loading"
               @click="Aiimgvideo.switch_video"
             />
 
@@ -418,8 +464,8 @@
             <a-switch 
               checked-children="开" 
               un-checked-children="关"
-              v-model:checked="Aiimgvideo.videostatus"
-              :loading="Aiimgvideo.button_video_loading"
+              v-model:checked="Aiimgvideo.img_3_4"
+              :loading="Aiimgvideo.button_3_4_loading"
               @click="Aiimgvideo.switch_3_4_img"
             />
 
@@ -520,30 +566,121 @@ export default {
       // ai生图托管状态==
       const Aiimgvideo = reactive({
         container:ref(null),// ai生图托管容器
-        img_1_1:ref(false),//1:1开关状态
+        img_1_1:false,//1:1开关状态
         button_1_1_loading:ref(false),// 1:1开关状态loading状态
-        img_3_4:ref(false),//3:4开关状态
+        img_3_4:false,//3:4开关状态
         button_3_4_loading:ref(false),
-        videostatus:ref(false),//video开关状态
+        videostatus:false,//video开关状态
         button_video_loading:ref(false),
         // 点击事件1：1
         switch_1_1_img:()=>{
-          console.log('开启/关闭1：1主图优化', Aiimgvideo.img_1_1)
-          // 上报点击事件
+          Aiimgvideo.button_1_1_loading = true;
+          // 请求1:1状态；
+          axios.post(API.AppSrtoreAPI.dou_product.updateMaterialHostingSwitch,{
+            "hosting_list": [
+              {
+                "open": Aiimgvideo.img_1_1, // true：开启；false：关闭
+                "scene_type": "3" //生图托管场景。枚举值：1为34图，2为主图视频，3为11图。
+              }]
+          }).then((res)=>{
+            let code = res.data.code;
+            if(code === 10000 && Aiimgvideo.img_1_1=== true){
+              tool.Fun_.message('success','1:1主图-AI优化开启成功！')
+            }else if(code === 10000 && Aiimgvideo.img_1_1=== false){
+              tool.Fun_.message('info','1:1主图-AI优化关闭成功！')
+            }else{
+              tool.Fun_.message('warning','1:1主图-AI优化操作失败！')
+            }
+            Aiimgvideo.button_1_1_loading = false;
+          })
+          // 上报点击事件 
+          exposure('bu_general_click', '6')
         },
         // 点击事件3：4
         switch_3_4_img:()=>{
-          console.log('开启/关闭3：4主图优化')
-          // 上报点击事件
+          Aiimgvideo.button_3_4_loading = true;
+          // 请求3:4状态；
+          axios.post(API.AppSrtoreAPI.dou_product.updateMaterialHostingSwitch,{
+            "hosting_list": [
+              {
+                "open": Aiimgvideo.img_3_4, // true：开启；false：关闭
+                "scene_type": "1" //生图托管场景。枚举值：1为34图，2为主图视频，3为11图。
+              }]
+          }).then((res)=>{
+            let code = res.data.code;
+            if(code === 10000 && Aiimgvideo.img_3_4=== true){
+              tool.Fun_.message('success','3:4主图-AI优化开启成功！')
+            }else if(code === 10000 && Aiimgvideo.img_3_4=== false){
+              tool.Fun_.message('info','3:4主图-AI优化关闭成功！')
+            }else{
+              tool.Fun_.message('warning','3:4主图-AI优化操作失败！')
+            }
+            Aiimgvideo.button_3_4_loading = false;
+          })
+          // 上报==点击事件
+          exposure('bu_general_click', '6')
         },
         // 点击事件video
         switch_video:()=>{
-          console.log('开启/关闭主图视频优化')
+          Aiimgvideo.button_video_loading = true;
+          // 请求3:4状态；
+          axios.post(API.AppSrtoreAPI.dou_product.updateMaterialHostingSwitch,{
+            "hosting_list": [
+              {
+                "open": Aiimgvideo.videostatus, // true：开启；false：关闭
+                "scene_type": "2" //生图托管场景。枚举值：1为34图，2为主图视频，3为11图。
+              }]
+          }).then((res)=>{
+            let code = res.data.code;
+            if(code === 10000 && Aiimgvideo.videostatus=== true){
+              tool.Fun_.message('success','主图视频-AI优化开启成功！')
+            }else if(code === 10000 && Aiimgvideo.videostatus=== false){
+              tool.Fun_.message('info','主图视频-AI优化关闭成功！')
+            }else{
+              tool.Fun_.message('warning','主图视频-AI优化操作失败！')
+            }
+            Aiimgvideo.button_video_loading = false;
+          })
           // 上报点击事件
+          exposure('bu_general_click', '6')
+        },
+        // 查询 生图/生视频状态 AI托管状态
+        Get_Shop_Hosting_Info:(data)=>{
+          console.log(API.AppSrtoreAPI.dou_product.getShopHostingInfo)
+          axios.post(API.AppSrtoreAPI.dou_product.getShopHostingInfo,data).then((res)=>{
+            console.log(res)
+          })
+        },
+        // 初始化 AI生图生视频 开关状态
+        RushAIimgvideofirst:()=>{
+
+          axios.post(API.AppSrtoreAPI.dou_product.getShopHostingInfo,{}).then((res)=>{
+
+            var hosting_infos_list = res.data.data.data.hosting_infos;
+            hosting_infos_list.forEach(element => {
+              console.log(element)
+              let hosting_scene_type = element.hosting_scene_type;
+              let hosting_open = element.hosting_open;
+              if(hosting_scene_type === 1){// 1为34图
+                Aiimgvideo.img_3_4 = hosting_open
+              }
+              if(hosting_scene_type === 2){// 2为主图视频
+                Aiimgvideo.videostatus = hosting_open
+              }
+              if(hosting_scene_type === 3){// 3为11图
+                Aiimgvideo.img_1_1 = hosting_open
+              }
+            });
+
+          })
+
+          // 上报埋点==曝光上报
+          exposure('block_view', '6')
         }
       })  
-
       // ai生图托管状态==
+
+
       const PAGEDATA = computed(()=>{
 
         return reactive({
@@ -738,48 +875,17 @@ export default {
             AititleStatus.value = false;
             Aititlecolor.value = 'red'
             tool.Fun_.message('warning','AI标题托光状态未开启')
-
           }
           rushLoading.value = false;
         })
       }
       Get_title_SEO_status();// 初始化页面SEO状态
-
-      // 开关操作 开启/关闭生图/生视频状态 AI托管
-      const Operation_Material_Hosting_Switch = ()=>{
-        console.log(API.AppSrtoreAPI.dou_product.updateMaterialHostingSwitch)
-      }
-
-      // 查询 生图/生视频状态 AI托管状态
-      const Get_Shop_Hosting_Info = (data)=>{
-        console.log(API.AppSrtoreAPI.dou_product.getShopHostingInfo)
-        axios.post(API.AppSrtoreAPI.dou_product.getShopHostingInfo,data).then((res)=>{
-          console.log(res)
-        })
-      }
-
-      // 初始化 AI生图生视频 开关状态
-      const RushAIimgvideofirst= ()=>{
-
-        axios.post(API.AppSrtoreAPI.dou_product.getShopHostingInfo,data).then((res)=>{
-
-          console.log(res)
-
-          var hosting_infos = ''
-
-          
-
-          // Aiimgvideo.img_1_1// 3为11图
-          // Aiimgvideo.img_3_4// 1为34图
-          // Aiimgvideo.videostatus// 2为主图视频
-
-        })
-      }
+      Aiimgvideo.RushAIimgvideofirst() // 初始化Ai生图生视频托管状态
+      
       // 查询下架商品列表及其处理建议
       const Get_Product_Suggestion_List = ()=>{
         console.log(API.AppSrtoreAPI.dou_product.getProductSuggestionList)
       }
-
       // 抖店组件SDK初始化----结束
 
 
