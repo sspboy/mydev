@@ -262,8 +262,8 @@
               <template #cover>
                 <img alt="example" src="../../../assets/6d23.jpg" />
               </template>
-              <a-card-meta title="Europe Street beat">
-                <template #description>www.instagram.com</template>
+              <a-card-meta title="图片尺寸处理">
+                <template #description>1:1尺寸&3：4尺寸截图工具</template>
               </a-card-meta>
             </a-card>
           </div>
@@ -275,7 +275,7 @@
               <template #cover>
                 <img alt="example" src="../../../assets/6d23.jpg" />
               </template>
-              <a-card-meta title="Europe Street beat">
+              <a-card-meta title="白底图处理">
                 <template #description>www.instagram.com</template>
               </a-card-meta>
             </a-card>
@@ -349,60 +349,96 @@
       </a-layout-content>
 
       <!--内容右侧 开始-->
-      <a-layout-sider style="background-color: #fff;margin: 0 0 0 0;" width='300px'>
+      <a-layout-sider class="bodyright" width='300px'>
+
+          <a-badge-ribbon 
+            class="font_size_12"
+            :text="AititleText" 
+            :color="Aititlecolor" 
+            v-expose="exposure('block_view','1')">
+            <a-card 
+              title=" AI标题自动优化托管" 
+              size="small"
+              style="margin: 16px 0 10px 0;"
+              class="font_size_12"
+            >
+              商品类目、卖点、热词优化。提升商品曝光度！
+              <a-button 
+                @click="Get_title_SEO_status" 
+                style="margin: 14px 10px 0 0;"
+                :loading="rushLoading"
+                >刷新状态</a-button>
+              <a-button @click="load_ai_title" style="margin-top: 14px;">管理标题托管</a-button>
+
+            </a-card>
+          </a-badge-ribbon>
 
 
-        <div class="RightMiniBox" v-expose="exposure('block_view','1')">
-          <h4>
-            AI标题自动优化托管 - 已开启
-            <a-switch 
-              checked-children="开" 
-              un-checked-children="关"  
-              @click="load_ai_title"
-              />
-          </h4>
-          <div class="font_size_12" style="margin: 16px 0 10px 0;">
-            商品类目、卖点、热词优化。
-            提升商品曝光度！
-          </div>
+          <!--加载插件容器哦-->
           <div class="font_size_12 cursor right_tips">
-
             <div ref="Aititle" id="aititle"></div>
-
           </div>
-        </div>
+        
 
         <div class="RightMiniBox">
-          <h4>
-            AI生图/生视频托管
+
+          <h4>AI生图/生视频托管</h4>
+          <p 
+            class="font_size_12" 
+            style="margin:16px 0 16px 0;"
+            v-expose="exposure('block_view','6')">
+          
+            自动生成1:1/3:4主图和商品视频
+            无需制作素材！
+          </p>
+          
+          <a-space>
+
+            1:1主图 
             <a-switch 
               checked-children="开" 
               un-checked-children="关"
-              :loading="true"
-              @click="load_ai_img_video" 
+              v-model:checked="Aiimgvideo.img_1_1"
+              :loading="Aiimgvideo.button_1_1_loading"
+              @click="Aiimgvideo.switch_1_1_img"
             />
-          </h4>
+            主图视频
+            <a-switch 
+              checked-children="开" 
+              un-checked-children="关"
+              v-model:checked="Aiimgvideo.img_3_4"
+              :loading="Aiimgvideo.button_3_4_loading"
+              @click="Aiimgvideo.switch_video"
+            />
 
-          <div class="font_size_12" style="margin-top: 16px;">
-            自动生成1:1/3:4主图和商品视频
-            无需制作素材！
-          </div>
+          </a-space>
+
+          <a-space style="margin-top: 16px;">
+            3:4主图 
+            <a-switch 
+              checked-children="开" 
+              un-checked-children="关"
+              v-model:checked="Aiimgvideo.videostatus"
+              :loading="Aiimgvideo.button_video_loading"
+              @click="Aiimgvideo.switch_3_4_img"
+            />
+
+          </a-space>
 
           <div style="margin-top: 16px;">
-            <a-button>查看优化记录</a-button>
+            <a-button @click="load_ai_img_video" >查看优化记录 >></a-button>
           </div>
-          
-          <div class="font_size_12 cursor right_tips">
-            <div ref="Aiimgvideo" id="aiimgvideo"></div>
-          </div>
+
+        </div>
+        <!--加载插件容器哦-->
+        <div class="font_size_12 cursor right_tips">
+          <div ref="Aiimgvideo.container" id="aiimgvideo"></div>
         </div>
 
         <div class="RightMiniBox">
           <h4><QuestionCircleFilled style="color:dimgray;"/> 帮助中心</h4>
           <div class="font_size_12" style="padding: 8px 0 0 0;">
             <a-row :gutter="[12, 12]">
-              <a-col :span="24">商品查询查询教程</a-col>
-              <a-col :span="24">商品查询查询教程</a-col>
               <a-col :span="24">商品查询查询教程</a-col>
             </a-row>
           </div>
@@ -444,6 +480,7 @@ import menu_head from "@/components/layout/menu_head.vue";
 // 组件引用=====结束
 import * as TOOL from '@/assets/JS_Model/tool';
 import * as utils from '@/assets/JS_Model/public_model';
+import axios from 'axios';
 // 平台组件库引用
 
 export default {
@@ -461,21 +498,52 @@ export default {
         QuestionCircleFilled,
         InfoCircleFilled,
         MehFilled,
-        RightOutlined
+        RightOutlined,
+        
     },
     setup() {
 
       const router = useRouter() // 路由
 
       const API = new utils.A_Patch()         // 请求接口地址合集
-
       const tool = new TOOL.TOOL()            // 工具方法
-
       const innerHeight = ref(window.innerHeight-100);// 初始化表格高度
       const store = useStore();// 共享数据
+      // ai标题托管状态===
       const Aititle = ref(null)     // ai标题托管容器
-      const Aiimgvideo = ref(null)  // ai生图托管容器
+      const AititleText = ref('loading')// 标题托光状态文字    
+      const AititleStatus = ref(false)// 标题seo开启状态
+      const Aititlecolor = ref('green') // 标题状态颜色
+      const rushLoading = ref(false)
+      // ai标题托管状态===
 
+      // ai生图托管状态==
+      const Aiimgvideo = reactive({
+        container:ref(null),// ai生图托管容器
+        img_1_1:ref(false),//1:1开关状态
+        button_1_1_loading:ref(false),// 1:1开关状态loading状态
+        img_3_4:ref(false),//3:4开关状态
+        button_3_4_loading:ref(false),
+        videostatus:ref(false),//video开关状态
+        button_video_loading:ref(false),
+        // 点击事件1：1
+        switch_1_1_img:()=>{
+          console.log('开启/关闭1：1主图优化', Aiimgvideo.img_1_1)
+          // 上报点击事件
+        },
+        // 点击事件3：4
+        switch_3_4_img:()=>{
+          console.log('开启/关闭3：4主图优化')
+          // 上报点击事件
+        },
+        // 点击事件video
+        switch_video:()=>{
+          console.log('开启/关闭主图视频优化')
+          // 上报点击事件
+        }
+      })  
+
+      // ai生图托管状态==
       const PAGEDATA = computed(()=>{
 
         return reactive({
@@ -644,7 +712,7 @@ export default {
         const shop_id = store.state.member.message.shop.id;
         const shop_name = store.state.member.message.shop.shop_name;
         var token = token_obj[shop_id].token
-        ecopen.bixi(Aiimgvideo.value, {
+        ecopen.bixi(Aiimgvideo.container, {
                 "appId":'583',
                 "shopId":shop_id,
                 "token":token,
@@ -653,26 +721,63 @@ export default {
         })
       }
 
-
-
       // 查询SEO状态
       const Get_title_SEO_status = ()=>{
-        console.log(API.dou_product.getSeoTrusteeshipStrategy)
+        rushLoading.value = true;
+        axios.post(API.AppSrtoreAPI.dou_product.getSeoTrusteeshipStrategy,{}).then((res)=>{
+          // open_status 为2 开启状态
+          var open_status = res.data.data.data.open_status;
+          console.log(open_status)
+          if(open_status == 2){// 开启时=页面显示开启
+            AititleText.value = '已开启';
+            AititleStatus.value = true;
+            Aititlecolor.value = 'green'
+            tool.Fun_.message('success','AI标题托光状态已开启')
+          }else{// 关闭是=页面显示关闭
+            AititleText.value = '未开启';
+            AititleStatus.value = false;
+            Aititlecolor.value = 'red'
+            tool.Fun_.message('warning','AI标题托光状态未开启')
+
+          }
+          rushLoading.value = false;
+        })
       }
+      Get_title_SEO_status();// 初始化页面SEO状态
 
       // 开关操作 开启/关闭生图/生视频状态 AI托管
       const Operation_Material_Hosting_Switch = ()=>{
-        console.log(API.dou_product.updateMaterialHostingSwitch)
+        console.log(API.AppSrtoreAPI.dou_product.updateMaterialHostingSwitch)
       }
 
       // 查询 生图/生视频状态 AI托管状态
-      const Get_Shop_Hosting_Info = ()=>{
-        console.log(API.dou_product.getShopHostingInfo)
+      const Get_Shop_Hosting_Info = (data)=>{
+        console.log(API.AppSrtoreAPI.dou_product.getShopHostingInfo)
+        axios.post(API.AppSrtoreAPI.dou_product.getShopHostingInfo,data).then((res)=>{
+          console.log(res)
+        })
       }
-      
+
+      // 初始化 AI生图生视频 开关状态
+      const RushAIimgvideofirst= ()=>{
+
+        axios.post(API.AppSrtoreAPI.dou_product.getShopHostingInfo,data).then((res)=>{
+
+          console.log(res)
+
+          var hosting_infos = ''
+
+          
+
+          // Aiimgvideo.img_1_1// 3为11图
+          // Aiimgvideo.img_3_4// 1为34图
+          // Aiimgvideo.videostatus// 2为主图视频
+
+        })
+      }
       // 查询下架商品列表及其处理建议
       const Get_Product_Suggestion_List = ()=>{
-        console.log(API.dou_product.getProductSuggestionList)
+        console.log(API.AppSrtoreAPI.dou_product.getProductSuggestionList)
       }
 
       // 抖店组件SDK初始化----结束
@@ -697,6 +802,11 @@ export default {
           load_ai_img_video,
           Aiimgvideo,
           exposure,
+          AititleStatus,
+          AititleText,
+          Get_title_SEO_status,
+          Aititlecolor,
+          rushLoading
 
         }
     },
@@ -711,7 +821,7 @@ export default {
 .cardTitle{font-size: 12px;margin: 0 0 6px 0;padding:22px 0 0 0;height: 36px;overflow: hidden;}
 .cardText{font-size: 12px;line-height: 18px;height: 20px;overflow: hidden;}
 .gutter-box{background-color: aliceblue;border-radius: 6px;}
-.RightMiniBox{margin: 15px 14px 0 0;border:1px solid #e5e5e596;border-radius: 4px;padding:12px;}
+.RightMiniBox{margin: 15px 0 0 0;border:1px solid #e5e5e596;border-radius: 4px;padding:12px;}
 .ListCard{}
 .NumberBox{margin: 4px 0 0 0 !important; border: 1px solid #e5e5e596;border-radius: 6px;padding: 14px 0 4px 0;}
 .Numbertext{margin: 4px 0 6px 0;font-size: 22px;text-align: center;height: 42px;}
@@ -719,4 +829,5 @@ export default {
 .task_text_bottom{text-align: center;margin: 0 0 20px 0;}
 .task_sty{width: 140px;margin: 6px 0 0 0;height: 26px;}
 .task_num{height: 56px;display: block;padding: 12px 0 0 0;}
+.bodyright{background-color: #fff;margin: 0 0 0 0;padding: 0 14px 0 0}
 </style>
