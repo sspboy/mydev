@@ -15,7 +15,7 @@
   </div>
   
   <a-affix :offset-bottom="bottom" style="bottom: 18px;right:10px;position:absolute;color: black;">
-      <a-button type="text" ghost size="small" style="font-size: 12px; margin:3px 16px 0 0;" @click="() => { store.commit('menu/change') }">
+      <a-button type="text" size="small" style="font-size: 12px; margin:3px 16px 0 0;" @click="() => { store.commit('menu/change') }">
           <menu-unfold-outlined v-if="store.state.menu.coll" class="trigger" />
           <menu-fold-outlined v-else class="trigger" />
       </a-button>

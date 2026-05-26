@@ -18,7 +18,6 @@
 
       <a-layout-content class="content_border" >
 
-
         <!--功能导航-->
         <a-row :gutter="[12, 12]">
 
@@ -247,69 +246,59 @@
             </p>
             <p class="font_size_12 task_text_bottom">素材缺失</p>
           </a-col>
-
         </a-row>
 
         <!--无曝光下架商品诊断-->
-        <a-row :gutter="[12, 0]" class=" cursor">
+        <a-row :gutter="[12, 0]" class="cursor">
           <a-col :span="8" >
-            <a-badge-ribbon 
-            class="font_size_12"
-            text="长期无曝光" 
-            :color="Aititlecolor" 
-            >
             <a-card 
               title="建议下架商品" 
               size="small"
               style="margin: 16px 0 10px 0;"
               class="font_size_12"
-            >建议下架商品</a-card>
-            </a-badge-ribbon>
+            >长期无曝光，建议下架处理。
+          <template #extra>
+            <span @click="router.push('/inefficient')" class="font_size_12">123231 + </span>
+          </template>
+          </a-card>
           </a-col>
           <a-col :span="8" >
-            <a-badge-ribbon 
-              class="font_size_12"
-              text="超过建议下架期限" 
-              :color="Aititlecolor" 
-            >
             <a-card 
               title="已强制下架商品" 
               size="small"
               style="margin: 16px 0 10px 0;"
               class="font_size_12"
-            >建议下架商品</a-card>
-            </a-badge-ribbon>
+            >已超过建议下架期限，系统已强制下架。
+          <template #extra>
+            <span class="font_size_12">1000+</span>
+          </template>
+          </a-card>
           </a-col>
           <a-col :span="8">
-            <a-badge-ribbon 
-              class="font_size_12"
-              text="建议优化" 
-              :color="Aititlecolor" 
-            >
             <a-card 
               title="潜力商品" 
               size="small"
               style="margin: 16px 0 10px 0;"
               class="font_size_12"
-            >建议下架商品</a-card>
-            </a-badge-ribbon>
+            >系统发掘待优化的商品
+          <template #extra>
+            <span @click="router.push('/inefficient')" class="font_size_12">13242+</span>
+          </template>
+          </a-card>
           </a-col>
         </a-row>
-
-                
 
         <!-- Comfyui-AI-list -->
         <a-row :gutter="[12, 12]" style="padding: 14px 0 0 0;">
 
           <a-col :span="3">
             <div class="gutter-box">
-
-            <a-card hoverable>
+            <a-card hoverable class="font_size_12">
               <template #cover>
-                <img alt="example" src="../../../assets/6d23.jpg" />
+                <img style="width: 50px; height: 50px;margin: 30px auto;" alt="example" src="/cut.png" />
               </template>
-              <a-card-meta title="图片尺寸处理">
-                <template #description>1:1尺寸&3：4尺寸截图工具</template>
+              <a-card-meta class="font_size_12" title="图片尺寸处理">
+                <template #description>1:1&3:4-截图</template>
               </a-card-meta>
             </a-card>
           </div>
@@ -319,9 +308,9 @@
             <div class="gutter-box">
             <a-card hoverable>
               <template #cover>
-                <img alt="example" src="../../../assets/6d23.jpg" />
+                <img style="width: 50px; height: 50px;margin: 30px auto;" alt="example" src="/white_background_image.png" />
               </template>
-              <a-card-meta title="白底图处理">
+              <a-card-meta title="白底图">
                 <template #description>www.instagram.com</template>
               </a-card-meta>
             </a-card>
@@ -332,63 +321,15 @@
             <div class="gutter-box">
             <a-card hoverable>
               <template #cover>
-                <img alt="example" src="../../../assets/6d23.jpg" />
+                <img style="width: 50px; height: 50px;margin: 30px auto;" alt="example" src="/remove_watermark.png" />
               </template>
-              <a-card-meta title="Europe Street beat">
+              <a-card-meta title="图片去水印">
                 <template #description>www.instagram.com</template>
               </a-card-meta>
             </a-card>
           </div>
           </a-col>
-          <a-col :span="3">
-            <div class="gutter-box">
-            <a-card hoverable>
-              <template #cover>
-                <img alt="example" src="../../../assets/6d23.jpg" />
-              </template>
-              <a-card-meta title="Europe Street beat">
-                <template #description>www.instagram.com</template>
-              </a-card-meta>
-            </a-card>
-          </div>
-          </a-col>
-          <a-col :span="3">
-            <div class="gutter-box">
-            <a-card hoverable>
-              <template #cover>
-                <img alt="example" src="../../../assets/6d23.jpg" />
-              </template>
-              <a-card-meta title="Europe Street beat">
-                <template #description>www.instagram.com</template>
-              </a-card-meta>
-            </a-card>
-          </div>
-          </a-col>
-          <a-col :span="3">
-            <div class="gutter-box">
-            <a-card hoverable>
-              <template #cover>
-                <img alt="example" src="../../../assets/6d23.jpg" />
-              </template>
-              <a-card-meta title="Europe Street beat">
-                <template #description>www.instagram.com</template>
-              </a-card-meta>
-            </a-card>
-          </div>
-          </a-col>
-
-          <a-col :span="4">
-            <!-- <div class="gutter-box">
-              <a-card hoverable>
-                <template #cover>
-                  <img alt="example" src="../../../assets/6d23.jpg" />
-                </template>
-                <a-card-meta title="Europe Street beat">
-                  <template #description>www.instagram.com</template>
-                </a-card-meta>
-              </a-card>
-            </div> -->
-          </a-col>
+          
 
         </a-row>
 
@@ -412,9 +353,10 @@
               <a-button 
                 @click="Get_title_SEO_status" 
                 style="margin: 14px 10px 0 0;"
+                :size="'small'"
                 :loading="rushLoading"
                 >刷新状态</a-button>
-              <a-button @click="load_ai_title" style="margin-top: 14px;">管理标题托管</a-button>
+              <a-button @click="load_ai_title" :size="'small'" style="margin-top: 14px;">管理标题托管</a-button>
 
             </a-card>
           </a-badge-ribbon>
@@ -428,7 +370,7 @@
 
         <div class="RightMiniBox">
 
-          <h4>AI生图/生视频托管</h4>
+          <h4 style="font-weight: bold;">AI生图/生视频托管</h4>
           <p 
             class="font_size_12" 
             style="margin:16px 0 16px 0;"
@@ -437,8 +379,7 @@
             无需制作素材！
           </p>
           
-          <a-space>
-
+          <a-space class="font_size_12">
             1:1主图 
             <a-switch 
               checked-children="开" 
@@ -459,7 +400,7 @@
 
           </a-space>
 
-          <a-space style="margin-top: 16px;">
+          <a-space class="font_size_12" style="margin-top: 16px;">
             3:4主图 
             <a-switch 
               checked-children="开" 
@@ -472,7 +413,7 @@
           </a-space>
 
           <div style="margin-top: 16px;">
-            <a-button @click="load_ai_img_video" >查看优化记录 >></a-button>
+            <a-button @click="load_ai_img_video" :size="'small'">查看优化记录 >></a-button>
           </div>
 
         </div>
@@ -929,7 +870,7 @@ export default {
 .gutter-box{background-color: aliceblue;border-radius: 6px;}
 .RightMiniBox{margin: 15px 0 0 0;border:1px solid #e5e5e596;border-radius: 4px;padding:12px;}
 .ListCard{}
-.NumberBox{margin: 4px 0 0 0 !important; border: 1px solid #e5e5e596;border-radius: 6px;padding: 14px 0 4px 0;}
+.NumberBox{margin: 4px 0 8px 0 !important; border: 1px solid #e5e5e596;border-radius: 6px;padding: 14px 0 4px 0;}
 .Numbertext{margin: 4px 0 6px 0;font-size: 22px;text-align: center;height: 42px;}
 .ZhenduanTitle{height: 30px;margin: 16px 0 0 0;}
 .task_text_bottom{text-align: center;margin: 0 0 20px 0;}
