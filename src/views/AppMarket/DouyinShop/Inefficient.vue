@@ -76,9 +76,9 @@
                         <a-col :span="12">
                             <a-space>
                                 <a-radio-group v-model:value="Select_the_column" size="small" >
-                                    <a-radio-button value="large" class="font_size_12">建议下架</a-radio-button>
-                                    <a-radio-button value="middle" class="font_size_12">强制下架</a-radio-button>
-                                    <a-radio-button value="small" class="font_size_12">潜力优化商品</a-radio-button>
+                                    <a-radio-button value="suggest_offline" class="font_size_12">建议下架</a-radio-button>
+                                    <a-radio-button value="force_offline" class="font_size_12">强制下架</a-radio-button>
+                                    <a-radio-button value="optimize" class="font_size_12">潜力优化商品</a-radio-button>
                                 </a-radio-group>
                             </a-space>
                         </a-col>
@@ -118,9 +118,16 @@
                                 <a-button type="link" size="small" @click="optimizeItem(record)">优化</a-button>
                             </a-space>
                         </template>
-                        <template v-if="column.key === 'inefficient_type'">
-                            <a-tag color="orange">{{ record.inefficient_type }}</a-tag>
+                        <template v-if="column.key === 'id'">
+                            <a-tag color="orange">{{ record.product_id }}</a-tag>
                         </template>
+                        <template v-if="column.key === 'title'">
+                            {{ record.product_name }}
+                        </template>
+                        <template v-if="column.key === 'image'">
+                            <a-image :src="record.main_url" width="80px" />
+                        </template>
+                        
                         <template v-if="column.key === 'status'">
                             <a-tag :color="record.status === 0 ? 'green' : 'red'">
                                 {{ record.status === 0 ? '在线' : '下线' }}
@@ -173,13 +180,20 @@ export default {
         const store = useStore();               // 共享数据
         const tool = new TOOL.TOOL()            // 工具方法
         const innerHeight = ref(window.innerHeight - 300);  // 初始化表格高度
-        const Select_the_column = ref('middle');
+        const Select_the_column = ref('suggest_offline'); // 选择类别
         const PAGEDATA = reactive({
             title: '低效商品',
+            // 菜单选中配置
             menudata: {
                 'key': '105',
                 'openKeys': 'douyinshop'
-            },            // 菜单选中配置
+            },
+            // 默认查询条件
+            navdata:{
+                "page_no":1,
+                "page_size":10,
+                "suggestion":"suggest_offline"  // force_offline强制下架, suggest_offline建议下架, optimize牵引优化
+            }
         })
 
         // 表单数据绑定
@@ -209,13 +223,14 @@ export default {
                 title: '商品ID',
                 dataIndex: 'id',
                 key: 'id',
-                width: 120,
+                width: 160,
             },
             {
                 title: '商品标题',
                 dataIndex: 'title',
                 key: 'title',
                 ellipsis: true,
+                width: 160,
             },
             {
                 title: '商品图片',
@@ -272,24 +287,17 @@ export default {
         // 查询数据
         const fetchData = () => {
             tableLoading.value = true;
-            const params = {
-                page: pagination.current,
-                page_size: pagination.pageSize,
-                title: formState.title,
-                product_id: formState.product_id,
-                status: formState.status,
-                category: formState.category,
-                create_time: formState.create_time,
-            };
-
+            
             // 这里替换为实际的接口地址
-            // tool.Http_.post(API.AppSrtoreAPI.inefficient.list, params).then(res => {
-            //     tableData.value = res.data.data.list || [];
-            //     pagination.total = res.data.data.total || 0;
-            //     tableLoading.value = false;
-            // }).catch(() => {
-            //     tableLoading.value = false;
-            // });
+            tool.Http_.post(API.AppSrtoreAPI.dou_product.getProductSuggestionList, PAGEDATA.navdata).then(res => {
+                console.log('接口返回数据:', res);
+                tableData.value = res.data.data.product_list || [];
+                pagination.total = res.data.data.total || 0;
+                tableLoading.value = false;
+            }).catch(() => {
+                tableLoading.value = false;
+                console.error('接口请求失败');  
+            });
 
             // 模拟数据
             setTimeout(() => {

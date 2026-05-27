@@ -686,7 +686,7 @@
                                 <div style="width: 100%;height:120px;margin: 20px 0 0 0;">
 
                                     <p class="img_3_4_pic" v-for="item in video_Fun.PicList.value">
-                                        <a-image :height="110" :src="item.video_info.video_cover_url" />
+                                        <a-image :height="80" :src="item.video_info.video_cover_url" />
                                         <span style="display:block;margin: 16px 0 0 0;width: 100%;text-align: center;">
                                             <a-button type="text" size="small" @click="video_Fun.del"> 
                                                 <DeleteOutlined />
@@ -2726,7 +2726,7 @@ export default defineComponent({
             // 视频信息
             if(video_Fun.get()){
                 var video_obj = video_Fun.get()
-                var material_video_id = video_obj[0].material_id;
+                var material_video_id = video_obj[0].video_info.vid;
                 product_data_obj.material_video_id = material_video_id;// 视频id
                 // console.log('视频素材id', material_video_id)
             }

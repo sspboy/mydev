@@ -254,23 +254,28 @@
             <a-card 
               title="建议下架商品" 
               size="small"
-              style="margin: 16px 0 10px 0;"
+              style="margin: 16px 0 10px 0;line-height: 22px;"
               class="font_size_12"
-            >长期无曝光，建议下架处理。
+            >
+            <a-tag color="#999">{{ Get_Offline_Product_List.suggest_offline_num }}</a-tag>个商品
+            长期无曝光 建议下架
           <template #extra>
-            <span @click="router.push('/inefficient')" class="font_size_12">123231 + </span>
+            <a @click="router.push('/inefficient')" class="font_size_12">查看>></a>
           </template>
+
           </a-card>
           </a-col>
           <a-col :span="8" >
             <a-card 
               title="已强制下架商品" 
               size="small"
-              style="margin: 16px 0 10px 0;"
+              style="margin: 16px 0 10px 0;line-height: 22px;"
               class="font_size_12"
-            >已超过建议下架期限，系统已强制下架。
+            >
+            <a-tag color="#999">{{ Get_Offline_Product_List.force_offline_num }}</a-tag>个商品
+            超过期限 已强制下架
           <template #extra>
-            <span class="font_size_12">1000+</span>
+            <a @click="router.push('/inefficient')" class="font_size_12">查看>></a>
           </template>
           </a-card>
           </a-col>
@@ -278,11 +283,13 @@
             <a-card 
               title="潜力商品" 
               size="small"
-              style="margin: 16px 0 10px 0;"
+              style="margin: 16px 0 10px 0;line-height: 22px;"
               class="font_size_12"
-            >系统发掘待优化的商品
+            >
+            <a-tag color="#999">{{ Get_Offline_Product_List.optimize_num }}</a-tag>个商品
+            系统发掘待优化商品
           <template #extra>
-            <span @click="router.push('/inefficient')" class="font_size_12">13242+</span>
+            <a @click="router.push('/inefficient')" class="font_size_12">查看>></a>
           </template>
           </a-card>
           </a-col>
@@ -297,8 +304,8 @@
               <template #cover>
                 <img style="width: 50px; height: 50px;margin: 30px auto;" alt="example" src="/cut.png" />
               </template>
-              <a-card-meta class="font_size_12" title="图片尺寸处理">
-                <template #description>1:1&3:4-截图</template>
+              <a-card-meta class="font_size_12">
+                <template #description>1:1&3:4截图</template>
               </a-card-meta>
             </a-card>
           </div>
@@ -310,8 +317,8 @@
               <template #cover>
                 <img style="width: 50px; height: 50px;margin: 30px auto;" alt="example" src="/white_background_image.png" />
               </template>
-              <a-card-meta title="白底图">
-                <template #description>www.instagram.com</template>
+              <a-card-meta class="font_size_12">
+                <template #description>白底图处理</template>
               </a-card-meta>
             </a-card>
           </div>
@@ -323,14 +330,12 @@
               <template #cover>
                 <img style="width: 50px; height: 50px;margin: 30px auto;" alt="example" src="/remove_watermark.png" />
               </template>
-              <a-card-meta title="图片去水印">
-                <template #description>www.instagram.com</template>
+              <a-card-meta class="font_size_12">
+                <template #description>图片去水印</template>
               </a-card-meta>
             </a-card>
           </div>
           </a-col>
-          
-
         </a-row>
 
       </a-layout-content>
@@ -504,7 +509,7 @@ export default {
       const rushLoading = ref(false)
       // ai标题托管状态===
 
-      // ai生图托管状态==
+      // ai生图/视频托管状态==
       const Aiimgvideo = reactive({
         container:ref(null),// ai生图托管容器
         img_1_1:false,//1:1开关状态
@@ -599,7 +604,7 @@ export default {
 
             var hosting_infos_list = res.data.data.data.hosting_infos;
             hosting_infos_list.forEach(element => {
-              console.log(element)
+              // console.log(element)
               let hosting_scene_type = element.hosting_scene_type;
               let hosting_open = element.hosting_open;
               if(hosting_scene_type === 1){// 1为34图
@@ -619,7 +624,7 @@ export default {
           exposure('block_view', '6')
         }
       })  
-      // ai生图托管状态==
+      // ai生图/视频托管状态==
 
 
       const PAGEDATA = computed(()=>{
@@ -799,13 +804,13 @@ export default {
         })
       }
 
-      // 查询SEO状态
+      // 查询标题SEO状态=开启/关闭
       const Get_title_SEO_status = ()=>{
         rushLoading.value = true;
         axios.post(API.AppSrtoreAPI.dou_product.getSeoTrusteeshipStrategy,{}).then((res)=>{
           // open_status 为2 开启状态
           var open_status = res.data.data.data.open_status;
-          console.log(open_status)
+          // console.log(open_status)
           if(open_status == 2){// 开启时=页面显示开启
             AititleText.value = '已开启';
             AititleStatus.value = true;
@@ -820,22 +825,42 @@ export default {
           rushLoading.value = false;
         })
       }
-      Get_title_SEO_status();// 初始化页面SEO状态
-      Aiimgvideo.RushAIimgvideofirst() // 初始化Ai生图生视频托管状态
+      Get_title_SEO_status();// 初始化页面SEO状态=显示是否开启/关闭
+      Aiimgvideo.RushAIimgvideofirst() // 初始化Ai生图生视频托==开关管状态开启/关闭
       
       // 查询下架商品列表及其处理建议
-      const Get_Product_Suggestion_List = ()=>{
-        console.log(API.AppSrtoreAPI.dou_product.getProductSuggestionList)
-      }
+      const Get_Offline_Product_List = reactive({
+        offline_product_list:[],// 下架商品列表
+        suggestion:'',// 处理建议
+        suggest_offline_num:0,// 建议下架商品数量
+        force_offline_num:0,// 强制下架商品数量
+        optimize_num:0,// 优化商品数量
+        Get_Product_Suggestion_List: async(suggestion) =>{
+          var res = await axios.post(API.AppSrtoreAPI.dou_product.getProductSuggestionList,{
+              "page_no":1,
+              "page_size":10,
+              "suggestion":suggestion
+          })
+          console.log(res.data.data)
+          let total = res.data.data.total;
+          if(suggestion === 'suggest_offline') {
+            Get_Offline_Product_List.suggest_offline_num = total;// 建议下架数量
+          }else if(suggestion === 'force_offline'){
+            Get_Offline_Product_List.force_offline_num = total;// 强制下架数量
+          }else if(suggestion === 'optimize'){
+            Get_Offline_Product_List.optimize_num = total;// 优化商品数量
+          }
+          return res.data.data
+        },
+
+      })
+      // 【optimize】牵引优化商品【初始化】
+      Get_Offline_Product_List.Get_Product_Suggestion_List('optimize')
+      // 【force_offline】牵引强制下架商品【初始化】
+      Get_Offline_Product_List.Get_Product_Suggestion_List('force_offline')
+      // 【suggest_offline】牵引优化商品【初始化】
+      Get_Offline_Product_List.Get_Product_Suggestion_List('suggest_offline')
       // 抖店组件SDK初始化----结束
-
-
-      // 会员信息
-
-      // 帮助中心
-
-      // 联系我们
-
 
         return{
           PAGEDATA,
@@ -853,7 +878,8 @@ export default {
           AititleText,
           Get_title_SEO_status,
           Aititlecolor,
-          rushLoading
+          rushLoading,
+          Get_Offline_Product_List
 
         }
     },
@@ -877,4 +903,9 @@ export default {
 .task_sty{width: 140px;margin: 6px 0 0 0;height: 26px;}
 .task_num{height: 56px;display: block;padding: 12px 0 0 0;}
 .bodyright{background-color: #fff;margin: 0 0 0 0;padding: 0 14px 0 0}
+/* 深度选择器覆盖标题样式 */
+:deep(.ant-card-head-title) {
+  font-size: 12px !important;  /* 或者你想要的尺寸 */
+  line-height: 22px;
+}
 </style>
