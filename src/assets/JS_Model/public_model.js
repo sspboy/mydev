@@ -164,7 +164,9 @@ export class A_Patch{
             "getSeoTrusteeshipStrategy":"api/douyin/product/getSeoTrusteeshipStrategy",// 查询AI标题SEO托管状态
             "updateMaterialHostingSwitch":"api/douyin/product/updateMaterialHostingSwitch",// 开启/关闭生图托管状态
             "getShopHostingInfo":"api/douyin/product/getShopHostingInfo",// 查询商家是否已开启AI生图托管
-            "getProductSuggestionList":"api/douyin/product/getProductSuggestionList"// 查询下架商品列表及其处理建议
+            "getProductSuggestionList":"api/douyin/product/getProductSuggestionList",// 查询下架商品列表及其处理建议
+            "setoffline":"api/douyin/product/offline", // 下架商品
+            "setOnline":"api/douyin/product/setOnline" // 上架商品
         },
         // 运费模板
         freight:{

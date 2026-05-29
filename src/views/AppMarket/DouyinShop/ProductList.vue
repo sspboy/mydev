@@ -231,12 +231,12 @@
                   <template #actions>
                     <div style="height: 60px;width: 260px;">
                       <a-row justify="center" align="middle" style="height: 100%;">
-                        <a-col :span="8"><a class="font_size_12" @click="showDetaile(item.product_id)"><EyeOutlined /> 查看详情</a></a-col>
-                        <a-col :span="8"><a class="font_size_12" @click="showImage(item.product_id)"><PictureOutlined /> 图片预览</a></a-col>
-                        <a-col :span="8"><a class="font_size_12" @click="showFeight(item.freight_id)"><EyeOutlined /> 运费模板</a></a-col>
-                        <a-col :span="8"><a class="font_size_12" @click="showEdit(item.product_id)"><FormOutlined /> 快捷编辑</a></a-col>
-                        <a-col :span="8"><a class="font_size_12" @click="edit_douyinshop_product(item.product_id)"><edit-outlined /> 抖店编辑</a></a-col>
-                        <a-col :span="8"><a class="font_size_12" @click="deldata.play(item.product_id)"><DeleteOutlined />移入回收站</a></a-col>
+                        <a-col :span="12"><a class="font_size_12" @click="showDetaile(item.product_id)"><EyeOutlined /> 查看详情</a></a-col>
+                        <a-col :span="12"><a class="font_size_12" @click="showImage(item.product_id)"><PictureOutlined /> 图片预览</a></a-col>
+                        <!-- <a-col :span="8"><a class="font_size_12" @click="showFeight(item.freight_id)"><EyeOutlined /> 运费模板</a></a-col> -->
+                        <!-- <a-col :span="8"><a class="font_size_12" @click="showEdit(item.product_id)"><FormOutlined /> 快捷编辑</a></a-col> -->
+                        <a-col :span="12"><a class="font_size_12" @click="edit_douyinshop_product(item.product_id)"><edit-outlined /> 抖店编辑</a></a-col>
+                        <a-col :span="12"><a class="font_size_12" @click="deldata.play(item.product_id)"><DeleteOutlined />移入回收站</a></a-col>
                       </a-row>
                     </div>
                   </template>

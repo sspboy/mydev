@@ -1,17 +1,21 @@
 // 新建商品组件：方法调用
 import { ref } from 'vue'
-import * as tool from '@/assets/JS_Model/tool';
+import * as TOOL from '@/assets/JS_Model/tool';
 import * as TABLE from '@/assets/JS_Model/TableOperate';
 import * as utils from '@/assets/JS_Model/public_model';
+import axios from 'axios';
+const tool = new TOOL.TOOL()            // 工具方法
+const API = new utils.A_Patch()         // 请求接口地址合集
+
 
 // 主图
 export class PicFun  {
     
-    PicList=ref([])
+    PicList=ref([])// 输出的图片列表
 
     // 删除图片
     del_pic=(index)=>{
-        Pic_Fun.PicList.value.splice(index, 1)
+        this.PicList.value.splice(index, 1)
     }
 
     // 添加图片
@@ -131,9 +135,17 @@ export class CATE {
 
 // 规格库存
 
-
 // 描述详情
 
 // 关闭新建商品按钮
 
 // 商品上传接口方法
+export class upload_product{
+
+    data={'product_name': '123'}// 商品商品data对象
+
+    up=()=>{
+        console.log(this.data)
+    }
+
+}

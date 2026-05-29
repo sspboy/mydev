@@ -138,7 +138,8 @@ export default defineComponent({
                 "appId":"583",
                 "shopId":shop_id,
                 "token":token,
-                "componentId": 317,
+                // "componentId": 317,
+                blockedDistributeComponents: [317,524],
                 "extra": {}
             });
             

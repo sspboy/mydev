@@ -15,7 +15,15 @@
         <!--左侧 菜单组件  结束-->
 
         <a-layout-content class="content_border">
-            <div>
+            
+            <div
+            :style="{
+                height: PAGEDATA.innerHeight + 'px',
+                overflowY:'auto',
+                overflowX:'hidden',
+                marginBottom:'10px'
+                }"
+            >
                 <a-form
                     ref="formRef"
                     name="advanced_search"
@@ -23,7 +31,7 @@
                     :model="formState"
                     @finish="onFinish"
                 >
-                    <a-row :gutter="24">
+                    <!-- <a-row :gutter="24">
                         <a-col :span="8">
                             <a-form-item
                             name="title"
@@ -71,23 +79,23 @@
                             <a-range-picker v-model:value="formState.create_time" style="width: 100%;" />
                             </a-form-item>
                         </a-col>
-                    </a-row>
+                    </a-row> -->
                     <a-row>
                         <a-col :span="12">
                             <a-space>
                                 <a-radio-group v-model:value="Select_the_column" size="small" >
-                                    <a-radio-button value="suggest_offline" class="font_size_12">建议下架</a-radio-button>
-                                    <a-radio-button value="force_offline" class="font_size_12">强制下架</a-radio-button>
-                                    <a-radio-button value="optimize" class="font_size_12">潜力优化商品</a-radio-button>
+                                    <a-radio-button value="suggest_offline" class="font_size_12" @click="Selecttable.Get_suggest_offline_list">建议下架</a-radio-button>
+                                    <a-radio-button value="force_offline" class="font_size_12" @click="Selecttable.Get_force_offline_list">强制下架</a-radio-button>
+                                    <a-radio-button value="optimize" class="font_size_12" @click="Selecttable.Get_optimize_list">潜力优化商品</a-radio-button>
                                 </a-radio-group>
                             </a-space>
                         </a-col>
                         <a-col :span="12" style="text-align: right">
-                            <a-button type="primary" html-type="submit" :size="'small'" :loading="formState.select_loading">查询</a-button>
-                            <a-button style="margin: 0 8px" type="primary" size="small" @click="batchOptimize" :loading="loading">批量优化</a-button>
-                            <a-button size="small" @click="exportData">导出数据</a-button>
-                            <a-button style="margin: 0 8px" :size="'small'" @click="() => formRef.resetFields()">重置</a-button>
-                            <a style="font-size: 12px" @click="expand = !expand">
+                            <!-- <a-button type="primary" html-type="submit" :size="'small'" :loading="formState.select_loading">查询</a-button>
+                            <a-button style="margin: 0 8px" type="primary" size="small" @click="batchOptimize" :loading="loading">批量优化</a-button> -->
+                            <!-- <a-button size="small" @click="exportData">导出数据</a-button> -->
+                            <!-- <a-button style="margin: 0 8px" :size="'small'" @click="() => formRef.resetFields()">重置</a-button> -->
+                            <!-- <a style="font-size: 12px" @click="expand = !expand">
                                 <template v-if="expand">
                                 <UpOutlined />
                                 </template>
@@ -95,47 +103,80 @@
                                 <DownOutlined />
                                 </template>
                                 {{ expand ? '收起' : '展开' }}
-                            </a>
+                            </a> -->
                         </a-col>
                     </a-row>
                 </a-form>
 
                 <!-- 数据表格 -->
                 <a-table
-                    style="margin-top: 10px;"
-                    :columns="columns"
-                    :data-source="tableData"
-                    :pagination="pagination"
-                    :loading="tableLoading"
-                    @change="handleTableChange"
-                    rowKey="id"
+                    class="full-body-table"
+                    :columns="Selecttable.columns"
+                    :data-source="Selecttable.tableData"
+                    :loading="Selecttable.tableloading"
+                    :pagination="false"
+                    rowKey="product_id"
                     :scroll="{ y: innerHeight }"
+                    :row-selection="rowSelection"
                 >
                     <template #bodyCell="{ column, record }">
                         <template v-if="column.key === 'operation'">
-                            <a-space>
-                                <a-button type="link" size="small" @click="viewDetail(record)">查看</a-button>
-                                <a-button type="link" size="small" @click="optimizeItem(record)">优化</a-button>
+                            <a-space v-if="record.suggestion === 'suggest_offline'">
+                                <!-- <a-button type="link" size="small" @click="console.log('下架商品')">查看</a-button> -->
+                                <a-button type="primary" size="small" @click="Selecttable.setofflineproduct(record)">下架</a-button>
+                            </a-space>
+                            <a-space v-if="record.suggestion === 'force_offline'">
+                                <!-- <a-button type="link" size="small" @click="console.log('强制下架')">查看</a-button> -->
+                                <a-button type="primary" size="small" @click="Selecttable.setofflineproduct(record)">下架</a-button>
+                            </a-space>
+                            <a-space v-if="record.suggestion === 'optimize'">
+                                <!-- <a-button type="link" size="small" @click="console.log('优化商品')">查看</a-button> -->
+                                <a-button type="primary" size="small" @click="console.log('优化商品')">优化</a-button>
                             </a-space>
                         </template>
-                        <template v-if="column.key === 'id'">
-                            <a-tag color="orange">{{ record.product_id }}</a-tag>
-                        </template>
                         <template v-if="column.key === 'title'">
-                            {{ record.product_name }}
+                            <div class="font_size_12">{{ record.product_name }}</div>
+                            <span class="font_size_12" style="color: #999;"> ID-{{ record.product_id }}</span>
                         </template>
                         <template v-if="column.key === 'image'">
-                            <a-image :src="record.main_url" width="80px" />
+                            <a-image :src="record.main_url" width="80px" style="border-radius: 6px;" />
                         </template>
-                        
-                        <template v-if="column.key === 'status'">
-                            <a-tag :color="record.status === 0 ? 'green' : 'red'">
-                                {{ record.status === 0 ? '在线' : '下线' }}
-                            </a-tag>
+                        <template v-if="column.key === 'suggestion'">
+                            <span class="font_size_12" v-if="record.suggestion === 'force_offline'">强制下架</span>
+                            <span class="font_size_12" v-else-if="record.suggestion === 'suggest_offline'">建议下架</span>
+                            <span class="font_size_12" v-else-if="record.suggestion === 'optimize'">牵引优化</span>
+                        </template>
+                        <template v-if="column.key === 'suggestion_reason'">
+                            <span class="font_size_12">{{ record.suggestion_reason }}</span>
                         </template>
                     </template>
                 </a-table>
+
             </div>
+            <!-- 表格底部栏：全选/反选 + 已选数量 -->
+            <a-row>
+                <a-col :span="8" style="padding:6px 0 0 20px;">
+                <a-space>
+                    <a-checkbox
+                        :checked="selectedRowKeys.length === (Selecttable.tableData || []).length && (Selecttable.tableData || []).length > 0"
+                        :indeterminate="selectedRowKeys.length > 0 && selectedRowKeys.length < (Selecttable.tableData || []).length"
+                        @change="toggleSelectAll"
+                    >
+                        全选/反选
+                    </a-checkbox>
+                    <span class="selected-count">已选<strong>{{ selectedRowKeys.length }}</strong> 条</span>
+
+                    <a-button size="small" type="primary" @click="Selecttable.batchsetofflineproduct">一键批量下架</a-button>
+                </a-space>
+            </a-col>
+
+            <a-col :span="16">
+                <nav_pagination :fandata="PAGEDATA" v-on:complete="page_turning"/>
+            </a-col>
+            </a-row>
+            
+            
+
         </a-layout-content>
 
     </a-layout>
@@ -145,16 +186,18 @@
 
 <script>
 import { MenuFoldOutlined, MenuUnfoldOutlined, UpOutlined, DownOutlined } from '@ant-design/icons-vue';
-import { defineComponent, onMounted, reactive, ref } from 'vue';
+import { defineComponent, onMounted, reactive, ref , onUnmounted } from 'vue';
 import { useStore } from 'vuex'
 import * as utils from '@/assets/JS_Model/public_model';
 import * as TABLE from '@/assets/JS_Model/TableOperate';
 import * as TOOL from '@/assets/JS_Model/tool';
-import axios from "axios";
+import axios from "axios"; 
 
 // 组件引用=====开始
 import menu_left from "@/components/layout/menu_left.vue";
 import menu_head from "@/components/layout/menu_head.vue";
+import nav_pagination from "@/components/nav_pagination.vue";
+import { timePickerProps } from 'ant-design-vue/es/time-picker/time-picker';
 
 export default {
 
@@ -168,6 +211,7 @@ export default {
         DownOutlined,
         menu_left,
         menu_head,
+        nav_pagination
     },
     // 父组件数据
     props: {},
@@ -176,24 +220,26 @@ export default {
 
         // 【数据绑定】=======================================>开始
         const API = new utils.A_Patch()         // 请求接口地址合集
-        const TO = new TABLE.TableOperate()     // 表格操作方法
         const store = useStore();               // 共享数据
         const tool = new TOOL.TOOL()            // 工具方法
-        const innerHeight = ref(window.innerHeight - 300);  // 初始化表格高度
+        const innerHeight = ref(window.innerHeight - 226);  // 初始化表格高度
         const Select_the_column = ref('suggest_offline'); // 选择类别
+        const selectedRowKeys = ref([]); // 选中的行 keys
+        const selectedRows = ref([]); // 选中的行数据
         const PAGEDATA = reactive({
+            innerHeight: ref(window.innerHeight - 130), // 初始化列表高度
+            innerWidth: ref(window.innerWidth - 230), // 初始化列表宽度
             title: '低效商品',
             // 菜单选中配置
             menudata: {
-                'key': '105',
+                'key': '117',
                 'openKeys': 'douyinshop'
             },
-            // 默认查询条件
-            navdata:{
-                "page_no":1,
-                "page_size":10,
-                "suggestion":"suggest_offline"  // force_offline强制下架, suggest_offline建议下架, optimize牵引优化
-            }
+            List_conditions: {
+                page: 1, // 当前页
+                page_size: 10, // 每页条数
+            },
+            total_number: 0, // 数据总条数
         })
 
         // 表单数据绑定
@@ -217,107 +263,184 @@ export default {
             ]),
         });
 
-        // 表格列定义
-        const columns = [
+        // 表格数据LISt
+        const Selecttable = reactive({
+
+            // 查询条件配置
+            navdata:{
+                "page_no":PAGEDATA.List_conditions.page,
+                "page_size":PAGEDATA.List_conditions.page_size,
+                "suggestion":"suggest_offline"  // force_offline强制下架, suggest_offline建议下架, optimize牵引优化
+            },
+            
+            // 查询方法
+            fetchData: () => {
+
+                Selecttable.tableloading = true;
+                // 这里替换为实际的接口地址
+                tool.Http_.post(API.AppSrtoreAPI.dou_product.getProductSuggestionList, Selecttable.navdata).then(res => {
+                    // console.log('接口返回数据:', res);
+                    // res.data.data.product_list ||
+                    Selecttable.tableData = res.data.data.product_list || [];
+                    PAGEDATA.total_number = res.data.data.total || 0; // 总页数
+                    Selecttable.tableloading = false;
+                }).catch(() => {
+                    console.error('接口请求失败');  
+                    Selecttable.tableloading = false;
+
+                });
+            },
+            // 建议下架tab查询
+            Get_suggest_offline_list: () => {
+                Selecttable.navdata.suggestion = 'suggest_offline';
+                Selecttable.fetchData();
+            },
+            // 强制下架tab查询
+            Get_force_offline_list: () => {
+                Selecttable.navdata.suggestion = 'force_offline';
+                Selecttable.fetchData();
+            },
+            // 牵引优化tab查询
+            Get_optimize_list: () => {
+                Selecttable.navdata.suggestion = 'optimize';
+                Selecttable.fetchData();
+            },
+            // 表头config
+            columns:[
             {
-                title: '商品ID',
-                dataIndex: 'id',
-                key: 'id',
-                width: 160,
+                title: '商品图片',
+                dataIndex: 'image',
+                key: 'image',
+                width: 80,
+                align: 'center',
+
             },
             {
                 title: '商品标题',
                 dataIndex: 'title',
                 key: 'title',
+                width: 220,
+            },
+            {
+                title: '处理建议',
+                dataIndex: 'suggestion',
+                align: 'center',
+                key: 'suggestion',
+                width: 120,
+            },
+            {
+                title: '下架的原因',
+                dataIndex: 'suggestion_reason',
+                key: 'suggestion_reason',
+                width: 120,
+            },
+            {
+                title: '首次上架时间',
+                dataIndex: 'first_publish_time',
+                key: 'first_publish_time',
+                width: 60,
+                align: 'center',
                 ellipsis: true,
-                width: 160,
-            },
-            {
-                title: '商品图片',
-                dataIndex: 'image',
-                key: 'image',
-                width: 100,
-            },
-            {
-                title: '类目',
-                dataIndex: 'category_name',
-                key: 'category_name',
-                width: 120,
-            },
-            {
-                title: '低效类型',
-                dataIndex: 'inefficient_type',
-                key: 'inefficient_type',
-                width: 120,
-            },
-            {
-                title: '状态',
-                dataIndex: 'status',
-                key: 'status',
-                width: 100,
-            },
-            {
-                title: '创建时间',
-                dataIndex: 'create_time',
-                key: 'create_time',
-                width: 160,
+
             },
             {
                 title: '操作',
                 key: 'operation',
-                fixed: 'right',
                 width: 150,
+                align: 'center',
             },
-        ];
+            ],
+            // 列表加载状态
+            tableloading: true,
+            // 列表数据
+            tableData: undefined,
+            // 下架商品
+            setofflineproduct: (record) => {
+                // console.log('下架商品:', record);
+                var product_id = record.product_id;
+                
+                console.log('要下架的商品ID:', product_id);
+                tool.Http_.post(API.AppSrtoreAPI.dou_product.setoffline, {
+                    "product_id":product_id
+                }).then(res => {
 
-        // 表格数据
-        const tableData = ref([]);
-        const tableLoading = ref(false);
-        const loading = ref(false);
+                    var code = res.data.code;
+                    console.log('接口返回数据:', code, res);
+                    if(code === 10000){
+                        tool.Fun_.message('success', '商品已下架');
+                    }else{
+                        tool.Fun_.message('error', '下架失败，'+ res.data.msg);
+                    }
 
-        // 分页配置
-        const pagination = reactive({
-            current: 1,
-            pageSize: 20,
-            total: 0,
-            showSizeChanger: true,
-            showTotal: (total) => `共 ${total} 条`,
+                    setTimeout(() => {
+                        Selecttable.fetchData(); // 刷新列表
+                    }, 2000);
+                
+                }).catch(() => {
+                    console.error('接口请求失败');  
+                    tool.Fun_.message('error', '下架失败，请重试');
+                });
+            },
+            // 批量下架商品
+            batchsetofflineproduct: () => {
+
+                var checkednumber = selectedRowKeys.value.length; // 判断是否勾选商品
+                console.log('选中的商品ID列表:',checkednumber, selectedRowKeys.value);
+                if(checkednumber == 0){
+                    // 如果未勾选
+                    tool.Fun_.message('warning', '请至少选择一件商品进行批量下架');
+                    return;
+                }else{
+                    // 如果已勾选
+                    // tool.Http_.post(API.AppSrtoreAPI.dou_product.batchoffline, {
+                    //     "product_ids":selectedRowKeys.value
+                    // }).then(res => {
+
+                    //     console.log('接口返回数据:', res);
+                    //     tool.Fun_.message('success', '批量下架任务已提交');
+
+                    //     Selecttable.fetchData(); // 刷新列表
+                    // }).catch(() => {
+                    //     console.error('接口请求失败');  
+                    //     tool.Fun_.message('error', '批量下架失败，请重试');
+                    // });
+                }
+
+                
+
+
+
+
+            },
+
         });
 
-        // 查询数据
-        const fetchData = () => {
-            tableLoading.value = true;
-            
-            // 这里替换为实际的接口地址
-            tool.Http_.post(API.AppSrtoreAPI.dou_product.getProductSuggestionList, PAGEDATA.navdata).then(res => {
-                console.log('接口返回数据:', res);
-                tableData.value = res.data.data.product_list || [];
-                pagination.total = res.data.data.total || 0;
-                tableLoading.value = false;
-            }).catch(() => {
-                tableLoading.value = false;
-                console.error('接口请求失败');  
-            });
+        // 【翻页-组件 回调方法】========================================开始
+        const page_turning = (data)=>{
 
-            // 模拟数据
-            setTimeout(() => {
-                tableData.value = [];
-                tableLoading.value = false;
-            }, 500);
-        };
+            PAGEDATA.List_conditions.page = data.page;
+            PAGEDATA.List_conditions.page_size = data.page_size;
 
-        // 表格分页/排序/筛选变化
-        const handleTableChange = (pag) => {
-            pagination.current = pag.current;
-            pagination.pageSize = pag.pageSize;
-            fetchData();
-        };
+            Selecttable.navdata.page_no = data.page;
+            Selecttable.navdata.page_size = data.page_size;
+
+            Selecttable.fetchData();
+
+        }
+        // 【查询组件 回调方法】========================================结束
+
+
+
+
+
+        // 按钮loading状态
+        const loading = ref(false);
+
 
         // 搜索
         const onFinish = (values) => {
             console.log('Search values:', values);
-            pagination.current = 1;
-            fetchData();
+            Selecttable.fetchData();
         };
 
         // 查看详情
@@ -347,28 +470,46 @@ export default {
         // 展开/收起
         const expand = ref(false);
 
-        onMounted(() => {
-            // 分类信息初始化
-            // tool.Http_.post(API.AppSrtoreAPI.dou_product.cate, { "cid": 0 }).then(res => {
-            //     let obj_list = res.data.data;
-            //     formState.options = getCateList(obj_list);
-            // });
-
-            fetchData();
-        });
-
-        // 类目列表转换
-        const getCateList = (obj) => {
-            var obj_list = []
-            for (let i of obj) {
-                let cate_obj = {}
-                cate_obj.value = i.id;
-                cate_obj.label = i.name;
-                cate_obj.isLeaf = i.is_leaf;
-                obj_list.push(cate_obj)
-            }
-            return obj_list
+        // 表格行选择配置
+        // 原理：Ant Design Vue 的 a-table 只要传入 row-selection 配置对象，就会自动在表格左侧渲染一列 checkbox。selectedRowKeys 控制哪些行被选中，onChange 在勾选/取消时回调，返回当前选中的 keys 和完整 rows 数据。
+        const rowSelection = {
+            selectedRowKeys: selectedRowKeys,
+            onChange: (keys, rows) => {
+                selectedRowKeys.value = keys; // 选中的行 keys
+                selectedRows.value = rows; // 选中的行数据
+            },
         };
+
+        // 全选/反选当前页
+        const toggleSelectAll = () => {
+            if (!Selecttable.tableData || Selecttable.tableData.length === 0) return;
+            if (selectedRowKeys.value.length === Selecttable.tableData.length) {
+                selectedRowKeys.value = [];
+                selectedRows.value = [];
+            } else {
+                selectedRowKeys.value = Selecttable.tableData.map(item => item.product_id);
+                selectedRows.value = [...Selecttable.tableData];
+            }
+        };
+
+        // 组件挂之后---请求数据===============================开始
+        // 定义一个函数来处理窗口大小变化 ==
+        const handleResize = () => {
+            PAGEDATA.innerHeight = window.innerHeight - 130; // 作为表格自适应高度
+            PAGEDATA.innerWidth = window.innerWidth - 230; // 作为表格自适应高度
+            innerHeight.value = window.innerHeight - 226; // 同步更新表格滚动高度
+        };
+        // 页面初始话加载
+        onMounted(() => {
+            window.addEventListener('resize', handleResize);// 窗口变换时候
+            Selecttable.fetchData();
+        });
+        // 在组件卸载时移除事件监听器
+        onUnmounted(() => {
+            window.removeEventListener('resize', handleResize);
+        });
+        // 【组件挂载】========================================结束
+
 
         return {
             store,
@@ -379,16 +520,17 @@ export default {
             formRef,
             expand,
             onFinish,
-            columns,
-            tableData,
-            tableLoading,
-            pagination,
-            handleTableChange,
             viewDetail,
             optimizeItem,
             batchOptimize,
             exportData,
-            Select_the_column
+            Select_the_column,
+            Selecttable,
+            page_turning,
+            selectedRowKeys,
+            selectedRows,
+            rowSelection,
+            toggleSelectAll
         }
     }
 }
@@ -400,12 +542,40 @@ export default {
 
 .content_border {
     padding: 10px;
-    background-color: #f0f2f5;
 }
 
 .ant-advanced-search-form {
-    background: #fff;
-    padding: 20px;
+    background: #f2f2f2;
+    padding: 8px;
     border-radius: 4px;
 }
+/*表格表头 字体大小定义*/
+:deep(.ant-table-thead > tr > th) {
+    font-size: 12px;
+    /* 还可以同时调整其他样式 */
+    /* font-weight: 500; */
+    /* padding: 8px 16px; */
+}
+
+/* tbody 高度 100%：固定滚动容器高度，并让 table/tbody 撑满 */
+:deep(.full-body-table .ant-table-body) {
+    height: v-bind(innerHeight + 'px') !important;
+    max-height: none !important;
+}
+
+:deep(.full-body-table table) {
+    height: 100%;
+}
+
+:deep(.full-body-table .ant-table-tbody) {
+    height: 100%;
+}
+
+
+
+.selected-count {
+    color: #666;
+    font-size: 13px;
+}
+
 </style>

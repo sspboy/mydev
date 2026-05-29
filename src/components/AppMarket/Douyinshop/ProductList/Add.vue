@@ -10,6 +10,9 @@
     <!-- 动态渲染异步组件--选择尺码模板 -->
     <selectsizetemplateid v-if="PAGEDATA.sizetemplate_open" v-on:sizetemplate_callback="selectsizetemplate_callback" :data="PAGEDATA"/>
 
+    <!--动态渲染异步组件--选择品牌模板-->
+    <selectbrandid v-if="PAGEDATA.brand_list_open" v-on:sizetemplate_callback="selectsizetemplate_callback" :data="PAGEDATA"/>
+
     <a-modal
       v-model:open="props.data.AddDate"
       width="100%"
@@ -287,7 +290,6 @@
                                 <!--必填属性-->
 
                                 <!--非必填属性-->
-
                                 <template v-for="item in CATE.format.value" >
                                     
                                     <!--文本-->
@@ -389,8 +391,6 @@
                                                 </a-select>
                                             </a-form-item>
                                         </p>
-
-
                                     </a-col>
 
                                     <!--多选-->
@@ -795,7 +795,6 @@
                                 <a-form-item
                                     label="客服电话"
                                     name="mobile"
-                                    
                                 >
                                     <a-input v-model:value="formState.mobile" placeholder="输入客服电话"/>
                                 </a-form-item>
@@ -811,6 +810,18 @@
                                         <a-button class="font_size_12" @click="PAGEDATA.chang_freighttemplate">选择</a-button>
                                     </a-input-group>
                                 </a-form-item>                                    
+                            </a-col>
+
+                            <a-col :span="8">
+                                <a-form-item
+                                    label="选择品牌"
+                                    name="standard_brand_id"
+                                >
+                                  <a-input-group compact>
+                                    <a-input v-model:value="formState.standard_brand_id" placeholder="选择品牌" disabled style="width: calc(74%);padding: 5.5px;" />
+                                    <a-button class="font_size_12" @click="PAGEDATA.change_brand_list">选择</a-button>
+                                  </a-input-group>
+                                </a-form-item>
                             </a-col>
 
                             <a-col :span="8">
@@ -1202,6 +1213,7 @@ export default defineComponent({
         selectFreightid:defineAsyncComponent(() => import('@/components/AppMarket/Douyinshop/templatefreight/selectFreightId.vue')),// 运费模板组件
         selectsizetemplateid:defineAsyncComponent(() => import('@/components/AppMarket/Douyinshop/templateSize/selectsizetemplateid.vue')),// 尺码模板组件
         format_cp:defineAsyncComponent(()=>import('@/components/AppMarket/Douyinshop/ProductList/edit_component/format_cp.vue')),// 商品属性组件
+        selectbrandid:defineAsyncComponent(()=>import('@/components/AppMarket/Douyinshop/brand/brandlist.vue')),// 商品品牌组件
         // 产品属性>面料属性》多选组件
         VNodes:defineComponent({
             props: {
@@ -1235,7 +1247,7 @@ export default defineComponent({
             selectimg_open:false,          // 添加主图-图片显示状态配置
             freighttemplate_open:false,    // 运费模板-图片显示状态配置
             sizetemplate_open:false,       // 尺码模板-图片显示状态配置
-
+            brand_list_open:false,         // 品牌列表-组件显示状态配置
             setimg_name:'',             // 添加图片的对象['PicList','long_img_List','white_img','video','des']
             sku_img_obj:'',             // 规格图片对象
 
@@ -1277,10 +1289,13 @@ export default defineComponent({
             chang_freighttemplate:()=>{
                 PAGEDATA.freighttemplate_open = true;
             },
+            // 选择品牌
+            change_brand_list:()=>{
+                PAGEDATA.brand_list_open = true;
+            },
             // 上传按钮状态
             upload_product_loading:ref(false)
         })
-
 
         // 主图对象
         const Pic_Fun = {
@@ -1525,6 +1540,7 @@ export default defineComponent({
             mobile:'18888888888',           // 客服电话
             name:undefined,                 // 商品标题
             recommend_remark:undefined,     // 推荐语：不能含emoj表情
+            standard_brand_id:undefined,    //品牌id
             pay_type:'1',                   // 支付类型
             reduce_type:'1',                // 减库存类型
             freight_id:{"name":"包邮","value":0},           // 运费模板
@@ -2743,13 +2759,13 @@ export default defineComponent({
                 product_data_obj.pay_type = pro_info.pay_type;          // 支付方式
                 product_data_obj.reduce_type = pro_info.reduce_type;    // 减库存类型
                 product_data_obj.mobile = pro_info.mobile;              // 电话
-                product_data_obj.commit = pro_info.commit;              // 提交方式
                 product_data_obj.freight_id = pro_info.freight_id.value;// 运费模板
                 product_data_obj.size_info_template_id = pro_info.size_info_template_id.value// 尺码模板
                 product_data_obj.minimum_per_order = pro_info.minimum_per_order; // 最少下单购买件数
                 product_data_obj.maximum_per_order = pro_info.maximum_per_order; // 最多下单购买件数
                 product_data_obj.limit_per_buyer = pro_info.limit_per_buyer; // 累计购买件数
                 product_data_obj.presell_type = pro_info.presell_type; // 发货模式
+                product_data_obj.short_product_name = pro_info.short_product_name;// 导购短标题
             }else{
                 return
             }
@@ -2778,7 +2794,6 @@ export default defineComponent({
                 // 规格图片
                 if(specs_info.spec_pic !== undefined){
                     product_data_obj.spec_pic = specs_info.spec_pic;
-                    console.log(product_data_obj)
                 }
 
                 // 正常获取
@@ -2825,42 +2840,43 @@ export default defineComponent({
         const upload_product = async (product_data) =>{
 
             // 按钮状态
-            PAGEDATA.upload_product_loading = true;
+            // PAGEDATA.upload_product_loading = true;
 
-            // console.log(product_data)
+            console.log(product_data)
+            product_data.commit = 1; // 提交方式-立即发布
             
             // 发送数据到接口
-            var res = await tool.Http_.post(API.AppSrtoreAPI.dou_product.add, product_data)
+            // var res = await tool.Http_.post(API.AppSrtoreAPI.dou_product.add, product_data)
 
             // console.log(res)
 
-            var code = res.data.code;
-            var sub_msg = res.data.sub_msg
-            if(code === 10000 ){ // 接口返回成功
+            // var code = res.data.code;
+            // var sub_msg = res.data.sub_msg
+            // if(code === 10000 ){ // 接口返回成功
                 
-                // 提示上传成功，刷新列表;
+            //     // 提示上传成功，刷新列表;
 
-                setTimeout(() => {
+            //     setTimeout(() => {
 
-                    tool.Fun_.message('success','商品添加成功！')
+            //         tool.Fun_.message('success','商品添加成功！')
 
-                    PAGEDATA.upload_product_loading = false;
+            //         PAGEDATA.upload_product_loading = false;
 
-                    closed() // 关闭新建商品
+            //         closed() // 关闭新建商品
 
-                    ctx.emit('add_call_back')// 刷新列表
+            //         ctx.emit('add_call_back')// 刷新列表
 
-                }, 1000);
+            //     }, 1000);
 
-            }else{ // 接口返回失败
+            // }else{ // 接口返回失败
 
-                // 提示失败，返回失败原因;
-                tool.Fun_.message('error', sub_msg)
+            //     // 提示失败，返回失败原因;
+            //     tool.Fun_.message('error', sub_msg)
 
-                // 重置提交按钮状态
-                PAGEDATA.upload_product_loading = false;
+            //     // 重置提交按钮状态
+            //     PAGEDATA.upload_product_loading = false;
 
-            }
+            // }
 
         }
 

@@ -98,15 +98,14 @@
           </a-col>
         </a-row>
 
-        <a-row>
-          <a-col :span="20">
+        <!--商品诊断任务-->
+        <a-row :gutter="[12, 10]" class="NumberBox cursor">
 
-            <div class="ZhenduanTitle">
-
-                <a-space :size="10">
+          <a-col :span="24">
+            <a-space :size="10">
                   <div class="font_size_12 task_sty" style="width:100px;margin: 4px 0 0 4px;font-weight: bold;">
                     <a-skeleton active :paragraph="{ rows: 1 }" :title="false" :loading="QualityTask.load_vife">
-                    <span style="display: block;height: 26px;line-height: 18px;">
+                    <span style="display: block;height: 26px;line-height: 18px;text-indent: 20px;">
                        <DashboardOutlined /> 诊断中心
                     </span>
                     </a-skeleton>
@@ -135,20 +134,14 @@
                         <span style="display: block;height: 26px;line-height: 18px;">任务id --{{ QualityTask.task_id }}</span>
                     </a-skeleton>
                   </div>
+                  
                 </a-space>
-            </div>
-          </a-col>
-          <a-col :span="4">
-            <div class="ZhenduanTitle">
-                  <div class="font_size_12" style="text-align: right;width: 100%;margin: 6px 0 0 0;height: 26px;padding-right: 10px;">
-                        <span style="display: block;height: 26px;line-height: 32px;"><a @click="router.push('/quality');">去诊断>></a></span>
+                <div class="ZhenduanTitle">
+                    <div class="font_size_12" style="text-align: right;width: 100%;margin: 0 0 0 0;height: 26px;padding-right: 10px;">
+                          <span style="display: block;height: 26px;line-height: 32px;"><a @click="router.push('/quality');">去诊断>></a></span>
+                    </div>
                   </div>
-            </div>
           </a-col>
-        </a-row>
-
-        <!--商品诊断任务-->
-        <a-row :gutter="[12, 0]" class="NumberBox cursor">
           
           <a-col :span="3">
             <p class="Numbertext">    
@@ -304,7 +297,7 @@
               <template #cover>
                 <img style="width: 50px; height: 50px;margin: 30px auto;" alt="example" src="/cut.png" />
               </template>
-              <a-card-meta class="font_size_12">
+              <a-card-meta class="font_size_12" style="text-align: center;">
                 <template #description>1:1&3:4截图</template>
               </a-card-meta>
             </a-card>
@@ -317,7 +310,7 @@
               <template #cover>
                 <img style="width: 50px; height: 50px;margin: 30px auto;" alt="example" src="/white_background_image.png" />
               </template>
-              <a-card-meta class="font_size_12">
+              <a-card-meta class="font_size_12" style="text-align: center;">
                 <template #description>白底图处理</template>
               </a-card-meta>
             </a-card>
@@ -330,7 +323,7 @@
               <template #cover>
                 <img style="width: 50px; height: 50px;margin: 30px auto;" alt="example" src="/remove_watermark.png" />
               </template>
-              <a-card-meta class="font_size_12">
+              <a-card-meta class="font_size_12" style="text-align: center;">
                 <template #description>图片去水印</template>
               </a-card-meta>
             </a-card>
@@ -366,8 +359,7 @@
             </a-card>
           </a-badge-ribbon>
 
-
-          <!--加载插件容器哦-->
+          <!--加载插件容器 AI标题自动优化托管-->
           <div class="font_size_12 cursor right_tips">
             <div ref="Aititle" id="aititle"></div>
           </div>
@@ -418,7 +410,7 @@
           </a-space>
 
           <div style="margin-top: 16px;">
-            <a-button @click="load_ai_img_video" :size="'small'">查看优化记录 >></a-button>
+            <a-button @click="load_ai_img_video" :size="'small'" type="primary">查看优化记录 >></a-button>
           </div>
 
         </div>
@@ -426,6 +418,24 @@
         <div class="font_size_12 cursor right_tips">
           <div ref="Aiimgvideo.container" id="aiimgvideo"></div>
         </div>
+
+        <a-card 
+          title="低效商品优化建议" 
+          size="small"
+          style="margin: 16px 0 10px 0;"
+          class="font_size_12"
+        >
+            及时清理下架最多可释放更多
+            流量给其他商品
+          <a-button 
+            @click="load_offline_product" 
+            :size="'small'" 
+            type="primary"
+            style="margin-top: 14px;"
+            >去下架低效商品>></a-button>
+          <div id="huinefficient_producthu"></div><!--弹窗容器-->
+
+        </a-card>
 
         <div class="RightMiniBox">
           <h4><QuestionCircleFilled style="color:dimgray;"/> 帮助中心</h4>
@@ -435,6 +445,8 @@
             </a-row>
           </div>
         </div>
+
+
 
         <div class="RightMiniBox">
           <h4> <InfoCircleFilled style="color:dimgray;"/> 联系我们 </h4>
@@ -451,6 +463,8 @@
       </a-layout-sider>
       <!--内容右侧 结束-->
       </a-layout>
+
+
 </a-layout>
 
 
@@ -783,10 +797,23 @@ export default {
                 "componentId": 502,
                 "extra": {}
         })
+
+        ecopen.bixi(document.getElementById('huhu'), {
+          componentId: 524,
+          extra: {},
+        });
         
         // 上报埋点==点击上报
         exposure('bu_general_click', '1')
 
+      }
+
+      // 下架低效商品手动查看弹出窗口
+      const load_offline_product = ()=>{
+        ecopen.bixi(document.getElementById('huinefficient_producthu'), {
+          componentId: 524,
+          extra: {},
+        });
       }
       
       // AI生图/生视频托管组件===抽屉调用
@@ -879,7 +906,8 @@ export default {
           Get_title_SEO_status,
           Aititlecolor,
           rushLoading,
-          Get_Offline_Product_List
+          Get_Offline_Product_List,
+          load_offline_product
 
         }
     },
@@ -895,10 +923,10 @@ export default {
 .cardText{font-size: 12px;line-height: 18px;height: 20px;overflow: hidden;}
 .gutter-box{background-color: aliceblue;border-radius: 6px;}
 .RightMiniBox{margin: 15px 0 0 0;border:1px solid #e5e5e596;border-radius: 4px;padding:12px;}
-.ListCard{}
-.NumberBox{margin: 4px 0 8px 0 !important; border: 1px solid #e5e5e596;border-radius: 6px;padding: 14px 0 4px 0;}
+
+.NumberBox{margin: 20px 0 8px 0 !important; border: 1px solid #e5e5e596;border-radius: 6px;padding: 14px 0 4px 0;}
 .Numbertext{margin: 4px 0 6px 0;font-size: 22px;text-align: center;height: 42px;}
-.ZhenduanTitle{height: 30px;margin: 16px 0 0 0;}
+.ZhenduanTitle{height: 30px;margin: 0 0 0 0;float: right;}
 .task_text_bottom{text-align: center;margin: 0 0 20px 0;}
 .task_sty{width: 140px;margin: 6px 0 0 0;height: 26px;}
 .task_num{height: 56px;display: block;padding: 12px 0 0 0;}

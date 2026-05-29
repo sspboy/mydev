@@ -1,3 +1,19 @@
+<!-- 翻页组件 
+  传递参数：
+    fandata: {
+      List_conditions: {
+        page: 1, // 当前页
+        page_size: 10, // 每页条数
+      },
+      total_number: 0, // 数据总条数
+    }
+  }
+  返回参数：
+    page_message: {
+      page: 1, // 当前页
+      page_size: 10, // 每页条数
+    }
+-->
 <template>
   <div id="components-pagination-demo-mini" class="nav_s">
     <a-pagination 
