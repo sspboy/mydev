@@ -24,6 +24,20 @@
             <!-- 选择文件夹树形结构 开始 -->
             <a-layout-sider width="300">
 
+                <p style="padding: 20px 0 0 18px;font-size: 12px;">
+                    <a-space-compact style="width: 100%" block>
+                        <a-tooltip title="素材库">
+                        <a-button><FolderOutlined /></a-button>
+                        </a-tooltip>
+                        <a-tooltip title="用量">
+                            <a-button><a-progress style="width: 100px;margin: 0px;" :percent="PAGEDATA.netdisk_info" size="small" /></a-button>
+                        </a-tooltip>
+                        <a-tooltip title="添加文件夹">
+                            <a-button class="font_size_12" @click="folderManagement.addRootFolder" size="small"><PlusOutlined /> 文件夹</a-button>
+                        </a-tooltip>
+                    </a-space-compact>
+                </p>
+
                 <!-- 加载状态 -->
                 <div v-if="PAGEDATA.treeData.value == []" style="text-align: center;margin-top: 65%;">
                     <a-spin />
@@ -35,22 +49,18 @@
                 </div>
 
                 <!-- 不为空状态 innerHeight -->
-                <div v-else style="height: 100px;"
+                <div v-else
                     :style="{
-                        height: PAGEDATA.innerHeight + 100 + 'px',
+                        height: PAGEDATA.innerHeight + 50 + 'px',
                         overflowY:'auto',
                         overflowX:'auto',
-                        marginTop:'10px',
+                        marginTop:'0px',
                         marginBottom:'10px',
                         padding:'10px 0 0 2px',
                     }"
                 >
-                    <p style="padding: 15px 0 0 32px;font-size: 12px;">
-                        <a-space style="width: 100%">
-                        <FolderOutlined /> 根目录
-                        <a-progress style="width: 100px;margin: 0px 0 0 0;" :percent="PAGEDATA.netdisk_info" size="small" />
-                        </a-space>
-                    </p>
+                    
+
                     <a-tree
                         v-model:expandedKeys="PAGEDATA.expandedKeys"
                         v-model:selectedKeys="PAGEDATA.selectedKeys"
@@ -60,10 +70,20 @@
                         show-icon
                         style="font-size: 12px;"
                     >
-                    
-                        <template #icon="{ key, selected }">
-                            <FolderOutlined />
+
+                        <!-- 自定义标题内容：添加按钮 -->
+                        <template #title="{ title, key, dataRef }">
+
+                            <a-row>
+                                <a-col flex="1" style="min-width: 0"><div class="ellipsis" :title="title"> <FolderOutlined /> {{ title }}</div></a-col>
+                                <a-col flex="148px" style="text-align: right;display: flex;justify-content: flex-end;gap: 4px;">
+                                    <span class="mater_op" @click.stop="folderManagement.handleAdd(dataRef)"><PlusOutlined /></span>
+                                    <span class="mater_op" @click.stop="folderManagement.handleEdit(dataRef)"><EditOutlined /></span>
+                                    <span class="mater_op" @click.stop="folderManagement.handleDelete(dataRef)"><DeleteOutlined /></span>
+                                </a-col>
+                            </a-row>
                         </template>
+                    
                     </a-tree>
                 </div>
             </a-layout-sider>
@@ -353,7 +373,7 @@
         </div>
 
         <div v-if="Material_Images.image_detaile == undefined">
-                <a-spin />
+            <a-spin />
         </div>
 
         <a-button size="small" @click="showChildimgDrawer">关闭</a-button>
@@ -551,6 +571,38 @@
     </a-modal>
     <!--批量恢复 确认弹窗 结束-->
 
+    <!--新建文件夹-->
+    <a-modal
+        v-model:open="folderManagement.newFolderModalOpen"
+        title="新建文件夹"
+        @ok="folderManagement.handleCreateFolder"
+        :confirmLoading="folderManagement.createLoading"
+    >   
+        <p style="margin-top: 16px;">选择在 "{{ folderManagement.fatherFolderName }}" 文件夹下创建【新文件夹】</p>
+        <a-input v-model:value="folderManagement.newFolderName" placeholder="请输入文件夹名称" />
+    </a-modal>
+
+    <!--编辑文件夹-->
+    <a-modal
+        v-model:open="folderManagement.editFolderModalOpen"
+        title="编辑文件夹"
+        @ok="folderManagement.handleEditFolder"
+        :confirmLoading="folderManagement.editLoading"
+    >
+        <a-input v-model:value="folderManagement.editFolderName" placeholder="请输入文件夹名称" />
+    </a-modal>
+
+    <!--删除文件夹-->
+    <a-modal
+        v-model:open="folderManagement.deleteFolderModalOpen"
+        title="删除文件夹"
+        @ok="folderManagement.handleDeleteFolder"
+        :confirmLoading="folderManagement.deleteLoading"
+    >
+        <p style="margin-top: 16px;">确定要删除文件夹 "{{ folderManagement.deleteFolderName }}" 吗？</p>
+        <p style="color: red; margin-top: 10px;">注意：删除文件夹将会删除文件夹下的所有素材，且无法恢复！</p>
+    </a-modal>
+
 </template>
 <script>
 import { defineAsyncComponent,computed,ref,reactive,onMounted,h,onUnmounted,watch } from 'vue';
@@ -558,7 +610,7 @@ import{Empty, message} from 'ant-design-vue'
 
 import { useStore } from 'vuex'
 // 网络请求工具引用FolderOutlined
-import { FolderOutlined,CloseCircleOutlined,ClearOutlined,EyeOutlined,DownOutlined,FolderOpenOutlined,DeleteOutlined,PictureOutlined,PlaySquareOutlined} from '@ant-design/icons-vue';
+import { FolderOutlined,CloseCircleOutlined,ClearOutlined,EyeOutlined,DownOutlined,FolderOpenOutlined,DeleteOutlined,PictureOutlined,PlaySquareOutlined,PlusOutlined,EditOutlined} from '@ant-design/icons-vue';
 import * as TOOL from '@/assets/JS_Model/tool';
 import * as utils from '@/assets/JS_Model/public_model';
 import * as MaterialList from '@/assets/douyinshop/productmanagement/material_list';// 商品管理->编辑操作方法
@@ -567,6 +619,7 @@ import * as MaterialList from '@/assets/douyinshop/productmanagement/material_li
 import menu_left from '@/components/layout/menu_left.vue'
 import menu_head from "@/components/layout/menu_head.vue";
 import nav_pagination from "@/components/nav_pagination.vue";
+import axios from 'axios';
 
 export default {
     name:'materiallist',
@@ -574,6 +627,8 @@ export default {
         menu_left,
         menu_head,
         nav_pagination,
+        PlusOutlined,
+        EditOutlined,
         FolderOutlined,
         EyeOutlined,
         ClearOutlined,
@@ -725,6 +780,131 @@ setup(props,ctx) {
 
     // 【查询组件 回调方法】========================================结束
 
+    // 文件夹管理开始
+
+    const folderManagement = reactive({
+
+        currentFolderId: ref(0), // 当前操作的文件夹ID
+        
+        fatherFolderId: undefined, // 父文件夹ID
+        fatherFolderName:undefined,// 父文件夹名称
+
+        newFolderName: undefined, // 新建文件夹名称
+        editFolderName: undefined, // 编辑文件夹名称
+        deleteFolderName: undefined, // 删除文件夹名称
+
+        newFolderModalOpen: false, // 新建文件夹-弹窗状态
+        createLoading: false, // 新建文件按钮loading状态
+        editFolderModalOpen: false, // 编辑文件夹-弹窗状态
+        editLoading: false, // 编辑文件按钮loading状态
+        deleteFolderModalOpen: false, // 删除文件夹-弹窗状态
+        deleteLoading: false, // 删除文件按钮loading状态
+
+        // 根目录新建文件夹
+        addRootFolder: () => {
+            folderManagement.newFolderModalOpen = true; // 开启新建文件夹弹窗
+            folderManagement.fatherFolderId = 0; // 根目录父文件夹id设为0
+            folderManagement.fatherFolderName = '根目录'; // 根目录父文件夹名称设为'根目录'
+            folderManagement.newFolderName = undefined; // 清空新建文件夹名称
+        },
+
+        // 【弹出窗口】添加文件夹
+        handleAdd:(nodeData) => {
+            // 阻止事件冒泡，避免触发节点选择
+            folderManagement.newFolderModalOpen = true; // 开启新建文件夹弹窗
+            // 你的添加逻辑：：获取父文件id = nodeData.folder_id，输入新文件夹名称，调用接口创建文件夹，刷新树结构
+            let id = nodeData.folder_id; // 父文件夹id
+            let folder_name = nodeData.folder_name;// 父文件夹名称
+            folderManagement.fatherFolderId = id; // 将父文件夹id赋值到弹窗提示
+            folderManagement.fatherFolderName = folder_name; // 将父文件夹名称赋值到弹窗提示
+            folderManagement.newFolderName = undefined; // 清空新建文件夹名称
+
+        },
+        // 【弹出窗口】编辑文件夹
+        handleEdit:(nodeData) => {
+            console.log('编辑节点', nodeData)
+            folderManagement.editFolderModalOpen = true; // 开启编辑文件夹弹窗
+            let id = nodeData.folder_id;
+            let folder_name = nodeData.folder_name;
+             // 你的编辑逻辑
+             folderManagement.editFolderId = id; // 将当前文件夹id赋值到编辑接口参数
+             folderManagement.editFolderName = folder_name; // 将当前文件夹名称赋值到编辑输入框
+        },
+        // 【弹出窗口】删除文件夹
+        handleDelete: (nodeData) => {
+            console.log('删除节点', nodeData)
+            folderManagement.deleteFolderModalOpen = true; // 开启删除文件夹弹窗
+            let id = nodeData.folder_id;
+            let folder_name = nodeData.folder_name;
+            folderManagement.deleteFolderName = folder_name;
+            folderManagement.deleteFolderId = id; // 将当前文件夹id赋值到删除接口参数deleteFolderId
+            // 你的删除逻辑
+
+        },
+        // 【确认】新建文件夹
+        handleCreateFolder: () => {
+            console.log('确认创建文件夹', folderManagement.newFolderName)
+            console.log('父文件夹id', folderManagement.fatherFolderId)
+            folderManagement.createLoading = true; // 开启创建按钮loading状态
+            axios.post(API.AppSrtoreAPI.material.createFolder, {
+                name: folderManagement.newFolderName,
+                parent_folder_id: folderManagement.fatherFolderId
+            }).then(res => {
+                console.log(res)
+                tool.Fun_.message('success','文件夹创建成功,注意1分钟内生效，请耐心等待后刷新查看!');
+                folderManagement.newFolderModalOpen = false; // 关闭新建文件夹弹窗
+                folderManagement.createLoading = false; // 关闭创建按钮loading状态
+            }).catch(err => {
+                tool.Fun_.message('error','文件夹创建失败');
+                console.error(err);
+                folderManagement.createLoading = false; // 关闭创建按钮loading状态
+            });          
+        },
+        // 【确认】编辑文件夹
+        handleEditFolder: () => {
+            console.log('确认编辑文件夹', folderManagement.editFolderName)
+            folderManagement.editLoading = true; // 开启编辑按钮loading状态
+            // 你的编辑逻辑
+            // folderManagement.editFolderModalOpen = false; // 关闭编辑文件夹弹窗
+            axios.post(API.AppSrtoreAPI.material.editFolder, {
+                name: folderManagement.editFolderName,
+                folder_id: folderManagement.editFolderId
+            }).then(res => {
+                console.log(res)
+                tool.Fun_.message('success','文件夹编辑成功,注意1分钟内生效，请耐心等待后刷新查看!');
+                folderManagement.editFolderModalOpen = false; // 关闭编辑文件夹弹窗
+                folderManagement.editLoading = false; // 关闭编辑按钮loading状态
+                MaterialListMethod.load.Loadtree(); // 刷新树结构
+            }).catch(err => {
+                tool.Fun_.message('error','文件夹编辑失败');
+                console.error(err);
+                folderManagement.editLoading = false; // 关闭编辑按钮loading状态
+            });
+
+        },
+        // 【确认】删除文件夹
+        handleDeleteFolder: () => {
+            console.log('确认删除文件夹', folderManagement.deleteFolderName)
+            folderManagement.deleteLoading = true; // 开启删除按钮loading状态
+            // 你的删除逻辑
+            // folderManagement.deleteFolderModalOpen = false; // 关闭删除文件夹弹窗
+            axios.post(API.AppSrtoreAPI.material.deleteFolder, {
+                folder_id: folderManagement.deleteFolderId
+            }).then(res => {
+                console.log(res)
+                tool.Fun_.message('success','文件夹删除成功,注意1分钟内生效，请耐心等待后刷新查看!');
+                folderManagement.deleteFolderModalOpen = false; // 关闭删除文件夹弹窗
+                folderManagement.deleteLoading = false; // 关闭删除按钮loading状态
+                MaterialListMethod.load.Loadtree(); // 刷新树结构
+            }).catch(err => {
+                tool.Fun_.message('error','文件夹删除失败');
+                console.error(err);
+                folderManagement.deleteLoading = false; // 关闭删除按钮loading状态
+            });
+        },
+
+    });
+
 
 
        return{
@@ -742,7 +922,8 @@ setup(props,ctx) {
         networkVideoUploadRef,
         localUploadRef,
         keywordSeachConfig,
-        handleUploadSuccess
+        handleUploadSuccess,
+        folderManagement
 
        }
    }
@@ -776,6 +957,16 @@ setup(props,ctx) {
     color: #333;
     margin-top: 4px;
 }
+.mater_op{margin:0 4px; cursor: pointer;float: right;}
+.mater_op:hover{color: #1890ff;}
+.ellipsis {
+    float: left;
+  white-space: nowrap;      /* 不换行 */
+  overflow: hidden;         /* 隐藏溢出 */
+  text-overflow: ellipsis;  /* 显示省略号 */
+  width: 100px;         /* 限制宽度 */
+}
+
 /**！！！素材类型---相对定位！！！**/
 .floating-badge {background-color: black;color: #fff;height: 20px;position: absolute;z-index: 100;border-radius: 4px;padding: 0 4px;font-size: 12px;opacity: 0.5}
 .floating-badge-video {background-color:blue;color: #fff;height: 20px;position: absolute;z-index: 100;border-radius: 4px;padding: 0 4px;font-size: 12px;opacity: 0.5}

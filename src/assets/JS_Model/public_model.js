@@ -125,13 +125,18 @@ export class A_Patch{
             "searchfolder":"api/douyin/material/searchfolder",  // 搜索文件夹
             "searchmaterial":"api/douyin/material/searchmaterial",// 搜索素材
             "getfolder":"api/douyin/material/getfolderinfo",    // 查看文件夹信息
+            
+            "createFolder":"api/douyin/material/creatfolder",// 新建文件夹
+            "editFolder":"api/douyin/material/editfolder",// 编辑文件夹
+            "deleteFolder":"api/douyin/material/deletefolder",// 彻底删除文件夹
+
             "list":"api/douyin/material/list",                  // 素材列表
             "detaile":"api/douyin/material/getmaterialdetaile", // 素材详情
             "deletematerial":"api/douyin/material/deletematerial", // 彻底删除素材
             "movematerialrecyclebin":"api/douyin/material/movematerialrecyclebin",// 放入回收站
             "easyshuttle":"api/douyin/material/easyshuttle",// 一键删除
-            "edit":"api/douyin/material/", // 编辑文件夹
-            "add":"api/douyin/material/add", // 添加文件夹
+            "edit":"api/douyin/material/", // 编辑素材
+            "add":"api/douyin/material/add", // 添加素材
             "videolist":"api/douyin/material/batchgetvideodetaile", // 视频列表
             "recovermaterial":"api/douyin/material/recovermaterial",// 回收站恢复素材
             "getcapinfo":"api/douyin/material/getcapinfo", // 网盘容量查询

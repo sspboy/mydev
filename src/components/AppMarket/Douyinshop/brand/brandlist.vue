@@ -20,6 +20,16 @@
         placement="right"
 
     >
+        <!-- 商品分类id未选择 提示-->
+        <a-alert
+            v-if="category_id === '' || category_id === undefined"
+            style="margin:0 0 20px 0;padding: 8px;line-height: 24px;"
+            class="font_size_12"
+            description="未选择商品类目，无法查询品牌列表，请先选择商品类目。"
+            type="info"
+            banner
+        />
+
         <!--
             <p>品牌列表</p>
             更具当前选择的类目查询品牌列表
@@ -39,19 +49,19 @@
         <a-form
             layout="inline"
             :model="formState"
-            @finish="handleFinish"
-            @finishFailed="handleFinishFailed"
+            @finish="formState.handleFinish"
+            @finishFailed="formState.handleFinishFailed"
         >
-                <a-form-item label="品牌id">
-                    <a-input v-model:value="props.data.brand_id" placeholder="请输入品牌id" />
+                <a-form-item label="ID" name="brand_id">
+                    <a-input v-model:value="formState.brand_id" placeholder="请输入品牌id" />
                 </a-form-item> 
 
-                <a-form-item label="品牌名称">
-                    <a-input v-model:value="props.data.brand_name" placeholder="请输入品牌名称" />
+                <a-form-item label="名称" name="brand_name">
+                    <a-input v-model:value="formState.brand_name" placeholder="请输入品牌名称" />
                 </a-form-item>
 
                 <a-form-item>
-                    <a-button type="primary" html-type="submit">查询品牌</a-button>
+                    <a-button type="primary" html-type="submit" size="small">查询</a-button>
                 </a-form-item>
         </a-form>
         
@@ -62,10 +72,9 @@
                 <a-list-item style="margin: 0;padding: 0;">
                     <a-card>
                         <a-radio :value="item.brand_id" class="font_size_12">
-                            <span> 
-                                品牌名称: {{item.name_cn}} 品牌id: {{item.brand_id}}
-                            </span>
+                            <span> 名称：： {{item.name_cn}}</span>
                         </a-radio>
+                        <span style="color: #999;float: right;display: block;" class="font_size_12">id: {{item.brand_id}}</span>
                     </a-card>
                 </a-list-item>
             </template>
@@ -112,19 +121,20 @@ export default defineComponent({
         
         // category_id 必填 - 按类目id推荐品牌
         var category_id = props.data.category_id; // 当前选择的类目id
+        
         // 查询表单
         const formState = reactive({
             brand_id: '', // 品牌id
-            brand_name: '' // 品牌名称
+            brand_name: '', // 品牌名称
+            // 查询正确执行方法
+            handleFinish: (values) => {
+                console.log(values);
+            },
+            // 查询异常执行方法
+            handleFinishFailed: (errors) => {
+                console.log(errors);
+            }
         });
-
-        const handleFinish = values => {
-            console.log(values, formState);
-        };
-
-        const handleFinishFailed = errors => {
-            console.log(errors);
-        };
 
         console.log(category_id) // 主模板
 
@@ -163,27 +173,28 @@ export default defineComponent({
         
 
 
-        // 取消
+        // 页面底部===取消
         const onClose = () =>{
 
             props.data.brand_list_open = !props.data.brand_list_open;
 
         }
-        // 确认提交
+        // 页面底部===确认提交
         const onSubmit = () =>{
-            console.log(BrandFun.radio_value)
+            // find到当前选中品牌的品牌信息
+            let select_brand = BrandFun.list.find(item=>item.brand_id === BrandFun.radio_value)
+            console.log(select_brand,BrandFun.radio_value)
         }
 
     
         return{
             props,
             visible:ref(false),
+            category_id,// 分类id
             BrandFun,
             onClose,
             onSubmit,
             formState,
-            handleFinish,
-            handleFinishFailed
         }
     }
     })
