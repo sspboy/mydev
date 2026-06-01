@@ -245,13 +245,17 @@
         <a-row :gutter="[12, 0]" class="cursor">
           <a-col :span="8" >
             <a-card 
-              title="建议下架商品" 
+              title="长期低效品清理" 
               size="small"
-              style="margin: 16px 0 10px 0;line-height: 22px;"
+              style="margin: 16px 0 10px 0;line-height: 22px;background-color: #fff3e8;"
               class="font_size_12"
             >
-            <a-tag color="#999">{{ Get_Offline_Product_List.suggest_offline_num }}</a-tag>个商品
-            长期无曝光 建议下架
+            <a-tag style="background-color: #ffffff;color: #ff7800;font-size: 20px;padding: 16px;float:left;">{{ Get_Offline_Product_List.suggest_offline_num }}</a-tag>
+            <div style="float: left;">
+              件商品30天内无曝光 建议下架
+              <p>预计下架获取收益</p>
+            </div>
+            
           <template #extra>
             <a @click="router.push('/inefficient')" class="font_size_12">查看>></a>
           </template>
@@ -260,13 +264,16 @@
           </a-col>
           <a-col :span="8" >
             <a-card 
-              title="已强制下架商品" 
+              title="超限期低效品清理" 
               size="small"
-              style="margin: 16px 0 10px 0;line-height: 22px;"
+              style="margin: 16px 0 10px 0;line-height: 22px;background-color: #ffece8;"
               class="font_size_12"
             >
-            <a-tag color="#999">{{ Get_Offline_Product_List.force_offline_num }}</a-tag>个商品
-            超过期限 已强制下架
+            <a-tag color="#999" style="background-color: #f53e3e;font-size: 20px;padding: 16px;float: left;">{{ Get_Offline_Product_List.force_offline_num }}</a-tag>
+            <div style="float: left;">
+              件商品超过建议期限 系统将自动下架
+              <p>预计下架获取收益</p>
+            </div>
           <template #extra>
             <a @click="router.push('/inefficient')" class="font_size_12">查看>></a>
           </template>
@@ -422,7 +429,7 @@
         <a-card 
           title="低效商品优化建议" 
           size="small"
-          style="margin: 16px 0 10px 0;"
+          style="margin: 16px 0 10px 0;font-weight: bold;"
           class="font_size_12"
         >
             及时清理下架最多可释放更多
@@ -935,5 +942,6 @@ export default {
 :deep(.ant-card-head-title) {
   font-size: 12px !important;  /* 或者你想要的尺寸 */
   line-height: 22px;
+
 }
 </style>
