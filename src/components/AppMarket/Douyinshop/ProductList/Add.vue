@@ -10,8 +10,8 @@
     <!-- 动态渲染异步组件--选择尺码模板 -->
     <selectsizetemplateid v-if="PAGEDATA.sizetemplate_open" v-on:sizetemplate_callback="selectsizetemplate_callback" :data="PAGEDATA"/>
 
-    <!--动态渲染异步组件--选择品牌模板-->
-    <selectbrandid v-if="PAGEDATA.brand_list_open" v-on:sizetemplate_callback="selectsizetemplate_callback" :data="PAGEDATA"/>
+    <!--dynamic rendering asynchronous component--select brand template-->
+    <selectbrandid v-if="PAGEDATA.brand_list_open" v-on:selectbrand_callback="selectbrand_callback" :data="PAGEDATA" :FormData="CATE"/>
 
     <a-modal
       v-model:open="props.data.AddDate"
@@ -818,7 +818,7 @@
                                     name="standard_brand_id"
                                 >
                                   <a-input-group compact>
-                                    <a-input v-model:value="formState.standard_brand_id" placeholder="选择品牌" disabled style="width: calc(74%);padding: 5.5px;" />
+                                    <a-input v-model:value="formState.standard_brand_id.brand_name" placeholder="选择品牌" disabled style="width: calc(74%);padding: 5.5px;" />
                                     <a-button class="font_size_12" @click="PAGEDATA.change_brand_list">选择</a-button>
                                   </a-input-group>
                                 </a-form-item>
@@ -1540,7 +1540,7 @@ export default defineComponent({
             mobile:'18888888888',           // 客服电话
             name:undefined,                 // 商品标题
             recommend_remark:undefined,     // 推荐语：不能含emoj表情
-            standard_brand_id:undefined,    //品牌id
+            standard_brand_id:{brand_id: undefined, brand_name: undefined},    //品牌id
             pay_type:'1',                   // 支付类型
             reduce_type:'1',                // 减库存类型
             freight_id:{"name":"包邮","value":0},           // 运费模板
@@ -1549,10 +1549,12 @@ export default defineComponent({
             remark:undefined,               // 商家备注
             presell_type:"0",         // 发货模式
             presell_delay_time:undefined,   // 预售发货时间
+            
             // 限购
             limit_per_buyer:undefined,          // 每个用户累计限购件数
             maximum_per_order:undefined,        // 每个用户每次下单限购件数
             minimum_per_order:undefined,        // 每个用户每次下单至少购买的件数
+
             // 导购短标题
             short_product_name:undefined,
             // 售后保障-7天无理由 "after_sale_service":"{\"supply_day_return_selector\":\"7-0\"}" 
@@ -2713,6 +2715,14 @@ export default defineComponent({
             // console.log(formState.size_info_template_id)
         }
 
+        // 选择品牌回调方法
+        const selectbrand_callback = (data) => {
+             // 填充id
+            formState.standard_brand_id.brand_id = data.brand_id;
+            formState.standard_brand_id.brand_name = data.name_cn;
+            console.log(data)
+        }
+
         // 确认按钮===>>>获取产品信息+验证
         const handleOk = async() => {
 
@@ -2846,37 +2856,37 @@ export default defineComponent({
             product_data.commit = 1; // 提交方式-立即发布
             
             // 发送数据到接口
-            // var res = await tool.Http_.post(API.AppSrtoreAPI.dou_product.add, product_data)
+            var res = await tool.Http_.post(API.AppSrtoreAPI.dou_product.add, product_data)
 
-            // console.log(res)
+            console.log(res)
 
-            // var code = res.data.code;
-            // var sub_msg = res.data.sub_msg
-            // if(code === 10000 ){ // 接口返回成功
+            var code = res.data.code;
+            var sub_msg = res.data.sub_msg
+            if(code === 10000 ){ // 接口返回成功
                 
-            //     // 提示上传成功，刷新列表;
+                // 提示上传成功，刷新列表;
 
-            //     setTimeout(() => {
+                setTimeout(() => {
 
-            //         tool.Fun_.message('success','商品添加成功！')
+                    tool.Fun_.message('success','商品添加成功！')
 
-            //         PAGEDATA.upload_product_loading = false;
+                    PAGEDATA.upload_product_loading = false;
 
-            //         closed() // 关闭新建商品
+                    closed() // 关闭新建商品
 
-            //         ctx.emit('add_call_back')// 刷新列表
+                    ctx.emit('add_call_back')// 刷新列表
 
-            //     }, 1000);
+                }, 1000);
 
-            // }else{ // 接口返回失败
+            }else{ // 接口返回失败
 
-            //     // 提示失败，返回失败原因;
-            //     tool.Fun_.message('error', sub_msg)
+                // 提示失败，返回失败原因;
+                tool.Fun_.message('error', sub_msg)
 
-            //     // 重置提交按钮状态
-            //     PAGEDATA.upload_product_loading = false;
+                // 重置提交按钮状态
+                PAGEDATA.upload_product_loading = false;
 
-            // }
+            }
 
         }
 
@@ -2909,6 +2919,7 @@ export default defineComponent({
             rules,
             selectfreight_callback,
             selectsizetemplate_callback,
+            selectbrand_callback,
             filterOption
         }
     }

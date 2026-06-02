@@ -30,6 +30,15 @@
             banner
         />
 
+        <a-alert
+            v-if="BrandFun.auth_required === true"
+            style="margin:0 0 20px 0;padding: 8px;line-height: 24px;"
+            class="font_size_12"
+            description="类目需要要求品牌有授权"
+            type="info"
+            banner
+        />
+
         <!--
             <p>品牌列表</p>
             更具当前选择的类目查询品牌列表
@@ -67,14 +76,23 @@
         
         <!-- 商品分类id未选择 -->
         <a-radio-group v-model:value="BrandFun.radio_value" style="width: 100%;margin-top: 20px;">
-        <a-list :grid="{ gutter: [0,10], column: 1 }" :data-source="BrandFun.list" >
+        <a-list 
+            :grid="{ gutter: [0,10], column: 1 }" 
+            :data-source="BrandFun.list" 
+            :loading="BrandFun.load"
+            style="height: 100%;"
+            >
             <template #renderItem="{ item }">
                 <a-list-item style="margin: 0;padding: 0;">
                     <a-card>
                         <a-radio :value="item.brand_id" class="font_size_12">
                             <span> 名称：： {{item.name_cn}}</span>
                         </a-radio>
-                        <span style="color: #999;float: right;display: block;" class="font_size_12">id: {{item.brand_id}}</span>
+                        <a-tag style="float: right;display: block;" v-if="item.auth" color="#87d068">已授权</a-tag>
+                        <span style="float: right;display: block;" v-else-if="item.auth === undefined"></span>
+                        <a-tag style="float: right;display: block;" v-else color="#999">未授权</a-tag>
+                        <!-- <span style="color: #999;float: right;display: block;" class="font_size_12">id: {{item.brand_id}}</span> -->
+                        
                     </a-card>
                 </a-list-item>
             </template>
@@ -110,7 +128,8 @@ export default defineComponent({
     // 父组件数据
     props: {
 
-        data:{typr:Object}
+        data:{typr:Object},
+        FormData:{type:Object}
   
     },
     
@@ -120,7 +139,7 @@ export default defineComponent({
         const API = new utils.A_Patch()         // 请求接口地址合集
         
         // category_id 必填 - 按类目id推荐品牌
-        var category_id = props.data.category_id; // 当前选择的类目id
+        var category_id = props.FormData.cate_value.value; // 当前选择的类目id
         
         // 查询表单
         const formState = reactive({
@@ -141,19 +160,17 @@ export default defineComponent({
         const BrandFun=reactive({
 
             // 596120136 默认品牌id-==无品牌
+            auth_required:undefined, // 类目是否要求品牌有授权
             // 品牌列表
             list:[
                 {
                     brand_id:"596120136",
                     name_cn:"无品牌",
-                    name_en:"无品牌"
-                },
-                {
-                    brand_id:"59612013611",
-                    name_cn:"无品牌",
-                    name_en:"无品牌"
+                    name_en:"无品牌",
+                    auth:undefined, // 授权状态，true授权，false未授权
                 }
             ], 
+            load:false, // 列表加载状态
             brand_list_open:false, // 品牌列表抽屉开关
             radio_value:undefined, // 品牌列表单选框选中值
             selectcondition:{
@@ -163,12 +180,70 @@ export default defineComponent({
             }, // 查询条件
 
             // 默认品牌列表查询
-            load_get_brand:(data)=>{
+            load_get_brand:(data, callback)=>{
                 tool.Http_.post(API.AppSrtoreAPI.dou_product.brand, data).then((res)=>{
-                    console.log(res)
+                    if(callback && typeof callback === 'function'){
+                        callback(res)
+                    }
+                })
+            },
+            // 关键词查询方法
+            get_brand_by_keyword:(data, callback)=>{
+                tool.Http_.post(API.AppSrtoreAPI.dou_product.brand, data).then((res)=>{
+                    if(callback && typeof callback === 'function'){
+                        callback(res)
+                    }
+                })
+            },
+            // 品牌id查询方法
+            get_brand_by_id:(data, callback)=>{
+                tool.Http_.post(API.AppSrtoreAPI.dou_product.brand, data).then((res)=>{
+                    if(callback && typeof callback === 'function'){
+                        callback(res)
+                    }
                 })
             }
         })
+
+        // 页面加载时，如果category_id存在则默认查询品牌列表
+        if(category_id !== '' && category_id !== undefined){
+
+            BrandFun.load = true; // 开启加载状态
+
+            // 默认查询品牌列表
+            BrandFun.load_get_brand({
+                 "category_id":category_id, // 当前选择的类目id
+            }, (res) => {
+                var code = res.data.code;
+                // console.log(res)
+                if(code !== 10000){
+                    BrandFun.load = false; // 关闭加载状态
+                    return;
+                }else{
+                    var data = res.data.data || {};
+                    BrandFun.auth_required = data.auth_required; // 类目是否要求品牌有授权
+                    var auth_brand_list = data.auth_brand_list || []; // 授权的品牌列表
+                    if(auth_brand_list.length > 0){
+                        auth_brand_list.map(item=>{
+                            item.auth = true; // 授权状态，true授权，false未授权
+                            BrandFun.list.push(item) // 品牌列表加入授权的品牌列表
+                        })
+                    }
+                    console.log(auth_brand_list)
+                    var brand_list = data.brand_list || []; // 未授权的品牌列表
+                    if(brand_list.length > 0){
+                        brand_list.map(item=>{
+                            item.auth = false; // 授权状态，true授权，false未授权
+                            BrandFun.list.push(item) // 品牌列表加入授权的品牌列表
+
+                        })
+                    }
+                    BrandFun.load = false; // 关闭加载状态
+
+                }
+                // console.log(res)
+            })
+        }
 
         
 
@@ -179,11 +254,21 @@ export default defineComponent({
             props.data.brand_list_open = !props.data.brand_list_open;
 
         }
+
         // 页面底部===确认提交
         const onSubmit = () =>{
             // find到当前选中品牌的品牌信息
             let select_brand = BrandFun.list.find(item=>item.brand_id === BrandFun.radio_value)
-            console.log(select_brand,BrandFun.radio_value)
+            console.log(select_brand, BrandFun.radio_value)
+            if(BrandFun.radio_value === undefined){
+                tool.Fun_.message('info','请选择品牌!')
+                return;
+            }else{
+                
+                // 选择不为空::回填
+                ctx.emit('selectbrand_callback', select_brand)
+                onClose() // 关闭抽屉
+            }
         }
 
     

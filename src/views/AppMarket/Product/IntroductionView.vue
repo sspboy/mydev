@@ -245,52 +245,69 @@
         <a-row :gutter="[12, 0]" class="cursor">
           <a-col :span="8" >
             <a-card 
-              title="长期低效品清理" 
               size="small"
-              style="margin: 16px 0 10px 0;line-height: 22px;background-color: #fff3e8;"
+              style="margin: 16px 0 10px 0;line-height: 22px;"
               class="font_size_12"
             >
-            <a-tag style="background-color: #ffffff;color: #ff7800;font-size: 20px;padding: 16px;float:left;">{{ Get_Offline_Product_List.suggest_offline_num }}</a-tag>
+
+            <a-tag class="suggest-offline-tag">
+              {{ Get_Offline_Product_List.suggest_offline_num }}
+              <span style="font-size: 12px;">低效品</span>
+            </a-tag>
+
             <div style="float: left;">
-              件商品30天内无曝光 建议下架
-              <p>预计下架获取收益</p>
+              <h3 style="color: #ff7800;margin: 4px 0 2px 0;"><ClearOutlined />-长期低效品清理 </h3>
+              商品30天内无曝光 建议下架 <a @click="router.push('/inefficient')" class="font_size_12">去下架>></a>
+              <p style="margin: 2px 0 0 0;">
+                预计下架获取收益
+                <span  style="padding: 0 3px;background-color: #fff3e8;color: #ff7800;border-radius: 4px;">
+                  {{ Get_Offline_Product_List.suggest_offline_total_exposure_lower_cnt }}-{{ Get_Offline_Product_List.suggest_offline_total_exposure_upper_cnt }}次曝光
+                </span>
+              </p>
             </div>
-            
-          <template #extra>
-            <a @click="router.push('/inefficient')" class="font_size_12">查看>></a>
-          </template>
 
           </a-card>
           </a-col>
           <a-col :span="8" >
             <a-card 
-              title="超限期低效品清理" 
-              size="small"
-              style="margin: 16px 0 10px 0;line-height: 22px;background-color: #ffece8;"
-              class="font_size_12"
-            >
-            <a-tag color="#999" style="background-color: #f53e3e;font-size: 20px;padding: 16px;float: left;">{{ Get_Offline_Product_List.force_offline_num }}</a-tag>
-            <div style="float: left;">
-              件商品超过建议期限 系统将自动下架
-              <p>预计下架获取收益</p>
-            </div>
-          <template #extra>
-            <a @click="router.push('/inefficient')" class="font_size_12">查看>></a>
-          </template>
-          </a-card>
-          </a-col>
-          <a-col :span="8">
-            <a-card 
-              title="潜力商品" 
               size="small"
               style="margin: 16px 0 10px 0;line-height: 22px;"
               class="font_size_12"
             >
-            <a-tag color="#999">{{ Get_Offline_Product_List.optimize_num }}</a-tag>个商品
-            系统发掘待优化商品
-          <template #extra>
-            <a @click="router.push('/inefficient')" class="font_size_12">查看>></a>
-          </template>
+            <a-tag class="force-offline-tag">
+              {{ Get_Offline_Product_List.force_offline_num }}
+              <span style="font-size: 12px;">超限期</span>
+            </a-tag>
+            <div style="float: left;">
+              <h3 style="color: #f53e3e;margin: 4px 0 2px 0;"><ClearOutlined />-超限期低效品清理</h3>
+              商品超过建议期限 将自动下架<a @click="router.push('/inefficient')" class="font_size_12"> 去查看>></a>
+              <p style="margin: 2px 0 0 0;">
+                预计下架获取收益
+                <span  style="padding: 0 3px;background-color: #ffece8;color: #f53e3e;border-radius: 4px;">
+                  {{ Get_Offline_Product_List.force_offline_total_exposure_lower_cnt }}-{{ Get_Offline_Product_List.force_offline_total_exposure_upper_cnt }}次曝光
+                </span>
+              </p>
+            </div>
+
+          </a-card>
+          </a-col>
+          <a-col :span="8">
+            <a-card 
+              size="small"
+              style="margin: 16px 0 10px 0;line-height: 22px;"
+              class="font_size_12"
+            >
+            <a-tag class="optimize-tag">
+              {{ Get_Offline_Product_List.optimize_num }} <span style="font-size: 12px;">优化品</span>
+            </a-tag>
+            <h3 style="color: #1890ff;margin: 4px 0 2px 0;"><RobotOutlined />-潜力商品优化 </h3>
+              商品系统发掘待优化商品<a @click="router.push('/inefficient')" class="font_size_12"> 去优化>></a>
+              <p style="margin: 2px 0 0 0;">
+                预计优化获取收益
+                <span  style="padding: 0 3px;background-color: #e8f7ff;color: #1890ff;border-radius: 4px;">
+                  {{ Get_Offline_Product_List.optimize_total_exposure_lower_cnt }}-{{ Get_Offline_Product_List.optimize_total_exposure_upper_cnt }}次曝光
+                </span>
+              </p>
           </a-card>
           </a-col>
         </a-row>
@@ -429,7 +446,7 @@
         <a-card 
           title="低效商品优化建议" 
           size="small"
-          style="margin: 16px 0 10px 0;font-weight: bold;"
+          style="margin: 16px 0 10px 0;"
           class="font_size_12"
         >
             及时清理下架最多可释放更多
@@ -483,7 +500,7 @@
 </template>
 <script>
 import { reactive,ref,computed} from 'vue';
-import{ShopTwoTone,ProfileTwoTone,MedicineBoxTwoTone,CodeTwoTone,QuestionCircleFilled,InfoCircleFilled,MehFilled,RightOutlined,LoadingOutlined,DashboardOutlined} from '@ant-design/icons-vue'
+import{ShopTwoTone,ProfileTwoTone,MedicineBoxTwoTone,CodeTwoTone,QuestionCircleFilled,InfoCircleFilled,MehFilled,RightOutlined,LoadingOutlined,DashboardOutlined,ClearOutlined,RobotOutlined} from '@ant-design/icons-vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 // 组件引用=====开始
@@ -501,7 +518,9 @@ export default {
     // 引用组件
     components: {
       DashboardOutlined,
+      RobotOutlined,
         LoadingOutlined,
+        ClearOutlined,
         menu_left,
         menu_head,
         ShopTwoTone,
@@ -867,8 +886,17 @@ export default {
         offline_product_list:[],// 下架商品列表
         suggestion:'',// 处理建议
         suggest_offline_num:0,// 建议下架商品数量
+        suggest_offline_total_exposure_lower_cnt:0,// 预计下架获取曝光量
+        suggest_offline_total_exposure_upper_cnt:0,// 预计下架获取曝光量
+
         force_offline_num:0,// 强制下架商品数量
+        force_offline_total_exposure_lower_cnt:0,// 预计下架获取曝光量
+        force_offline_total_exposure_upper_cnt:0,// 预计下架获取曝光量
+
         optimize_num:0,// 优化商品数量
+        optimize_total_exposure_lower_cnt:0,// 预计下架获取曝光量
+        optimize_total_exposure_upper_cnt:0,// 预计下架获取曝光量
+
         Get_Product_Suggestion_List: async(suggestion) =>{
           var res = await axios.post(API.AppSrtoreAPI.dou_product.getProductSuggestionList,{
               "page_no":1,
@@ -877,12 +905,20 @@ export default {
           })
           console.log(res.data.data)
           let total = res.data.data.total;
+          let total_exposure_lower_cnt = res.data.data.total_exposure_lower_cnt;
+          let total_exposure_upper_cnt = res.data.data.total_exposure_upper_cnt;
           if(suggestion === 'suggest_offline') {
             Get_Offline_Product_List.suggest_offline_num = total;// 建议下架数量
+            Get_Offline_Product_List.suggest_offline_total_exposure_lower_cnt = total_exposure_lower_cnt;
+            Get_Offline_Product_List.suggest_offline_total_exposure_upper_cnt = total_exposure_upper_cnt;
           }else if(suggestion === 'force_offline'){
             Get_Offline_Product_List.force_offline_num = total;// 强制下架数量
+            Get_Offline_Product_List.force_offline_total_exposure_lower_cnt = total_exposure_lower_cnt;
+            Get_Offline_Product_List.force_offline_total_exposure_upper_cnt = total_exposure_upper_cnt;
           }else if(suggestion === 'optimize'){
             Get_Offline_Product_List.optimize_num = total;// 优化商品数量
+            Get_Offline_Product_List.optimize_total_exposure_lower_cnt = total_exposure_lower_cnt;
+            Get_Offline_Product_List.optimize_total_exposure_upper_cnt = total_exposure_upper_cnt;
           }
           return res.data.data
         },
@@ -942,6 +978,13 @@ export default {
 :deep(.ant-card-head-title) {
   font-size: 12px !important;  /* 或者你想要的尺寸 */
   line-height: 22px;
-
 }
+/*建议下架*/
+.suggest-offline-tag{background-color: #fff3e8;color: #ff7800;font-size: 20px;padding: 28px 16px;float:left;border: none;}
+/*强制下架*/
+.force-offline-tag{background-color: #ffece8;color: #f53e3e;font-size: 20px;padding: 28px 16px;float:left;border: none;}
+/*潜力优化*/
+.optimize-tag{background-color: #e8f7ff;color: #1890ff;font-size: 20px;padding: 28px 16px;float:left;border: none;}
+
+
 </style>
