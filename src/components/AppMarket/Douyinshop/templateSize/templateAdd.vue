@@ -139,7 +139,7 @@ setup(props,ctx) {
 
         template_type:ref('size_info'),// 模板类型：尺码模板
         template_name:ref(undefined),// 模板名称
-        shareable:ref(false),// 是否设置为公有模板
+        shareable:ref(true),// 是否设置为公有模板
 
         // 新建模板类型选择
         template_sub_type:ref('clothing'), // 模板子类型
@@ -220,40 +220,40 @@ setup(props,ctx) {
                         Chest_circumference: '34',// 胸围(cm)
                         Shoulder_width:'22',// '肩宽(cm)'
                         Waist_circumference:'22',// '腰围(cm)'
-                        Hip_circumference:'22', // '臀围(cm)'
+                        Hip_circumference:'50', // '臀围(cm)'
                         Sleeve_length:'22'// '袖长(cm)'
                     },
                     {
                         key: '2',
                         size: 'M',// 尺码
-                        Height: '160', // 身高(cm)
-                        Weight: '50',//体重(cm)
-                        Chest_circumference: '34',// 胸围(cm)
+                        Height: '162', // 身高(cm)
+                        Weight: '52',//体重(cm)
+                        Chest_circumference: '36',// 胸围(cm)
                         Shoulder_width:'22',// '肩宽(cm)'
                         Waist_circumference:'22',// '腰围(cm)'
-                        Hip_circumference:'22', // '臀围(cm)'
+                        Hip_circumference:'52', // '臀围(cm)'
                         Sleeve_length:'22'// '袖长(cm)'
                     },
                     {
                         key: '3',
                         size: 'L',// 尺码
-                        Height: '160', // 身高(cm)
-                        Weight: '50',//体重(cm)
-                        Chest_circumference: '34',// 胸围(cm)
+                        Height: '164', // 身高(cm)
+                        Weight: '54',//体重(cm)
+                        Chest_circumference: '38',// 胸围(cm)
                         Shoulder_width:'22',// '肩宽(cm)'
                         Waist_circumference:'22',// '腰围(cm)'
-                        Hip_circumference:'22', // '臀围(cm)'
+                        Hip_circumference:'54', // '臀围(cm)'
                         Sleeve_length:'22'// '袖长(cm)'
                     },
                     {
                         key: '4',
                         size: 'XL',// 尺码
-                        Height: '160', // 身高(cm)
-                        Weight: '50',//体重(cm)
-                        Chest_circumference: '34',// 胸围(cm)
+                        Height: '166', // 身高(cm)
+                        Weight: '56',//体重(cm)
+                        Chest_circumference: '40',// 胸围(cm)
                         Shoulder_width:'22',// '肩宽(cm)'
                         Waist_circumference:'22',// '腰围(cm)'
-                        Hip_circumference:'22', // '臀围(cm)'
+                        Hip_circumference:'56', // '臀围(cm)'
                         Sleeve_length:'22'// '袖长(cm)'
                     },
             ]

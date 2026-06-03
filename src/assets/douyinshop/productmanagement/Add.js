@@ -8,6 +8,101 @@ const tool = new TOOL.TOOL()            // 工具方法
 const API = new utils.A_Patch()         // 请求接口地址合集
 
 
+// 商品发布规则：跟随分类id变化
+// 1、支持那些必填字段
+// 2、字段的输入规范（长度、格式等）
+// 点击[预测商品类目]=>获取到类目触发加载规则==ok
+// 切换商品类目=>触发加载规格==ok
+export class ProductUpdateRule {
+
+    category_id=ref(undefined) // 分类id
+    senses=ref(undefined) // 闪购定制参数，普通发品忽略
+    standard_brand_id=ref(undefined) // 品牌id
+    spu_id=ref(undefined) // spu_id
+    info=ref(undefined) // 发布规则信息对象
+
+    // 获取发布规则
+    get=()=>{
+
+        // 判断类是否选择
+        if (!this.category_id.value) {
+            tool.Fun_.message('info', '请先选择商品类目后，才能查看对应发布规则.')
+            return
+        }
+        console.log(this.category_id.value)
+        axios.post(API.AppSrtoreAPI.dou_product.addrule, {
+            category_leaf_id: this.category_id.value,
+        }).then((response) => {
+            this.info.value = response.data.data; // 规则赋值
+            console.log(this.info.value)
+
+        }).catch((error) => {
+            console.log(error);
+        });
+    }
+
+    // 点击tab回调方法 
+    // Tab调用发放
+    // 0 基础信息 1 主图类目 2 商品规格 3 库存数量 4 履约发货 5 描述详情 6 资质规则
+
+    click_tab=(value)=>{
+        
+        if(value === '4'){
+            console.log(value)
+            console.log(this.Fulfillment.hehe.value)
+            // this.Fulfillment.load(this.info.value)
+        }
+    }
+
+    
+
+    // 履约规则fulfillment_rule
+    Fulfillment = {
+
+        hehe:ref('a'), // 履约方式tab key
+        // 履约tab list
+        panes:ref([
+            {
+                title: 'tab标题',
+                content: `Content of Tab Pane`,
+                key: 'a',
+                closable:false // 是否允许关闭
+            }
+        ]),
+
+        // 加载履约方式
+        load:(data)=>{
+            console.log(data)
+        }
+    }
+
+    // 商品标题推荐规则recommend_name_rule
+    // 参考价相关规则reference_price_rule
+    // 商品主图3:4配置规则main_image_three_to_four_rule
+
+    // 售后服务规则after_sale_rule
+
+    // 商品规格约束product_spec_rule
+
+    // 商品尺码模板配置规则component_template_rule
+
+    // sku规则sku_rule
+
+    // 资质规则，类目属性影响资质必填和资质属性必填qualification_rule
+
+    // spu管控规则spu_control_rule
+    // 交易相关的规则trade_rule
+    // 提取方式规则pick_up_method_rule
+    // 金价信息gold_price_rule
+    // 其他规则extra_rule
+
+    // 商品【履约发货】
+
+}
+
+// 【基本信息】
+
+
 // 主图
 export class PicFun  {
     

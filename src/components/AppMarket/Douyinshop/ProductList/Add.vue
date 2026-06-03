@@ -23,13 +23,26 @@
 
             <div style="width: 950px;margin: 0 auto;height: 100%;">
 
-                <a-tabs v-model:activeKey="activeKey" @change="refesh_stock_number(activeKey)">
+                <a-tabs 
+                    v-model:activeKey="activeKey" 
+                    @change="refesh_stock_number(activeKey)"
+                    @tabClick="Rule.click_tab"
+                >
 
                     <template #leftExtra >
                         <div style="margin: 0 40px 0 10px;font-size: 18px;font-weight: b;">新建商品</div>
                     </template>
 
-                    <a-tab-pane key="1" tab="主图类目">
+                    <a-tab-pane key="1" tab="主图类目" >
+
+                        <a-alert
+                            message="注意：输入主图>>标题>>预测商品类目后，再进行后续商品信息的录入！"
+                            type="info"
+                            show-icon
+                            closable
+                        />
+
+
                         <!--基本信息-->
                         <a-row>
                             <!----主图--pic-->
@@ -646,7 +659,7 @@
 
                     </a-tab-pane>
 
-                    <a-tab-pane key="0" tab="基础信息">
+                    <a-tab-pane key="0" tab="基础信息" :disabled="PAGEDATA.tab_pane_status">
 
                         <a-row>
                             <!--白底图 -- white_back_ground_pic_url -->
@@ -929,7 +942,18 @@
 
                     </a-tab-pane>
 
-                    <a-tab-pane key="2" tab="商品规格">
+                    <!--履约发货 发货模式 发货时间配置 -->
+                    <a-tab-pane key="4" tab="履约发货" :disabled="PAGEDATA.tab_pane_status">
+                        <a-tabs v-model:activeKey="Rule.Fulfillment.hehe.value" hide-add type="editable-card">
+                            <a-tab-pane v-for="pane in Rule.Fulfillment.panes.value" :key="pane.key" :tab="pane.title" :closable="pane.closable">
+                                {{ pane.content }}
+                            </a-tab-pane>
+                        </a-tabs>
+                    
+                    
+                    </a-tab-pane>
+
+                    <a-tab-pane key="2" tab="商品规格" :disabled="PAGEDATA.tab_pane_status">
 
                         <a-divider orientation="left" orientation-margin="0px">
                             规格
@@ -1043,7 +1067,7 @@
 
                     </a-tab-pane>
 
-                    <a-tab-pane key="3" tab="库存数量">
+                    <a-tab-pane key="3" tab="库存数量" :disabled="PAGEDATA.tab_pane_status">
 
                         <!--库存开始-->
                         <a-divider orientation="left" orientation-margin="0px">库存</a-divider>
@@ -1124,7 +1148,7 @@
 
                     </a-tab-pane>
 
-                    <a-tab-pane key="5" tab="描述详情">
+                    <a-tab-pane key="5" tab="描述详情" :disabled="PAGEDATA.tab_pane_status">
 
                         <div style="margin: 0 0 10px 0;">
 
@@ -1158,9 +1182,15 @@
                             />
                         </div>
                     </a-tab-pane>
+
+                    <a-tab-pane key="6" tab="资质规则" :disabled="PAGEDATA.tab_pane_status">
+
+                    </a-tab-pane>
+
                 </a-tabs>
 
             </div>
+
 
         </a-layout-content>
 
@@ -1175,23 +1205,35 @@
             </div>
         </a-affix>
         <!--底部按钮--结束-->
+        <a-float-button-group shape="square" :style="{ right: '100px' }">
+            <a-float-button
+                tooltip="商品发布规则" 
+                @click="Rule.get" />
 
-
+            <a-float-button
+                tooltip="商品发布记录" 
+            >
+                <template #icon>
+                    <ReadOutlined />
+                </template>
+            </a-float-button>
+        </a-float-button-group>
 
     </a-modal>
 </template>
 <script>
-import { defineComponent,defineAsyncComponent,ref,reactive,onMounted,computed,shallowRef,onBeforeUnmount,toRaw } from 'vue';
-import { useStore } from 'vuex'
-import { PlusOutlined,DeleteOutlined,MinusOutlined,MinusCircleOutlined} from '@ant-design/icons-vue';
+import { defineComponent,defineAsyncComponent,ref,reactive,onMounted,computed,shallowRef,onBeforeUnmount,toRaw, watch } from 'vue';
+import { PlusOutlined,DeleteOutlined,MinusOutlined,MinusCircleOutlined,ReadOutlined} from '@ant-design/icons-vue';
 import axios from 'axios';
 import { Empty, Space } from 'ant-design-vue';
 import * as TOOL from '@/assets/JS_Model/tool';
 import * as TABLE from '@/assets/JS_Model/TableOperate';
 import * as utils from '@/assets/JS_Model/public_model';
+import { ProductUpdateRule } from '@/assets/douyinshop/productmanagement/Add';
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue' // 描述详情富媒体
 import '@wangeditor/editor/dist/css/style.css' // 引入富媒体编辑器样式 css
 import { CATE } from '@/assets/douyinshop/productmanagement/Add';
+import { PARAM_PARSER_INT } from 'vue-router/dist/experimental/index.mjs';
 
 // 商品管理->编辑操作方法
 // import {
@@ -1204,6 +1246,7 @@ export default defineComponent({
     name:'新建商品',
     components:{
         PlusOutlined,
+        ReadOutlined,
         DeleteOutlined,
         MinusOutlined,
         MinusCircleOutlined,
@@ -1240,16 +1283,19 @@ export default defineComponent({
         const simpleImage = Empty.PRESENTED_IMAGE_SIMPLE;// 默认为空图标
         const buttonload = ref(true)            // 新建按钮loading状态；
         const activeKey = ref('1');             // 默认选项卡
-        
+        const Rule = new ProductUpdateRule()    // 实例化商品发布规则
+
+
         // 添加商品配置
         const PAGEDATA=reactive({
 
-            selectimg_open:false,          // 添加主图-图片显示状态配置
-            freighttemplate_open:false,    // 运费模板-图片显示状态配置
-            sizetemplate_open:false,       // 尺码模板-图片显示状态配置
-            brand_list_open:false,         // 品牌列表-组件显示状态配置
-            setimg_name:'',             // 添加图片的对象['PicList','long_img_List','white_img','video','des']
-            sku_img_obj:'',             // 规格图片对象
+            selectimg_open:false,           // 添加主图-图片显示状态配置
+            freighttemplate_open:false,     // 运费模板-图片显示状态配置
+            sizetemplate_open:false,        // 尺码模板-图片显示状态配置
+            brand_list_open:false,          // 品牌列表-组件显示状态配置
+            setimg_name:'',                 // 添加图片的对象['PicList','long_img_List','white_img','video','des']
+            sku_img_obj:'',                 // 规格图片对象
+            tab_pane_status:true,          // 选项卡禁用状态
 
             // 图片组件获取地址后添加到页面容器：：：回调方法
             Add_Callback:(data)=>{
@@ -1270,6 +1316,7 @@ export default defineComponent({
                     CATE.add_img(data)
                 }
             },
+
             // 变更添加素材类型
             change_material_type:(typeName)=>{
                 PAGEDATA.selectimg_open = true;
@@ -1470,7 +1517,7 @@ export default defineComponent({
             }
         }
 
-        // 基础信息
+        // 基础信息【验证】
         const formRef = ref();
 
         // 基础信息验证规则
@@ -1547,7 +1594,7 @@ export default defineComponent({
             size_info_template_id:{"name":undefined,"value":undefined},// 尺码模板
             commit:'false',                 // 提交
             remark:undefined,               // 商家备注
-            presell_type:"0",         // 发货模式
+            presell_type:undefined,         // 发货模式
             presell_delay_time:undefined,   // 预售发货时间
             
             // 限购
@@ -1575,10 +1622,13 @@ export default defineComponent({
                 return res
                 
             }).catch(error => {
+
                 tool.Fun_.message('error',error.errorFields[0].errors[0]);
                 activeKey.value = '1';
                 return false
+
             })
+
             return res
         }
 
@@ -1946,6 +1996,10 @@ export default defineComponent({
         // 刷新库存
         const refesh_stock_number = (activate_key) =>{
             
+            // 分类id填写验证：：未选择分类id无法获取-发布规则-品牌id-等信息
+            // console.log(activate_key)
+            // console.log(CATE.cate_value.value)
+
             // 选择的是库存tag;
             if(activate_key == '3'){
                 var colums = sku_list.get_colums();
@@ -1953,6 +2007,7 @@ export default defineComponent({
                 skumodel.skucolumns = colums
                 skumodel.skudatelist = data_list
             }
+
         }
 
         // 分类&属性
@@ -2064,6 +2119,8 @@ export default defineComponent({
 
             // 请求属性:加载到列表
             loadFormat:async()=>{
+
+                Rule.category_id.value =  CATE.cate_value.value; // 商品规则类目id赋值
 
                 var cate_id = CATE.cate_value.value
 
@@ -2374,8 +2431,11 @@ export default defineComponent({
                     tool.Fun_.message('success', '预测分类成功！');
 
                     CATE.options.value = cate_list;
+
                     CATE.cate_value.value = cate_list[0].value; // 下拉选择赋值
 
+                    Rule.category_id.value =  cate_list[0].value; // 商品规则类目id赋值
+                    
                     CATE.loadFormat();// 加载对应商品属性
                     
                     CATE.Ceck_format()// 迭代预测的属性到页面
@@ -2693,6 +2753,24 @@ export default defineComponent({
             }
         }
 
+        // 转移售后服务0-8
+        const after_sale_list = {
+
+            get:(data)=>{
+                var value = "7-"+ data
+                return {"supply_day_return_selector":value}
+            },
+            // {value:0,name:'不支持退换'},
+            // {value:1,name:'支持7天无理由退换'},
+            // {value:2,name:'支持15天无理由退换'},
+            // {value:3,name:'支持30天无理由退换'},
+            // {value:4,name:'支持60天无理由退换'},
+            // {value:5,name:'支持90天无理由退换'},
+            // {value:6,name:'支持180天无理由退换'},
+            // {value:7,name:'支持365天无理由退换'},
+            // {value:8,name:'其他售后服务'}
+        }
+
         // 选择运费模板==回调方法
         const selectfreight_callback= (data)=>{
             // 填充id
@@ -2771,11 +2849,13 @@ export default defineComponent({
                 product_data_obj.mobile = pro_info.mobile;              // 电话
                 product_data_obj.freight_id = pro_info.freight_id.value;// 运费模板
                 product_data_obj.size_info_template_id = pro_info.size_info_template_id.value// 尺码模板
+                product_data_obj.standard_brand_id = pro_info.standard_brand_id.brand_id;// 品牌id
                 product_data_obj.minimum_per_order = pro_info.minimum_per_order; // 最少下单购买件数
                 product_data_obj.maximum_per_order = pro_info.maximum_per_order; // 最多下单购买件数
                 product_data_obj.limit_per_buyer = pro_info.limit_per_buyer; // 累计购买件数
                 product_data_obj.presell_type = pro_info.presell_type; // 发货模式
                 product_data_obj.short_product_name = pro_info.short_product_name;// 导购短标题
+                product_data_obj.after_sale_service = after_sale_list.get(pro_info.after_sale_service);//售后服务
             }else{
                 return
             }
@@ -2833,8 +2913,16 @@ export default defineComponent({
                 return
             }
             
-            // console.log(product_data_obj)
-            
+
+            // 过滤 掉值为空的key
+            Object.keys(product_data_obj).forEach(key => {
+                if (product_data_obj[key] === undefined || product_data_obj[key] === '') {
+                    delete product_data_obj[key];
+                }
+            });
+
+            console.log(product_data_obj)
+
             upload_product(product_data_obj)// 上传商品
 
         }
@@ -2850,9 +2938,8 @@ export default defineComponent({
         const upload_product = async (product_data) =>{
 
             // 按钮状态
-            // PAGEDATA.upload_product_loading = true;
+            PAGEDATA.upload_product_loading = true;
 
-            console.log(product_data)
             product_data.commit = 1; // 提交方式-立即发布
             
             // 发送数据到接口
@@ -2895,6 +2982,14 @@ export default defineComponent({
             return option.name.toLowerCase().indexOf(input.toLowerCase()) >= 0;
         };
 
+
+        // 监听商品类目是否填写：：如果填写了商品类目，才能填写其它商品信息
+        watch(CATE.cate_value,(newVal, oldVal)=>{
+            if(CATE.cate_value.value !== '' && CATE.cate_value.value !== undefined){
+                PAGEDATA.tab_pane_status = false;
+            }
+        })
+
         return{
             PAGEDATA,
             Pic_Fun,whiteimg_Fun,Longimg_Fun,video_Fun,        // 主图,白底图,长图,视频
@@ -2920,7 +3015,8 @@ export default defineComponent({
             selectfreight_callback,
             selectsizetemplate_callback,
             selectbrand_callback,
-            filterOption
+            filterOption,
+            Rule, // 发布规则实力
         }
     }
 })

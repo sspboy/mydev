@@ -101,7 +101,6 @@
         </a-radio-group>
         <!-- 商品分类id已选择 -->
 
-
         <template #footer>
             <a-space align="end" style="height: 100%;">
                 <a-button type="primary" @click="onSubmit">确认</a-button>
