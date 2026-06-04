@@ -942,17 +942,6 @@
 
                     </a-tab-pane>
 
-                    <!--履约发货 发货模式 发货时间配置 -->
-                    <a-tab-pane key="4" tab="履约发货" :disabled="PAGEDATA.tab_pane_status">
-                        <a-tabs v-model:activeKey="Rule.Fulfillment.hehe.value" hide-add type="editable-card">
-                            <a-tab-pane v-for="pane in Rule.Fulfillment.panes.value" :key="pane.key" :tab="pane.title" :closable="pane.closable">
-                                {{ pane.content }}
-                            </a-tab-pane>
-                        </a-tabs>
-                    
-                    
-                    </a-tab-pane>
-
                     <a-tab-pane key="2" tab="商品规格" :disabled="PAGEDATA.tab_pane_status">
 
                         <a-divider orientation="left" orientation-margin="0px">
@@ -1067,7 +1056,59 @@
 
                     </a-tab-pane>
 
-                    <a-tab-pane key="3" tab="库存数量" :disabled="PAGEDATA.tab_pane_status">
+                    <a-tab-pane key="3" tab="库存发货" :disabled="PAGEDATA.tab_pane_status">
+                        
+                        <a-radio-group 
+                            v-model:value="Fulfillment_selected" 
+                            option-type="button" 
+                            :options="Rule.Fulfillment.options" 
+                            size="small"
+                            style="margin-top: 20px;"
+                            @change="console.log(Fulfillment_selected)"
+                        />
+
+                        <!--现货发货-->
+                        <a-form style="margin-top: 20px;" v-show="Fulfillment_selected === 'normal_rule'">
+                            <a-form-item label="现货发货时间">
+                                <a-radio-group 
+                                    v-model:value="delivery_delay_day" 
+                                    :options="Rule.Fulfillment.normal_formdata.de_op"
+                                    class="custom-radio"
+                                />
+                            </a-form-item>
+                        </a-form>
+                        
+                        <!--阶梯发货模-->
+                        <a-form style="margin-top: 20px;" v-show="Fulfillment_selected === 'step_rule'">
+                            <a-form-item label="阶梯发货模">
+                            </a-form-item>
+                        </a-form>
+
+                        <!--全款预售发货-->
+                        <a-form style="margin-top: 20px;" v-show="Fulfillment_selected === 'product_presell_rule'">
+                            <span>全款预售发货</span>
+                        </a-form>
+                        
+                        <!--SKU预售发货-->
+                        <a-form style="margin-top: 20px;" v-show="Fulfillment_selected === 'sku_presell_rule'">
+                            <span>SKU预售发货</span>
+                        </a-form>
+
+                        <!--现货+预售发货-->
+                        <a-form style="margin-top: 20px;" v-show="Fulfillment_selected === 'time_sku_presell_with_normal_rule'">
+                            <span>现货+预售发货</span>
+                        </a-form>
+
+                        <!--新预售发货模式-->
+                        <a-form style="margin-top: 20px;" v-show="Fulfillment_selected === 'time_sku_pure_presell_rule'">
+                            <span>新预售发货模式</span>
+                        </a-form>
+
+                        <!--特殊时间延迟发货-->
+                        <a-form style="margin-top: 20px;" v-show="Fulfillment_selected === 'delay_rule'">
+                            <span>特殊时间延迟发货</span>
+                        </a-form>
+
 
                         <!--库存开始-->
                         <a-divider orientation="left" orientation-margin="0px">库存</a-divider>
@@ -1229,7 +1270,7 @@ import { Empty, Space } from 'ant-design-vue';
 import * as TOOL from '@/assets/JS_Model/tool';
 import * as TABLE from '@/assets/JS_Model/TableOperate';
 import * as utils from '@/assets/JS_Model/public_model';
-import { ProductUpdateRule } from '@/assets/douyinshop/productmanagement/Add';
+import { ProductUpdateRule,Fulfillment_selected,delivery_delay_day } from '@/assets/douyinshop/productmanagement/Add';
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue' // 描述详情富媒体
 import '@wangeditor/editor/dist/css/style.css' // 引入富媒体编辑器样式 css
 import { CATE } from '@/assets/douyinshop/productmanagement/Add';
@@ -1284,7 +1325,7 @@ export default defineComponent({
         const buttonload = ref(true)            // 新建按钮loading状态；
         const activeKey = ref('1');             // 默认选项卡
         const Rule = new ProductUpdateRule()    // 实例化商品发布规则
-
+        const selected = ref('normal_rule') //
 
         // 添加商品配置
         const PAGEDATA=reactive({
@@ -1295,7 +1336,7 @@ export default defineComponent({
             brand_list_open:false,          // 品牌列表-组件显示状态配置
             setimg_name:'',                 // 添加图片的对象['PicList','long_img_List','white_img','video','des']
             sku_img_obj:'',                 // 规格图片对象
-            tab_pane_status:true,          // 选项卡禁用状态
+            tab_pane_status:false,          // 选项卡禁用状态
 
             // 图片组件获取地址后添加到页面容器：：：回调方法
             Add_Callback:(data)=>{
@@ -2019,7 +2060,7 @@ export default defineComponent({
 
             select_loading:ref(true),  // 预测选项状态
 
-            cate_value:ref(undefined),  // 选中分类
+            cate_value:ref(1000003396),  // 选中分类
 
             options:ref([]),            // 分类选项
 
@@ -2984,7 +3025,7 @@ export default defineComponent({
 
 
         // 监听商品类目是否填写：：如果填写了商品类目，才能填写其它商品信息
-        watch(CATE.cate_value,(newVal, oldVal)=>{
+        watch(CATE.cate_value ,(newVal, oldVal)=>{
             if(CATE.cate_value.value !== '' && CATE.cate_value.value !== undefined){
                 PAGEDATA.tab_pane_status = false;
             }
@@ -3017,6 +3058,8 @@ export default defineComponent({
             selectbrand_callback,
             filterOption,
             Rule, // 发布规则实力
+            Fulfillment_selected,// 发货模式选中值
+            delivery_delay_day // 承若发货时间
         }
     }
 })
@@ -3036,5 +3079,7 @@ export default defineComponent({
 .Add_shui_img :hover{color: #2600ff;border:1px #2600ff dotted;border-radius: 4px;}
 .call_shui_img{height: 90px;width: 100%;background-color: #fff;border: 1px silver dotted; border-radius: 4px;margin: 0 10px 0 0;float: left;text-align: center;padding: 4px 0 0 0;}
 .clear_shui_img{margin: 0 0 0 6px;}
-
+/*履约模式选项卡字体大小设置*/
+:deep(.ant-radio-button-wrapper) {font-size: 12px;}
+.custom-radio :deep(.ant-radio + span) {font-size: 12px;}
 </style>

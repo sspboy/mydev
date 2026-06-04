@@ -903,7 +903,7 @@ export default {
               "page_size":10,
               "suggestion":suggestion
           })
-          console.log(res.data.data)
+          // console.log(res.data.data)
           let total = res.data.data.total;
           let total_exposure_lower_cnt = res.data.data.total_exposure_lower_cnt;
           let total_exposure_upper_cnt = res.data.data.total_exposure_upper_cnt;
