@@ -259,7 +259,7 @@
               <h3 style="color: #ff7800;margin: 4px 0 2px 0;"><ClearOutlined />-长期低效品清理 </h3>
               商品30天内无曝光 建议下架 <a @click="router.push('/inefficient')" class="font_size_12">去下架>></a>
               <p style="margin: 2px 0 0 0;">
-                预计下架获取收益
+                下架至多可获取收益
                 <span  style="padding: 0 3px;background-color: #fff3e8;color: #ff7800;border-radius: 4px;">
                   {{ Get_Offline_Product_List.suggest_offline_total_exposure_lower_cnt }}-{{ Get_Offline_Product_List.suggest_offline_total_exposure_upper_cnt }}次曝光
                 </span>

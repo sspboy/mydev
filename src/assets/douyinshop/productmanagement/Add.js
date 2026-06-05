@@ -17,6 +17,16 @@ const API = new utils.A_Patch()         // 请求接口地址合集
 // 点击【库存发货】选项卡后click_tab，加载可用发货模式
 // 对应读取发货规则,渲染可用发货表单Fulfillment.load
 
+
+// 【现货发货说明】
+// 发货模式：：presell_type=1 
+// 承诺发货时间，在现货模式下填写。delivery_delay_day： 承诺发货时间，单位是天,不传则默认为2天。现货发货(presell_type=0)模式下，支持传入9999 、1、 2 （分别表示当日发、次日发、48小时发），具体支持传入的参数范围：/product/getProductUpdateRule。
+
+// 【新-现货+预售说明】
+// 现货+预售(逐步下线)：  presell_type=1&&presell_config_level=2；
+// 阶梯发货模式(逐步下线)： presell_type=2&&new_step_product=false；
+// 上述两种方式的升级版 - (新)现货+预售： presell_type=2&&new_step_product=true；
+
 // 发货模式 presell_type ，0-现货发货，1-预售发货，2-阶梯发货，默认0
 export const Fulfillment_selected = ref('normal_rule') // 发货模式选中值
 export const delivery_delay_day = ref(undefined)// 承诺发货时间
