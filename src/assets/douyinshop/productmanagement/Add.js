@@ -27,13 +27,120 @@ const API = new utils.A_Patch()         // 请求接口地址合集
 // 阶梯发货模式(逐步下线)： presell_type=2&&new_step_product=false；
 // 上述两种方式的升级版 - (新)现货+预售： presell_type=2&&new_step_product=true；
 
+
+
 // 发货模式 presell_type ，0-现货发货，1-预售发货，2-阶梯发货，默认0
-export const Fulfillment_selected = ref('normal_rule') // 发货模式选中值
-export const delivery_delay_day = ref(undefined)// 承诺发货时间
+
+
+
+// 现货发货提交字段
+export const fulfillment_rule_formdata = reactive({
+
+    Fulfillment_selected:'normal_rule', // 发货模式选中值
+
+    delivery_delay_day:'9999',// 承若发货时间
+
+    //承若发货时间--下拉选项
+    de_op:[{
+        label: '当日发',
+        value: '9999',
+    },{
+        label: '次日发',
+        value: '1',
+    },{
+        label: '48小时发',
+        value: '2',
+    }],
+    // 发货模式 tab list
+    options:[
+        {
+            label: '现货发货',
+            value: 'normal_rule',
+            disabled:false // 禁用状态
+        },
+        // {
+        //     label: '阶梯发货模式',
+        //     value: 'step_rule',
+        //     disabled:true
+
+        // },
+        {
+            label: '全款预售发货',
+            value: 'product_presell_rule',
+            disabled:false
+        },
+        // {
+        //     label: 'SKU预售发货模式',
+        //     value: 'sku_presell_rule',
+        //     disabled:true
+        // },
+        // {
+        //     label: '现货+预售发货',
+        //     value: 'time_sku_presell_with_normal_rule',
+        //     disabled:false
+        // },
+        {
+            label: '新预售+现货发货',
+            value: 'time_sku_pure_presell_rule',
+            disabled:false
+        },
+        // {
+        //     label: '特殊时间延迟发货',
+        //     value: 'delay_rule',
+        //     disabled:true
+        // },
+
+    ],
+
+    // 阶梯发货模式提交字段
+    step_formdata:{
+
+        // 
+        // 阶梯发货时间
+        op:[{
+            label: '支付完成后',
+            value: '9999'}
+        ]
+
+    },
+
+    // 全款预售发货
+    product_presell_formdata:{
+        presell_type: 1, // 发货模式，0-现货发货，1-预售发货，2-阶梯发货，默认0
+        presell_config_level: 0, // 默认0，0：全款预售，1：sku预售，2：现货+预售 ，3：新预售
+        presell_delivery_type: 0,  // 全款预售和sku预售时传递，其他不传： 0 预售结束后发货 1支付完成后发货
+        delivery_op:[{
+            label: '预售结束后',
+            value: 0
+        },{
+            label: '支付完成后',
+            value: 1
+        }],
+        presell_end_time: "2022-11-30 11:11:11", // 预售结束时间
+        presell_delay: 8 //预售承诺发货时间
+    },
+    // SKU预售发货
+    sku_presell_formdata:{
+
+    },
+    // 现货+预售发货
+    time_sku_presell_with_normal_formdata:{
+
+    },
+    // 新预售发货模式
+    time_sku_pure_presell_formdata:{
+
+    },
+    // 特殊时间延迟发货
+    delay_formdata:{
+
+    }
+})
+
 
 export class ProductUpdateRule {
 
-    category_id=ref(1000003396) // 分类id
+    category_id=ref(1000003396) // 分类id-3396-26491
     senses=ref(undefined) // 闪购定制参数，普通发品忽略
     standard_brand_id=ref(undefined) // 品牌id
     spu_id=ref(undefined) // spu_id
@@ -65,8 +172,6 @@ export class ProductUpdateRule {
     click_tab=(value)=>{
         
         if(value === '3'){
-            console.log(value)
-            console.log(Fulfillment_selected.value)
             this.Fulfillment.load(this.info.value)
         }
 
@@ -74,110 +179,37 @@ export class ProductUpdateRule {
 
     // 履约规则fulfillment_rule
     Fulfillment = {
-        
-        // 履约tab list
-        options:[
-            {
-                label: '现货发货模式',
-                value: 'normal_rule',
-                disabled:true
-            },
-            {
-                label: '阶梯发货模式',
-                value: 'step_rule',
-                disabled:true
-            },
-            {
-                label: '全款预售发货模',
-                value: 'product_presell_rule',
-                disabled:true
-            },
-            {
-                label: 'SKU预售发货模式',
-                value: 'sku_presell_rule',
-                disabled:true
-            },
-            {
-                label: '现货+预售发货',
-                value: 'time_sku_presell_with_normal_rule',
-                disabled:true
-            },
-            {
-                label: '新预售发货模式',
-                value: 'time_sku_pure_presell_rule',
-                disabled:true
-            },
-            {
-                label: '特殊时间延迟发货',
-                value: 'delay_rule',
-                disabled:true
-            },
-
-        ],
-
-        // 现货发货提交字段
-        normal_formdata:reactive({
-
-            delivery_delay_day:['999'],// 选中值
-
-            //下拉选项
-            de_op:[{
-                label: '当日发',
-                value: '999',
-            },{
-                label: '次日发',
-                value: '1',
-            },{
-                label: '48小时发',
-                value: '2',
-            }]
-        }),
-        // 阶梯发货模式提交字段
-        step_formdata:reactive({
-
-        }),
-        // 全款预售发货
-        product_presell_formdata:reactive({
-
-        }),
-        // SKU预售发货
-        sku_presell_formdata:reactive({
-
-        }),
-        // 现货+预售发货
-        time_sku_presell_with_normal_formdata:reactive({
-
-        }),
-        // 新预售发货模式
-        time_sku_pure_presell_formdata:reactive({
-
-        }),
-        // 特殊时间延迟发货
-        delay_formdata:reactive({
-
-        }),
 
         // 加载履约方式：：渲染支持的发货方式
         load:(data)=>{
+
             var data_obj = toRaw(data)
+
             var fulfillment_rule = data_obj.fulfillment_rule
+
             Object.keys(fulfillment_rule).forEach(key=>{
+
                 let obj = fulfillment_rule[key]
+
                 let support = obj.support;// 是否支持
-                this.Fulfillment.options.find(item=>{
-                    if(item.value == key){
-                        item.disabled = !support
-                    }
-                })
-                
+
+                // fulfillment_rule_formdata.options.value.forEach(item=>{
+                //     if(item.value === key){
+                //         item.disabled = !support
+                //     }
+                // })
+
                 if(key === 'normal_rule' && support === true){
                     // 现货发货表单渲染方法
                     this.Fulfillment.rendering_normal(obj)
+
                 }else if(key === 'step_rule' && support === true){
                     // 阶梯发货模渲染方法
                     this.Fulfillment.rendering_step(obj)
+                    
                 }else if(key === 'product_presell_rule' && support === true){
                     // 全款预售发货渲染方法
+
                 }else if(key === 'sku_presell_rule' && support === true){
                     // SKU预售发货模式渲染方法
                 }else if(key === 'time_sku_presell_with_normal_rule' && support === true){
@@ -187,8 +219,6 @@ export class ProductUpdateRule {
                 }else if(key === 'delay_rule' && support === true){
                     // 特殊延迟发货模式渲染方法
                 }
-
-
             })
             // console.log(toRaw(data))
         },
@@ -196,12 +226,12 @@ export class ProductUpdateRule {
         // 渲染现货表单初始值
         rendering_normal:(data)=>{
             // 可选项
-            console.log('现货发货规则',data)
+            console.log('现货发货',data)
         },
 
         // 渲染阶梯发货表单初始值
         rendering_step:(data)=>{
-            console.log('现货发货规则',data)
+            console.log('阶梯发货',data)
         }
     }
 

@@ -1058,57 +1058,7 @@
 
                     <a-tab-pane key="3" tab="库存发货" :disabled="PAGEDATA.tab_pane_status">
                         
-                        <a-radio-group 
-                            v-model:value="Fulfillment_selected" 
-                            option-type="button" 
-                            :options="Rule.Fulfillment.options" 
-                            size="small"
-                            style="margin-top: 20px;"
-                            @change="console.log(Fulfillment_selected)"
-                        />
-
-                        <!--现货发货-->
-                        <a-form style="margin-top: 20px;" v-show="Fulfillment_selected === 'normal_rule'">
-                            <a-form-item label="现货发货时间">
-                                <a-radio-group 
-                                    v-model:value="delivery_delay_day" 
-                                    :options="Rule.Fulfillment.normal_formdata.de_op"
-                                    class="custom-radio"
-                                />
-                            </a-form-item>
-                        </a-form>
-                        
-                        <!--阶梯发货模-->
-                        <a-form style="margin-top: 20px;" v-show="Fulfillment_selected === 'step_rule'">
-                            <a-form-item label="阶梯发货模">
-                            </a-form-item>
-                        </a-form>
-
-                        <!--全款预售发货-->
-                        <a-form style="margin-top: 20px;" v-show="Fulfillment_selected === 'product_presell_rule'">
-                            <span>全款预售发货</span>
-                        </a-form>
-                        
-                        <!--SKU预售发货-->
-                        <a-form style="margin-top: 20px;" v-show="Fulfillment_selected === 'sku_presell_rule'">
-                            <span>SKU预售发货</span>
-                        </a-form>
-
-                        <!--现货+预售发货-->
-                        <a-form style="margin-top: 20px;" v-show="Fulfillment_selected === 'time_sku_presell_with_normal_rule'">
-                            <span>现货+预售发货</span>
-                        </a-form>
-
-                        <!--新预售发货模式-->
-                        <a-form style="margin-top: 20px;" v-show="Fulfillment_selected === 'time_sku_pure_presell_rule'">
-                            <span>新预售发货模式</span>
-                        </a-form>
-
-                        <!--特殊时间延迟发货-->
-                        <a-form style="margin-top: 20px;" v-show="Fulfillment_selected === 'delay_rule'">
-                            <span>特殊时间延迟发货</span>
-                        </a-form>
-
+                        <Preselltype_component />
 
                         <!--库存开始-->
                         <a-divider orientation="left" orientation-margin="0px">库存</a-divider>
@@ -1270,11 +1220,12 @@ import { Empty, Space } from 'ant-design-vue';
 import * as TOOL from '@/assets/JS_Model/tool';
 import * as TABLE from '@/assets/JS_Model/TableOperate';
 import * as utils from '@/assets/JS_Model/public_model';
-import { ProductUpdateRule,Fulfillment_selected,delivery_delay_day } from '@/assets/douyinshop/productmanagement/Add';
+import { ProductUpdateRule, } from '@/assets/douyinshop/productmanagement/Add';
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue' // 描述详情富媒体
 import '@wangeditor/editor/dist/css/style.css' // 引入富媒体编辑器样式 css
 import { CATE } from '@/assets/douyinshop/productmanagement/Add';
 import { PARAM_PARSER_INT } from 'vue-router/dist/experimental/index.mjs';
+import Preselltype_component from './Add_component/preselltype_component.vue';
 
 // 商品管理->编辑操作方法
 // import {
@@ -1298,6 +1249,7 @@ export default defineComponent({
         selectsizetemplateid:defineAsyncComponent(() => import('@/components/AppMarket/Douyinshop/templateSize/selectsizetemplateid.vue')),// 尺码模板组件
         format_cp:defineAsyncComponent(()=>import('@/components/AppMarket/Douyinshop/ProductList/edit_component/format_cp.vue')),// 商品属性组件
         selectbrandid:defineAsyncComponent(()=>import('@/components/AppMarket/Douyinshop/brand/brandlist.vue')),// 商品品牌组件
+        Preselltype_component:defineAsyncComponent(()=>import('@/components/AppMarket/Douyinshop/ProductList/Add_component/preselltype_component.vue')),// 发货模式组件
         // 产品属性>面料属性》多选组件
         VNodes:defineComponent({
             props: {
@@ -1324,7 +1276,9 @@ export default defineComponent({
         const simpleImage = Empty.PRESENTED_IMAGE_SIMPLE;// 默认为空图标
         const buttonload = ref(true)            // 新建按钮loading状态；
         const activeKey = ref('1');             // 默认选项卡
+
         const Rule = new ProductUpdateRule()    // 实例化商品发布规则
+
         const selected = ref('normal_rule') //
 
         // 添加商品配置
@@ -2298,6 +2252,7 @@ export default defineComponent({
                 return r_name
 
             },
+            
             // 获取分类
             get_cate:()=>{
                 var cate_values = toRaw(CATE.cate_value.value)
@@ -3058,8 +3013,6 @@ export default defineComponent({
             selectbrand_callback,
             filterOption,
             Rule, // 发布规则实力
-            Fulfillment_selected,// 发货模式选中值
-            delivery_delay_day // 承若发货时间
         }
     }
 })
