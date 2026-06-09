@@ -83,4 +83,8 @@ div[aria-hidden="true"]{display: none !important;}
   background-color: #f1f1f1; /* 滚动条轨道背景颜色 */
   border-radius: 5px; /* 轨道圆角 */
 }
+/* 穿透修改 InputNumber 的 addon */
+.ant-input-number-group-addon{
+  font-size: 12px !important;
+}
 </style>

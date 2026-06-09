@@ -12,91 +12,89 @@
 
 <template>
 
-    <a-radio-group 
-        v-model:value="fulfillment_rule_formdata.Fulfillment_selected" 
-        option-type="button" 
-        :options="fulfillment_rule_formdata.options" 
-        size="small"
-        style="margin-top: 20px;"
-        @change="console.log(fulfillment_rule_formdata.Fulfillment_selected)"
-    />
-
     <!--现货发货-->
-    <a-form style="margin-top: 20px;" v-show="fulfillment_rule_formdata.Fulfillment_selected === 'normal_rule'">
-        <a-form-item label="现货发货时间">
-            <a-radio-group 
-                v-model:value="fulfillment_rule_formdata.delivery_delay_day" 
-                :options="fulfillment_rule_formdata.de_op"
-                class="custom-radio"
-            />
-        </a-form-item>
+    <a-form>
+        <a-row :gutter="[16]">
+            <a-col :span="24">
+                <a-form-item label="发货模式">
+                    <a-radio-group 
+                        v-model:value="fulfillment_rule_formdata.Fulfillment_selected" 
+                        option-type="button" 
+                        :options="fulfillment_rule_formdata.options" 
+                        size="small"
+                        @change="console.log(fulfillment_rule_formdata.Fulfillment_selected)"
+                    />
+                </a-form-item>
+            </a-col>
+            
+            <!--现货发货-->
+            <a-col :span="4">
+                <a-form-item label="现货发货">
+                    <a-select
+                        ref="select"
+                        v-model:value="fulfillment_rule_formdata.delivery_delay_day" 
+                        :options="fulfillment_rule_formdata.delay_op"
+                        class="custom-radio"
+                    />
+                </a-form-item>
+            </a-col>
+
+            <!--全款预售发货-->
+            <a-col :span="6" v-show="fulfillment_rule_formdata.Fulfillment_selected === 'product_presell_rule'">
+                <a-form-item label="预售发货时效">
+                    <a-select
+                        ref="select"
+                        v-model:value="fulfillment_rule_formdata.time_selected" 
+                        :options="fulfillment_rule_formdata.time_end_op"
+                        class="custom-radio"
+                        @focus="console.log('预售结束时间')"
+                        @change="console.log('预售结束时间')"
+                    />
+                </a-form-item>
+            </a-col>
+            <a-col :span="4" v-show="fulfillment_rule_formdata.Fulfillment_selected === 'product_presell_rule'">
+                <a-form-item>
+                    <a-date-picker show-time placeholder="选择预售结束时间点" @change="console.log('选择时间')" @ok="console.log('选择时间')" />
+                </a-form-item>
+            </a-col>
+            
+            <a-col :span="8" v-show="fulfillment_rule_formdata.Fulfillment_selected === 'product_presell_rule'">
+                <a-form-item>
+                    <a-space>
+                    <a-select
+                        ref="select"
+                        v-model:value="fulfillment_rule_formdata.presell_delivery_type"
+                        style="width: 120px"
+                        :options="fulfillment_rule_formdata.delivery_op"
+                        @focus="console.log('选择发货时间')"
+                        @change="console.log('选择发货时间')"
+                    />
+                    <a-input-number 
+                        addon-after="天后发货"
+                        placeholder="输入天数"
+                        style="width: 130px;"
+                        v-model:value="fulfillment_rule_formdata.presell_delay" :min="1" :max="10" 
+                    />
+                    </a-space>
+                </a-form-item>
+            </a-col>
+
+            <!--新现货+预售发货模式-->
+            <a-col :span="12" v-show="fulfillment_rule_formdata.Fulfillment_selected === 'time_sku_pure_presell_rule'">
+                <a-form-item label="预售发货时效">
+                    <a-checkbox-group 
+                        v-model:value="fulfillment_rule_formdata.new_presell_delay" 
+                        :options="fulfillment_rule_formdata.de_op" 
+                        />
+                </a-form-item>
+            </a-col>
+
+        </a-row>
+
     </a-form>
 
-    <!--阶梯发货模-->
-    <a-form style="margin-top: 20px;" v-show="fulfillment_rule_formdata.Fulfillment_selected === 'step_rule'">
-        <a-form-item label="现货发货时间">
-            <a-radio-group 
-                v-model:value="fulfillment_rule_formdata.delivery_delay_day" 
-                :options="fulfillment_rule_formdata.de_op"
-                class="custom-radio"
-            />
-        </a-form-item>
-        <a-form-item label="阶梯发货时间">
-        <!-- <a-select
-            ref="select"
-            v-model:value="value"
-            style="width: 120px"
-            :options="options3"
-            @focus="focus"
-            @change="handleChange"
-        /> -->
-        </a-form-item>
-    </a-form>
 
-    <!--全款预售发货-->
-    <a-form style="margin-top: 20px;" v-show="fulfillment_rule_formdata.Fulfillment_selected === 'product_presell_rule'">
-        <a-form-item label="现货发货时间">
-            <a-radio-group 
-                v-model:value="fulfillment_rule_formdata.delivery_delay_day" 
-                :options="fulfillment_rule_formdata.de_op"
-                class="custom-radio"
-            />
-        </a-form-item>
-        <a-form-item label="预售结束时间">
-        </a-form-item>
-        <a-form-item label="预售结束时间点">
-        </a-form-item>
-        <a-form-item label="预售发货时间">
-            <!-- <a-select
-            ref="select"
-            v-model:value="value"
-            style="width: 120px"
-            :options="options3"
-            @focus="focus"
-            @change="handleChange"
-        /> -->
-        </a-form-item>
-    </a-form>
 
-    <!--SKU预售发货-->
-    <a-form style="margin-top: 20px;" v-show="fulfillment_rule_formdata.Fulfillment_selected === 'sku_presell_rule'">
-        <span>SKU预售发货</span>
-    </a-form>
-
-    <!--现货+预售发货-->
-    <a-form style="margin-top: 20px;" v-show="fulfillment_rule_formdata.Fulfillment_selected === 'time_sku_presell_with_normal_rule'">
-        <span>现货+预售发货</span>
-    </a-form>
-
-    <!--新预售发货模式-->
-    <a-form style="margin-top: 20px;" v-show="fulfillment_rule_formdata.Fulfillment_selected === 'time_sku_pure_presell_rule'">
-        <span>新预售发货模式</span>
-    </a-form>
-
-    <!--特殊时间延迟发货-->
-    <a-form style="margin-top: 20px;" v-show="fulfillment_rule_formdata.Fulfillment_selected === 'delay_rule'">
-        <span>特殊时间延迟发货</span>
-    </a-form>
 </template>
 
 
@@ -120,8 +118,9 @@ export default defineComponent({
     setup(props,ctx) {
 
         const Rule = new ProductUpdateRule()    // 实例化商品发布规则
-        
+        console.log(props.data)
         return{
+            props,
             fulfillment_rule_formdata,
             Rule, // 发布规则实力
             
@@ -130,5 +129,9 @@ export default defineComponent({
 })
 </script>
 <style scoped>
+
+:deep(.ant-radio-wrapper) {
+  font-size: 12px;
+}
 
 </style>
