@@ -28,36 +28,76 @@ const API = new utils.A_Patch()         // 请求接口地址合集
 // 上述两种方式的升级版 - (新)现货+预售： presell_type=2&&new_step_product=true；
 
 
-
 // 发货模式 presell_type ，0-现货发货，1-预售发货，2-阶梯发货，默认0
-
-
-
-// 现货发货提交字段
-export const fulfillment_rule_formdata = reactive({
-
-    Fulfillment_selected:'normal_rule', // 发货模式选中值
-
+export const presell_formdata = reactive({
+    // 发货模式==字段开始
     presell_type: 0, // 发货模式，0-现货发货，1-预售发货，2-阶梯发货，默认0
-    
+    presell_config_level: 0, // 默认0，0：全款预售，1：sku预售，2：现货+预售 ，3：新预售
     // 发货模式 tab list
     options:[
         {
             label: '现货发货',
-            value: 'normal_rule',
+            value: 0,
+            name:'normal_rule',
             disabled:false // 禁用状态
+            
         },
         {
-            label: '预售发货',
-            value: 'product_presell_rule',
+            label: '全款预售发货',
+            value: 1,
+            name:'product_presell_rule',
             disabled:false
         },
         {
-            label: '[新]预售+现货发货',
-            value: 'time_sku_pure_presell_rule',
+            label: '新预售发货',
+            value: 3,
+            name:'time_sku_pure_presell_rule',
             disabled:false
         },
+        {
+            label:'现货+预售发货',
+            value:'4',
+            name:'time_sku_presell_with_normal_rule',
+            disabled:false
+            
+        },
+        {
+            label:'新-现货+预售发货',
+            value:'5',
+            name:'step_rule',
+            disabled:false
+
+        }
     ],
+})
+
+// 现货表单
+export const spot_formdata = reactive({
+    // 现货发货
+    delivery_delay_day:'9999',// 现货承若发货时间
+    //现货发货 承若发货时间--下拉选项
+    delay_op:[{
+        label: '当日发',
+        value: '9999',
+    },{
+        label: '次日发',
+        value: '1',
+    },{
+        label: '48小时发',
+        value: '2',
+    }],
+})
+
+// 现货表单规则
+export const spot_formdata_rule = {
+    // 现货发货承若时间
+    delivery_delay_day:[{
+        required: true,
+    }],
+}
+
+// 预售表单
+export const presale_formdata =  reactive({
 
     // 现货发货
     delivery_delay_day:'9999',// 现货承若发货时间
@@ -73,11 +113,8 @@ export const fulfillment_rule_formdata = reactive({
         value: '2',
     }],
 
-    // 预售
-    presell_config_level: 0, // 默认0，0：全款预售，1：sku预售，2：现货+预售 ，3：新预售
-
     presell_end_time: undefined, // 预售结束时间
-
+    presell_end_time_status:false,// 是否需要选择结束时间点
     time_selected:0, // 选择发货时间方式
     time_end_op:[
         {
@@ -101,7 +138,81 @@ export const fulfillment_rule_formdata = reactive({
     }],
 
     presell_delay: '5', //预售承诺发货时间
-    new_presell_delay:[5],
+    
+    // 预售时间点==presell_end_time 最多支持设置距离当前30天
+    get_end_time:(value)=>{
+
+        let str = value?.format('YYYY-MM-DD HH:mm:ss') || undefined;
+        // 获取当前天数
+        // 获取 支付结束后 && 预售结束后
+        // 获取最长预售结束时间 Rule.info
+        presale_formdata.presell_end_time = str
+
+    },
+    // 设置预售时间方式
+    set_time_selected:(value)=>{
+
+        // 为1，无需设置时间点-支付完成后-指定天数发货
+        if(value == '1'){
+            presale_formdata.presell_delivery_type = 1
+            presale_formdata.delivery_op.forEach(item=>{
+                if(item.value == 0){
+                    item.disabled = true;
+                }
+            })
+            presale_formdata.presell_end_time_status = true;
+            presale_formdata_rule.presell_end_time[0].required = false; // 非必填
+        }else if(value == '0'){
+            // 为0，需要设置结束时间-预售结束后-指定天数发货
+            presale_formdata.presell_end_time_status = false;
+            presale_formdata.delivery_op.forEach(item=>{
+                if(item.value == 0){
+                    item.disabled = false;
+                }
+            })
+            presale_formdata_rule.presell_end_time[0].required = true; // 必填
+        }
+    }
+})
+
+// 预售表单规则
+export const presale_formdata_rule = {
+    delivery_delay_day:[{
+        required: true,
+    }],
+    time_selected:[{
+        required: true,
+
+    }],
+    presell_end_time:[{
+        required: true,
+        message: '时间不能为空!',
+        trigger: 'change',
+    }],
+    presell_delay:[{
+        required: true,
+        message: '不能为空!',
+        trigger: 'change',
+    }]
+}
+
+// 现货+预售 混合发货表单
+export const spot_presale_formdata = reactive({
+
+    // 现货发货
+    delivery_delay_day:'9999',// 现货承若发货时间
+    //现货发货 承若发货时间--下拉选项
+    delay_op:[{
+        label: '当日发',
+        value: '9999',
+    },{
+        label: '次日发',
+        value: '1',
+    },{
+        label: '48小时发',
+        value: '2',
+    }],
+    presell_delay:['5'],
     de_op:[
         {
             label: '5天内',
@@ -117,9 +228,19 @@ export const fulfillment_rule_formdata = reactive({
         }
     ],
 
-
 })
 
+// 现货+预售 规则
+export const spot_presale_formdata_rule = {
+    delivery_delay_day:[{
+        required: true,
+    }],
+    // 新现货+预售发货模式
+    presell_delay:[{
+        required: true
+    }]
+
+}
 
 export class ProductUpdateRule {
 
@@ -159,7 +280,7 @@ export class ProductUpdateRule {
 
     }
 
-    // 履约规则fulfillment_rule
+    // 履约发货
     Fulfillment = {
 
         // 加载履约方式：：渲染支持的发货方式
@@ -200,15 +321,34 @@ export class ProductUpdateRule {
             })
         },
 
-        // 渲染[现货]表单初始值
+        // 渲染【现货]】表单初始值
         rendering_normal:(data)=>{
             console.log('现货发货', data)
         },
 
+        // 渲染【预售】表单
+        rendering_product_presell:(data)=>{
+            console.log('预售发货', data)
+        },
+
+        // 渲染【现货+预售】表单
+        rendering_time_sku_presell_with_normal:(data)=>{
+            console.log('现货 + 预售发货', data)
+        },
+
+        // 预售门槛价
+
+
+        
     }
 
+    // 渲染现货+预售表单
 
+    // 获取现货
 
+    // 获取预售
+
+    // 获取现货+预售
 
     // 商品标题推荐规则recommend_name_rule
     // 参考价相关规则reference_price_rule
@@ -230,150 +370,5 @@ export class ProductUpdateRule {
     // 金价信息gold_price_rule
     // 其他规则extra_rule
     // 商品【履约发货】
-
-}
-
-// 【基本信息】
-
-
-// 主图
-export class PicFun  {
-    
-    PicList=ref([])// 输出的图片列表
-
-    // 删除图片
-    del_pic=(index)=>{
-        this.PicList.value.splice(index, 1)
-    }
-
-    // 添加图片
-    add=(data)=>{
-
-        data.forEach((obj,idx)=>{
-            // 判断是否图片素材
-            var material_type = obj.material_type;
-
-            // console.log(material_type)
-            // 是图片=>添加到数组
-            if(material_type == 'photo'){
-                var photo_info = obj.photo_info;
-                var pic_width = photo_info.width;      // 宽度
-                var pic_height = photo_info.height;     // 高度
-                if(pic_width == pic_height){
-                    Pic_Fun.PicList.value.push(obj)
-                }else{
-                
-                    tool.Fun_.message('info','主图长宽比例需要1:1,不小于600X600.')
-                
-                }
-            }else if(material_type == 'video'){
-
-                tool.Fun_.message('info','【主图】不能选择视频，请选择图片素材！')
-            
-            }
-        })
-
-        // 只保留5张主图；
-        if(Pic_Fun.PicList.value.length > 5){
-            Pic_Fun.PicList.value = Pic_Fun.PicList.value.slice(0, 5)
-            tool.Fun_.message('info','最多上传5张主图')
-        }
-
-    }
-    
-    // 获取主图
-    get=()=>{
-
-        var pic = Pic_Fun.PicList.value;
-
-        if(pic.length == 0){
-            return false
-        }else{
-            var res_text = ''
-            pic.forEach((obj,index)=>{
-                res_text = res_text + obj.byte_url  + '|'
-            })
-            return res_text.slice(0, -1)
-        }
-    }
-}
-
-// 3：4--长图
-export class Longimg_Fun {
-
-    PicList=ref([])
-
-    // 删除长图
-    del=(idx)=>{
-        Longimg_Fun.PicList.value.splice(idx, 1);
-    }
-
-    // 添加长图
-    add=(data)=>{
-        data.forEach((obj,idx)=>{
-            Longimg_Fun.PicList.value.push(obj)
-        })
-        if(Longimg_Fun.PicList.value.length > 5){
-            Longimg_Fun.PicList.value = Longimg_Fun.PicList.value.slice(0, 5)
-        }
-    }
-
-    // 获取长图
-    get=()=>{
-
-        var res = Longimg_Fun.PicList.value;
-
-        if(res.length >0){
-
-            var res_text = ''
-            res.forEach((obj,index)=>{
-                res_text = res_text + obj.byte_url  + '|'
-            })
-
-            return res_text.slice(0, -1)
-
-        }else{
-            return false
-        }
-    }
-    
-}
-
-// 白底图
-export class whiteimg_Fun {
-
-}
-
-// 视频
-export class video_Fun {
-
-}
-
-// 标题
-export class AddProduct {
-
-}
-
-// 分类、属性
-export class CATE {
-
-}
-
-// 基础信息
-
-// 规格库存
-
-// 描述详情
-
-// 关闭新建商品按钮
-
-// 商品上传接口方法
-export class upload_product{
-
-    data={'product_name': '123'}// 商品商品data对象
-
-    up=()=>{
-        console.log(this.data)
-    }
 
 }

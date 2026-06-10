@@ -40,6 +40,7 @@
                             type="info"
                             show-icon
                             closable
+                            class="font_size_12"
                         />
 
 
@@ -884,18 +885,6 @@
                             </a-col>
 
                             <a-col :span="8">
-                                <a-form-item 
-                                    label="发货模式" 
-                                    name="presell_type"
-                                >
-                                    <a-select v-model:value="formState.presell_type" placeholder="选择方式">
-                                        <a-select-option value="0">现货发货</a-select-option>
-                                    </a-select>
-                                </a-form-item>
-
-                            </a-col>
-
-                            <a-col :span="8">
                                 <a-form-item
                                     label="最少购买"
                                     name="minimum_per_order"
@@ -1059,7 +1048,7 @@
                     <a-tab-pane key="3" tab="库存发货" :disabled="PAGEDATA.tab_pane_status">
                         
                         <!--发货模式 组件-->
-                        <Preselltype_component :data="formState"/>
+                        <Preselltype_component />
 
                         <!--库存开始-->
                         <a-divider orientation="left" orientation-margin="0px">库存</a-divider>
@@ -1224,9 +1213,6 @@ import * as utils from '@/assets/JS_Model/public_model';
 import { ProductUpdateRule, } from '@/assets/douyinshop/productmanagement/Add';
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue' // 描述详情富媒体
 import '@wangeditor/editor/dist/css/style.css' // 引入富媒体编辑器样式 css
-import { CATE } from '@/assets/douyinshop/productmanagement/Add';
-import { PARAM_PARSER_INT } from 'vue-router/dist/experimental/index.mjs';
-import Preselltype_component from './Add_component/preselltype_component.vue';
 
 // 商品管理->编辑操作方法
 // import {
@@ -1546,6 +1532,7 @@ export default defineComponent({
                 message: '类型不能为空!',
                 trigger: 'change',
             }],
+
             // 支付方式
             pay_type:[
                 {
@@ -1553,6 +1540,7 @@ export default defineComponent({
                     message: '支付方式不能为空!',
                     trigger: 'change',
             }],
+
             // 减库存方式
             reduce_type:[
                 {
@@ -1573,7 +1561,7 @@ export default defineComponent({
                     required: true,
                     message: '运费模板不能为空!',
                     trigger: 'change',
-            }]
+            }],
         }
 
         // 基础信息表单数据
@@ -1602,96 +1590,6 @@ export default defineComponent({
 
             // 售后保障-7天无理由 "after_sale_service":"{\"supply_day_return_selector\":\"7-0\"}" 
             after_sale_service:"1",
-
-
-
-            // 发货模式==字段开始
-
-            Fulfillment_selected:'normal_rule', // 发货模式选中值
-
-            presell_type: 0, // 发货模式，0-现货发货，1-预售发货，2-阶梯发货，默认0
-            
-            // 发货模式 tab list
-            options:[
-                {
-                    label: '现货发货',
-                    value: 'normal_rule',
-                    disabled:false // 禁用状态
-                },
-                {
-                    label: '预售发货',
-                    value: 'product_presell_rule',
-                    disabled:false
-                },
-                {
-                    label: '[新]预售+现货发货',
-                    value: 'time_sku_pure_presell_rule',
-                    disabled:false
-                },
-            ],
-
-            // 现货发货
-            delivery_delay_day:'9999',// 现货承若发货时间
-            //现货发货 承若发货时间--下拉选项
-            delay_op:[{
-                label: '当日发',
-                value: '9999',
-            },{
-                label: '次日发',
-                value: '1',
-            },{
-                label: '48小时发',
-                value: '2',
-            }],
-
-            // 预售
-            presell_config_level: 0, // 默认0，0：全款预售，1：sku预售，2：现货+预售 ，3：新预售
-
-            presell_end_time: undefined, // 预售结束时间
-
-            time_selected:0, // 选择发货时间方式
-            time_end_op:[
-                {
-                    label: '设置预售结束时间',
-                    // 预售结束后发货 presell_delivery_type=0 需要传值presell_end_time
-                    value: 0},
-                {
-                    label: '无预售结束时间',
-                    // 支付完成后发货 presell_delivery_type=1 不需要传值presell_end_time
-                    value: 1
-                },
-            ],
-
-            presell_delivery_type: 0,  // 全款预售和sku预售时传递，其他不传： 0 预售结束后发货 1支付完成后发货
-            delivery_op:[{
-                label: '预售结束后',
-                value: 0
-            },{
-                label: '支付完成后',
-                value: 1
-            }],
-
-            presell_delay: '5', //预售承诺发货时间
-            new_presell_delay:[5],
-            de_op:[
-                {
-                    label: '5天内',
-                    value: '5'
-                },
-                {
-                    label: '15天内',
-                    value: '15'
-                },
-                {
-                    label: '45天内',
-                    value: '45'
-                }
-            ],
-
-            // 发货模式==字段结束
-            
-
-
             
         })
         

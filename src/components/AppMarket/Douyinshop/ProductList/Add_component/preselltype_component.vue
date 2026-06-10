@@ -12,88 +12,138 @@
 
 <template>
 
+    <!--现货模式-->
+    <a-radio-group 
+        v-model:value="presell_formdata.presell_type" 
+        option-type="button" 
+        :options="presell_formdata.options" 
+        size="small"
+        @change="console.log(presell_formdata.presell_type)"
+    />
+
     <!--现货发货-->
-    <a-form>
-        <a-row :gutter="[16]">
+    <a-form
+        :model="spot_formdata"
+        :rules="spot_formdata_rule"
+        v-show="presell_formdata.presell_type === 0"
+        style="margin: 20px 0 0 0;"
+    >
+          <a-row :gutter="[16]">
             <a-col :span="24">
-                <a-form-item label="发货模式">
-                    <a-radio-group 
-                        v-model:value="fulfillment_rule_formdata.Fulfillment_selected" 
-                        option-type="button" 
-                        :options="fulfillment_rule_formdata.options" 
-                        size="small"
-                        @change="console.log(fulfillment_rule_formdata.Fulfillment_selected)"
-                    />
-                </a-form-item>
-            </a-col>
-            
-            <!--现货发货-->
-            <a-col :span="4">
-                <a-form-item label="现货发货">
+                <a-form-item 
+                    style="width: 200px;"
+                    label="现货发货" 
+                    name="delivery_delay_day"
+                >
                     <a-select
                         ref="select"
-                        v-model:value="fulfillment_rule_formdata.delivery_delay_day" 
-                        :options="fulfillment_rule_formdata.delay_op"
-                        class="custom-radio"
+                        v-model:value="spot_formdata.delivery_delay_day" 
+                        :options="spot_formdata.delay_op"
                     />
                 </a-form-item>
             </a-col>
-
-            <!--全款预售发货-->
-            <a-col :span="6" v-show="fulfillment_rule_formdata.Fulfillment_selected === 'product_presell_rule'">
-                <a-form-item label="预售发货时效">
-                    <a-select
-                        ref="select"
-                        v-model:value="fulfillment_rule_formdata.time_selected" 
-                        :options="fulfillment_rule_formdata.time_end_op"
-                        class="custom-radio"
-                        @focus="console.log('预售结束时间')"
-                        @change="console.log('预售结束时间')"
-                    />
-                </a-form-item>
-            </a-col>
-            <a-col :span="4" v-show="fulfillment_rule_formdata.Fulfillment_selected === 'product_presell_rule'">
-                <a-form-item>
-                    <a-date-picker show-time placeholder="选择预售结束时间点" @change="console.log('选择时间')" @ok="console.log('选择时间')" />
-                </a-form-item>
-            </a-col>
-            
-            <a-col :span="8" v-show="fulfillment_rule_formdata.Fulfillment_selected === 'product_presell_rule'">
-                <a-form-item>
-                    <a-space>
-                    <a-select
-                        ref="select"
-                        v-model:value="fulfillment_rule_formdata.presell_delivery_type"
-                        style="width: 120px"
-                        :options="fulfillment_rule_formdata.delivery_op"
-                        @focus="console.log('选择发货时间')"
-                        @change="console.log('选择发货时间')"
-                    />
-                    <a-input-number 
-                        addon-after="天后发货"
-                        placeholder="输入天数"
-                        style="width: 130px;"
-                        v-model:value="fulfillment_rule_formdata.presell_delay" :min="1" :max="10" 
-                    />
-                    </a-space>
-                </a-form-item>
-            </a-col>
-
-            <!--新现货+预售发货模式-->
-            <a-col :span="12" v-show="fulfillment_rule_formdata.Fulfillment_selected === 'time_sku_pure_presell_rule'">
-                <a-form-item label="预售发货时效">
-                    <a-checkbox-group 
-                        v-model:value="fulfillment_rule_formdata.new_presell_delay" 
-                        :options="fulfillment_rule_formdata.de_op" 
-                        />
-                </a-form-item>
-            </a-col>
-
         </a-row>
+
 
     </a-form>
 
+    <!--预售发货-->
+    <a-form 
+        :model="presale_formdata"
+        :rules="presale_formdata_rule"
+        v-show="presell_formdata.presell_type === 1" style="margin: 20px 0 0 0;"
+    >
+      <a-row :gutter="[16]">
+            <!--全款预售发货-->
+            <a-col>
+                <a-form-item 
+                    style="width: 200px;"
+                    label="现货发货" 
+                    name="delivery_delay_day"
+                >
+                <a-select
+                    ref="select"
+                    v-model:value="presale_formdata.delivery_delay_day" 
+                    :options="presale_formdata.delay_op"
+                />
+            </a-form-item>
+            </a-col>
+            <a-col :span="6" >
+                <a-form-item label="预售发货时效" name="time_selected">
+                    <a-select
+                        ref="select"
+                        v-model:value="presale_formdata.time_selected" 
+                        :options="presale_formdata.time_end_op"
+                        class="custom-radio"
+                        @change="presale_formdata.set_time_selected"
+                    />
+                </a-form-item>
+            </a-col>
+            <a-col :span="4">
+                <a-form-item name="presell_end_time">
+                    <a-date-picker 
+                        show-time 
+                        :disabled="presale_formdata.presell_end_time_status"
+                        format="YYYY-MM-DD HH:mm:ss"
+                        placeholder="选择预售结束时间点"
+                        @change="presale_formdata.get_end_time" 
+                     />
+                </a-form-item>
+            </a-col>
+            
+            <a-col :span="4">
+                <a-form-item>
+                    <a-select
+                        ref="select"
+                        v-model:value="presale_formdata.presell_delivery_type"
+                        :options="presale_formdata.delivery_op"
+                        @focus="console.log('选择发货时间')"
+                        @change="console.log('选择发货时间')"
+                    />
+                </a-form-item>
+            </a-col>
+            <a-col :span="4">
+                <a-form-item name="presell_delay">
+                <a-input-number 
+                        addon-after="天后发货"
+                        placeholder="输入天数"
+                        style="width: 130px;"
+                        v-model:value="presale_formdata.presell_delay" :min="3" :max="10" 
+                    />
+                    </a-form-item>
+            </a-col>
+        </a-row>
+    </a-form>
 
+    <!--现货+预售发货-->
+    <a-form 
+        :model="spot_presale_formdata"
+        :rules="spot_presale_formdata_rule"
+        v-show="presell_formdata.presell_type === 3" style="margin: 20px 0 0 0;">
+        <a-row :gutter="[16]">
+            <a-col>
+                <a-form-item 
+                    style="width: 200px;"
+                    label="现货发货" 
+                    name="delivery_delay_day"
+                >
+                <a-select
+                    ref="select"
+                    v-model:value="spot_presale_formdata.delivery_delay_day" 
+                    :options="spot_presale_formdata.delay_op"
+                />
+            </a-form-item>
+            </a-col>
+            <a-col :span="12">
+                <a-form-item label="预售发货时效" name="presell_delay">
+                    <a-checkbox-group 
+                        v-model:value="spot_presale_formdata.presell_delay" 
+                        :options="spot_presale_formdata.de_op" 
+                        />
+                </a-form-item>
+            </a-col>
+        </a-row>
+    </a-form>
 
 </template>
 
@@ -103,8 +153,15 @@
 // 导入方法
 import { defineComponent,defineAsyncComponent,ref,reactive,onMounted,computed,shallowRef,onBeforeUnmount,toRaw, watch } from 'vue';
 import { 
-    fulfillment_rule_formdata,
-    ProductUpdateRule } from '@/assets/douyinshop/productmanagement/Add';
+    ProductUpdateRule,
+    presell_formdata,
+    spot_formdata,
+    spot_formdata_rule,
+    presale_formdata,
+    presale_formdata_rule,
+    spot_presale_formdata,
+    spot_presale_formdata_rule
+} from '@/assets/douyinshop/productmanagement/Add';
 
 // 组件引用=====开始
 export default defineComponent({
@@ -113,16 +170,26 @@ export default defineComponent({
         
     },
     props: {
-        data:{typr:Object}
+        data:{typr:Object},
     },
     setup(props,ctx) {
 
         const Rule = new ProductUpdateRule()    // 实例化商品发布规则
-        console.log(props.data)
+        
         return{
-            props,
-            fulfillment_rule_formdata,
+
             Rule, // 发布规则实力
+
+            presell_formdata, // 发货模式
+
+            spot_formdata,              // 现货发货 表单
+            spot_formdata_rule,         // 现货发货 表单规则
+
+            presale_formdata,// 预售 表单
+            presale_formdata_rule,// 预售表单规则
+
+            spot_presale_formdata,      // 现货+预售
+            spot_presale_formdata_rule  // 现货+预售规则
             
         }
     }
