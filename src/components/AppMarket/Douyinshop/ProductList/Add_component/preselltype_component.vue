@@ -12,14 +12,26 @@
 
 <template>
 
-    <!--现货模式-->
-    <a-radio-group 
-        v-model:value="presell_formdata.presell_type" 
-        option-type="button" 
-        :options="presell_formdata.options" 
-        size="small"
-        @change="console.log(presell_formdata.presell_type)"
-    />
+
+    <a-divider orientation="left" orientation-margin="0px">
+        
+        发货模式
+        
+        <a-button @click="Rule.Fulfillment.get" size="small" style="margin:0 20px;"> 获取发货模式 </a-button>
+        
+        <a-button @click="Rule.Stock.get_specs" size="small" style="margin:0 20px;"> 打印库存 </a-button>
+
+        <a-radio-group 
+            v-model:value="presell_formdata.presell_type" 
+            option-type="button" 
+            :options="presell_formdata.options" 
+            size="small"
+            @change="console.log(presell_formdata.presell_type)"
+        />
+    </a-divider>
+
+
+
 
     <!--现货发货-->
     <a-form
@@ -115,35 +127,109 @@
         </a-row>
     </a-form>
 
-    <!--现货+预售发货-->
+    <!--新 现货+预售发货-->
     <a-form 
-        :model="spot_presale_formdata"
-        :rules="spot_presale_formdata_rule"
-        v-show="presell_formdata.presell_type === 3" style="margin: 20px 0 0 0;">
-        <a-row :gutter="[16]">
-            <a-col>
+        ref="step_formRef"
+        :model="step_formdata"
+        :rules="step_formdata_rule"
+        v-show="presell_formdata.presell_type === 2" style="margin: 20px 0 0 0;">
+        <a-row :gutter="[116,16]">
+            <a-col :span="5">
                 <a-form-item 
                     style="width: 200px;"
                     label="现货发货" 
                     name="delivery_delay_day"
                 >
-                <a-select
-                    ref="select"
-                    v-model:value="spot_presale_formdata.delivery_delay_day" 
-                    :options="spot_presale_formdata.delay_op"
-                />
-            </a-form-item>
+                    <a-select
+                        ref="select"
+                        v-model:value="step_formdata.delivery_delay_day" 
+                        :options="step_formdata.delay_op"
+                    />
+                </a-form-item>
             </a-col>
-            <a-col :span="12">
-                <a-form-item label="预售发货时效" name="presell_delay">
+            <a-col :span="19">
+                <a-form-item label="预售发货" name="presell_delay">
                     <a-checkbox-group 
-                        v-model:value="spot_presale_formdata.presell_delay" 
-                        :options="spot_presale_formdata.de_op" 
-                        />
+                        v-model:value="step_formdata.presell_delay" 
+                        :options="step_formdata.de_op"
+                        @change="Rule.Fulfillment.get_same_value"
+                    />
                 </a-form-item>
             </a-col>
         </a-row>
     </a-form>
+
+
+    <!--库存-->
+    <a-divider orientation="left" orientation-margin="0px">库存</a-divider>
+
+
+    <a-table 
+        :columns="load_table.skucolumns"
+        :data-source="load_table.skudatelist"
+        :pagination="false"
+        style="font-size: 12px;"
+        size="small"
+        bordered
+    >
+
+        <!-- <template #bodyCell="{ column, text, record, index }">
+            
+            <template v-if="column.dataIndex === 'name'">
+                <a>{{ text }}</a>
+            </template>
+
+            <template v-if="column.dataIndex === 'price'">
+
+                <a-form-item
+                    :name="['skudatelist', index, 'price']"
+                    :rules="{required: true, trigger: 'change', message:'价格不能为空'}"
+                    >
+                    <a-input-number 
+                        placeholder="输入价格" 
+                        v-model:value="record.price" 
+                        prefix="￥" 
+                        :min="0" 
+                        :step="0.01"
+                        autocomplete="off"
+                        allow-clear
+                        style="font-size: 12px;width: 100%;margin-top: 22px;"/>
+                </a-form-item>
+            </template>
+
+            <template v-if="column.dataIndex === 'stock_num'">
+            <a-form-item 
+                :name="['skudatelist', index, 'stock_num']"
+                :rules="{required: true, trigger: 'change', message:'库存不能为空'}"
+                :style="{ 'margin': '0 0 0px 0' }"
+
+            >
+                <a-input-number 
+                    placeholder="输入库存" 
+                    :min="0"
+                    :max="999999999"
+                    v-model:value="record.stock_num" 
+                    autocomplete="off"
+                    allow-clear
+                    style="font-size: 12px;width: 100%;margin-top: 22px;"
+                />
+            </a-form-item>
+            </template>
+            
+            <template v-if="column.dataIndex === 'code'">
+                <a-form-item :style="{ 'margin': '0 0 0px 0' }">
+                    <a-input
+                        placeholder="商家编码"
+                        autocomplete="off"
+                        v-model:value="record.code" 
+                        style="font-size: 12px;width: 100%;margin-top: 22px;" />
+                </a-form-item>
+            </template>
+            
+        </template> -->
+    
+    </a-table>
+    <!--库存结束-->
 
 </template>
 
@@ -159,8 +245,10 @@ import {
     spot_formdata_rule,
     presale_formdata,
     presale_formdata_rule,
-    spot_presale_formdata,
-    spot_presale_formdata_rule
+    step_formdata,
+    step_formRef,
+    step_formdata_rule,
+
 } from '@/assets/douyinshop/productmanagement/Add';
 
 // 组件引用=====开始
@@ -171,11 +259,23 @@ export default defineComponent({
     },
     props: {
         data:{typr:Object},
+        specs_info:{typr:Object}// 获取规格spec
     },
     setup(props,ctx) {
 
         const Rule = new ProductUpdateRule()    // 实例化商品发布规则
-        
+
+        Rule.Stock.sepec_info = props.specs_info;
+
+        // 库存
+        const skulistRef = ref(); // 验证库存表单
+        const load_table = computed(()=>{
+            return {
+                skucolumns:Rule.Stock.get_colums(),
+                skudatelist:Rule.Stock.get_data()
+            }
+        })
+
         return{
 
             Rule, // 发布规则实力
@@ -188,8 +288,15 @@ export default defineComponent({
             presale_formdata,// 预售 表单
             presale_formdata_rule,// 预售表单规则
 
-            spot_presale_formdata,      // 现货+预售
-            spot_presale_formdata_rule  // 现货+预售规则
+            step_formdata,      // 现货+预售
+            step_formRef,
+            step_formdata_rule,  // 现货+预售规则
+
+            skulistRef,
+
+            columns,
+            dataSource,
+            load_table
             
         }
     }
