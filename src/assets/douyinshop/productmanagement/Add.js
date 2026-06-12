@@ -567,7 +567,6 @@ export class ProductUpdateRule {
             let presale_stock = stock_operation_formdata.presale_stock
             let code = stock_operation_formdata.code
             
-                console.log(stock_operation_formdata.price)// 价格
 
             
             // console.log(stock_operation_formdata.stock)// 现货库存
@@ -575,10 +574,12 @@ export class ProductUpdateRule {
             // console.log(stock_operation_formdata.code)// 编码
 
             skulist_formState.skudatelist.forEach(item=>{
-                if(price){item.price = stock_operation_formdata.price}
-                if(stock){item.stock = stock_operation_formdata.stock}
-                if(presale_stock){item.presale_stock = stock_operation_formdata.presale_stock}
-                if(code){item.code = stock_operation_formdata.code}
+                console.log(stock)// 价格
+
+                if(price){item.price = price}
+                if(stock){item.stock_num = stock}
+                if(presale_stock){item.presale_stock = presale_stock}
+                if(code){item.code = code}
             })
             
 
