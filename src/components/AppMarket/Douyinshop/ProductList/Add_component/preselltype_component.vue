@@ -21,6 +21,8 @@
         
         <a-button @click="Rule.Stock.get_specs" size="small" style="margin:0 20px;"> 打印库存 </a-button>
 
+        <a-button @click="Rule.Stock.get_sku_list" size="small" style="margin:0 20px;">验证库存表单</a-button>
+
         <a-radio-group 
             v-model:value="presell_formdata.presell_type" 
             option-type="button" 
@@ -38,7 +40,7 @@
         :model="spot_formdata"
         :rules="spot_formdata_rule"
         v-show="presell_formdata.presell_type === 0"
-        style="margin: 20px 0 0 0;"
+        style="margin: 40px 0 0 0;"
     >
           <a-row :gutter="[16]">
             <a-col :span="24">
@@ -63,7 +65,7 @@
     <a-form 
         :model="presale_formdata"
         :rules="presale_formdata_rule"
-        v-show="presell_formdata.presell_type === 1" style="margin: 20px 0 0 0;"
+        v-show="presell_formdata.presell_type === 1" style="margin: 40px 0 0 0;"
     >
       <a-row :gutter="[16]">
             <!--全款预售发货-->
@@ -132,7 +134,7 @@
         ref="step_formRef"
         :model="step_formdata"
         :rules="step_formdata_rule"
-        v-show="presell_formdata.presell_type === 2" style="margin: 20px 0 0 0;">
+        v-show="presell_formdata.presell_type === 2" style="margin: 40px 0 0 0;">
         <a-row :gutter="[116,16]">
             <a-col :span="5">
                 <a-form-item 
@@ -162,73 +164,131 @@
 
     <!--库存-->
     <a-divider orientation="left" orientation-margin="0px">库存</a-divider>
-
-
-    <a-table 
-        :columns="load_table.skucolumns"
-        :data-source="load_table.skudatelist"
-        :pagination="false"
-        style="font-size: 12px;"
-        size="small"
-        bordered
+    
+    <!--批量设置库存-->
+    <a-form
+        :model="stock_operation_formdata"
     >
+        <a-row :gutter="[16]">
+            <a-col :span="4">
+                <a-form-item label="全部规格">
 
-        <!-- <template #bodyCell="{ column, text, record, index }">
-            
-            <template v-if="column.dataIndex === 'name'">
-                <a>{{ text }}</a>
-            </template>
+                </a-form-item>
+            </a-col>
+            <a-col :span="4">
+                <a-form-item>
+                    <a-input 
+                        placeholder="设置价格"
+                        v-model:value="stock_operation_formdata.price" 
+                        allow-clear></a-input>
+                </a-form-item>
+            </a-col>
+            <a-col :span="4">
+                <a-form-item>
+                    <a-input 
+                    placeholder="现货库存"
+                    v-model:value="stock_operation_formdata.stock"
+                     allow-clear></a-input>
 
-            <template v-if="column.dataIndex === 'price'">
+                </a-form-item>
+            </a-col>
+            <a-col :span="4">
+                <a-form-item>
+                    <a-input 
+                        placeholder="预售库存"
+                        v-model:value="stock_operation_formdata.presale_stock"
+                        allow-clear
+                    ></a-input>
 
-                <a-form-item
-                    :name="['skudatelist', index, 'price']"
-                    :rules="{required: true, trigger: 'change', message:'价格不能为空'}"
-                    >
+                </a-form-item>
+            </a-col>
+            <a-col :span="4">
+                <a-form-item>
+                    <a-input 
+                        placeholder="商家编码"
+                        v-model:value="stock_operation_formdata.code"
+                        allow-clear
+                    ></a-input>
+                </a-form-item>
+            </a-col>
+            <a-col :span="4">
+                <a-button @click="Rule.Stock.batch_set">批量设置</a-button>
+            </a-col>
+        </a-row>
+    </a-form>
+
+    <a-form 
+        ref="skulistRef" 
+        :model="skulist_formState" 
+        name="basic"
+    >
+        <a-table 
+            :columns="skumodel.skucolumns"
+            :data-source="skulist_formState.skudatelist"
+            :pagination="false"
+            style="font-size: 12px;"
+            size="small"
+            bordered
+        >
+
+            <template #bodyCell="{ column, text, record, index }">
+                
+                <template v-if="column && column.dataIndex === 'name'">
+                    <a>{{ text }}</a>
+                </template>
+
+                <template v-if="column && column.dataIndex === 'price'">
+
+                    <a-form-item
+                        :name="['skudatelist', index, 'price']"
+                        :rules="{required: true, trigger: 'change', message:'价格不能为空'}"
+                        >
+                        <a-input-number 
+                            placeholder="输入价格" 
+                            v-model:value="record.price" 
+                            prefix="￥" 
+                            :min="0" 
+                            :step="0.01"
+                            autocomplete="off"
+                            allow-clear
+                            style="font-size: 12px;width: 100%;margin-top: 22px;"/>
+                    </a-form-item>
+                </template>
+
+                <template v-if="column && column.dataIndex === 'stock_num'">
+                <a-form-item 
+                    :name="['skudatelist', index, 'stock_num']"
+                    :rules="{required: true, trigger: 'change', message:'库存不能为空'}"
+                    :style="{ 'margin': '0 0 0px 0' }"
+
+                >
                     <a-input-number 
-                        placeholder="输入价格" 
-                        v-model:value="record.price" 
-                        prefix="￥" 
-                        :min="0" 
-                        :step="0.01"
+                        placeholder="输入库存" 
+                        :min="0"
+                        :max="999999999"
+                        v-model:value="record.stock_num" 
                         autocomplete="off"
                         allow-clear
-                        style="font-size: 12px;width: 100%;margin-top: 22px;"/>
+                        style="font-size: 12px;width: 100%;margin-top: 22px;"
+                    />
                 </a-form-item>
+                </template>
+                
+                <template v-if="column && column.dataIndex === 'code'">
+                    <a-form-item :style="{ 'margin': '0 0 0px 0' }">
+                        <a-input
+                            placeholder="商家编码"
+                            autocomplete="off"
+                            v-model:value="record.code" 
+                            style="font-size: 12px;width: 100%;margin-top: 22px;" />
+                    </a-form-item>
+                </template>
+                
             </template>
+        
+        </a-table>
 
-            <template v-if="column.dataIndex === 'stock_num'">
-            <a-form-item 
-                :name="['skudatelist', index, 'stock_num']"
-                :rules="{required: true, trigger: 'change', message:'库存不能为空'}"
-                :style="{ 'margin': '0 0 0px 0' }"
-
-            >
-                <a-input-number 
-                    placeholder="输入库存" 
-                    :min="0"
-                    :max="999999999"
-                    v-model:value="record.stock_num" 
-                    autocomplete="off"
-                    allow-clear
-                    style="font-size: 12px;width: 100%;margin-top: 22px;"
-                />
-            </a-form-item>
-            </template>
-            
-            <template v-if="column.dataIndex === 'code'">
-                <a-form-item :style="{ 'margin': '0 0 0px 0' }">
-                    <a-input
-                        placeholder="商家编码"
-                        autocomplete="off"
-                        v-model:value="record.code" 
-                        style="font-size: 12px;width: 100%;margin-top: 22px;" />
-                </a-form-item>
-            </template>
-            
-        </template> -->
-    
-    </a-table>
+    </a-form>
     <!--库存结束-->
 
 </template>
@@ -248,6 +308,9 @@ import {
     step_formdata,
     step_formRef,
     step_formdata_rule,
+    skulistRef,
+    skulist_formState,
+    stock_operation_formdata
 
 } from '@/assets/douyinshop/productmanagement/Add';
 
@@ -258,23 +321,31 @@ export default defineComponent({
         
     },
     props: {
-        data:{typr:Object},
-        specs_info:{typr:Object}// 获取规格spec
+        data:{type:Object},
+        specs_info:{type:Object}// 获取规格spec
     },
     setup(props,ctx) {
 
-        const Rule = new ProductUpdateRule()    // 实例化商品发布规则
+        const Rule = new ProductUpdateRule()        // 实例化商品发布规则
 
-        Rule.Stock.sepec_info = props.specs_info;
+        Rule.Stock.sepec_info = props.specs_info;   // 规格值--绑定到视频
 
         // 库存
-        const skulistRef = ref(); // 验证库存表单
-        const load_table = computed(()=>{
+        const skumodel = computed(()=>{
             return {
                 skucolumns:Rule.Stock.get_colums(),
-                skudatelist:Rule.Stock.get_data()
             }
         })
+
+        // 监听规格列表变化【form表单绑定必须可变的响应式对象】
+        watch(() => Rule.Stock.sepec_info, (newVal) => {
+            if (newVal) {
+                skulist_formState.skudatelist = Rule.Stock.get_data()
+            }
+        }, { immediate: true, deep: true })
+
+
+        
 
         return{
 
@@ -293,10 +364,12 @@ export default defineComponent({
             step_formdata_rule,  // 现货+预售规则
 
             skulistRef,
+            skumodel,
+            skulist_formState,
 
-            columns,
-            dataSource,
-            load_table
+            stock_operation_formdata
+
+
             
         }
     }
@@ -306,6 +379,7 @@ export default defineComponent({
 
 :deep(.ant-radio-wrapper) {
   font-size: 12px;
+
 }
 
 </style>

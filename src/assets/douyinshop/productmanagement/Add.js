@@ -42,13 +42,13 @@ export const presell_formdata = reactive({
             disabled:false // 禁用状态
         },
         {
-            label: '新-现货+预售发货',
+            label: '现货预售混合发货',
             value: 2,
             name:'step_rule',
             disabled:false
         },
         {
-            label: '全款预售发货',
+            label: '预售发货',
             value: 1,
             name:'product_presell_rule',
             disabled:false
@@ -222,6 +222,21 @@ export const step_formdata_rule = {
 
 }
 
+// 库存
+export const skulistRef = ref(); // 验证库存表单
+export const skulist_formState = reactive({
+    skudatelist: []
+})
+
+// 库存批量操作表单
+export const stock_operation_formdata = reactive({
+    spec:[],// 规格树
+    price:undefined,// 价格
+    stock:undefined,// 现货库存
+    presale:[],// 预售类型
+    presale_stock:undefined,// 预售库存
+    code:undefined// 编码
+})
 
 export class ProductUpdateRule {
 
@@ -377,7 +392,6 @@ export class ProductUpdateRule {
             let b = this.Stock.get_data()
             console.log('规格信息',a)
             console.log('规格信息',b)
-
         },
 
         // 笛卡尔积方法sku_value数组取值
@@ -409,20 +423,25 @@ export class ProductUpdateRule {
             var name_list = this.Stock.get_name_sku_list()
 
             var res_list = []
+
             for(let i of name_list){
                 let c_obj = {}
                 c_obj.title = i;
                 c_obj.dataIndex = i;
-                res_list.push(c_obj)
+                if(i){res_list.push(c_obj)}
             }
 
-            let price_obj = {title:'价格',dataIndex:'price'}
-            let stock_num_obj = {title:'库存',dataIndex:'stock_num'}
-            let code_obj = {title:'编码',dataIndex:'code'}
-            res_list.push(price_obj)
-            res_list.push(stock_num_obj)
-            res_list.push(code_obj)
+            if(res_list.length>0){
+                let price_obj = {title:'价格',dataIndex:'price',width:'140px'}
+                let stock_num_obj = {title:'库存',dataIndex:'stock_num',width:'140px'}
+                let code_obj = {title:'编码',dataIndex:'code',width:'140px'}
+                res_list.push(price_obj)
+                res_list.push(stock_num_obj)
+                res_list.push(code_obj)
+            }
+
             return res_list
+
         },
 
         // 规格表单data取值(实时)
@@ -430,9 +449,8 @@ export class ProductUpdateRule {
 
             var name_list = this.Stock.get_name_sku_list()//名称列表
 
-            var d_list = this.Stock.get_value_sku_list()// 值列表
-
-            // var o_sku_v_obj = this.Stock.load_old_sku(d_list, skumodel.skudatelist)// 历史数据匹配关系
+            var d_list = this.Stock.get_value_sku_list()// 笛卡尔积-值列表
+            
 
             var data_list = []
 
@@ -445,21 +463,18 @@ export class ProductUpdateRule {
                 for(var i=0;i<name_list.length;i++){
 
                     data[name_list[i]] = y[i];
+                    data['price'] = '';
+                    data['stock_num'] = '';
 
                 }
-                // if(o_sku_v_obj[y_text_name] !== undefined &&o_sku_v_obj[y_text_name] !== ''){
-                //         var o_obj = o_sku_v_obj[y_text_name]
-                //         data.price = o_obj.price
-                //         data.stock_num = o_obj.stock_num
-                //         data.code = o_obj.code
-                // }
 
-                data_list.push(data)
-
+                if(y[0]){data_list.push(data)}
+                
             }
             return data_list
 
         },
+
         // 提取sku的name数组
         get_name_sku_list:() =>{
             var name_list = []
@@ -469,6 +484,7 @@ export class ProductUpdateRule {
             }
             return name_list
         },
+
         // 提取-初始情况下-sku_价格、库存
         get_p_s_obj:() => {
             var res_obj = {}
@@ -486,15 +502,86 @@ export class ProductUpdateRule {
             return res_obj
         },
         
-        // 规格历史值保留
-        load_old_sku:(sku_value_list, data)=>{
-            var d_list = sku_value_list// 值列表
-            var res_obj = {};
-            for(let i=0;i<d_list.length;i++){
-                var name = d_list[i].join('')
-                res_obj[name]=data[i]
+        // 获取库存验证
+        get_sku_list:async()=>{
+
+            // 库存未初始化
+            if(skulistRef.value === undefined){
+
+                tool.Fun_.message('error', '库存信息不能为空！');
+
+                return false
+
             }
-            return res_obj
+
+            // 库存以及初始化
+            var res = await skulistRef.value.validate().then(()=>{
+
+                var sku_list_res = skulist_formState.skudatelist;
+                
+                var s_list = []
+
+                sku_list_res.forEach(obj=>{
+                    var o = {}
+                    var sell_obj = []
+
+                    Object.keys(obj).forEach(key=>{
+                        if(key !== 'stock_num' && key !== 'price' && key !== 'code'){
+                            var s_obj = {}
+                            s_obj.property_name = key;
+                            s_obj.value_name = obj[key]
+                            sell_obj.push(s_obj)
+                        }
+                    })
+
+                    o.sell_properties = sell_obj; //名称对象
+                    o.sku_type = 0;
+                    o.stock_num = obj.stock_num;
+                    o.price = obj.price * 100;// 价格转换为分
+                    o.code = obj.code; // 商家编码
+                    s_list.push(o)
+
+                })
+
+                console.log(s_list)
+
+                return s_list
+
+            }).catch(error => {
+                console.log(error)
+                tool.Fun_.message('error',error.errorFields[0].errors[0]);
+                return false
+
+            })
+
+            return res
+        },
+
+        // 批量设置库存
+        batch_set:()=>{
+
+            // console.log('批量设置的表单',stock_operation_formdata)
+            // console.log('被修改的skuList',skulist_formState.skudatelist)
+            let price = stock_operation_formdata.price
+            let stock = stock_operation_formdata.stock
+            let presale_stock = stock_operation_formdata.presale_stock
+            let code = stock_operation_formdata.code
+            
+                console.log(stock_operation_formdata.price)// 价格
+
+            
+            // console.log(stock_operation_formdata.stock)// 现货库存
+            // console.log(stock_operation_formdata.presale_stock)// 预售库存
+            // console.log(stock_operation_formdata.code)// 编码
+
+            skulist_formState.skudatelist.forEach(item=>{
+                if(price){item.price = stock_operation_formdata.price}
+                if(stock){item.stock = stock_operation_formdata.stock}
+                if(presale_stock){item.presale_stock = stock_operation_formdata.presale_stock}
+                if(code){item.code = stock_operation_formdata.code}
+            })
+            
+
         }
     }
 

@@ -23,10 +23,7 @@
 
             <div style="width: 950px;margin: 0 auto;height: 100%;">
 
-                <a-tabs 
-                    v-model:activeKey="activeKey" 
-                    @change="refesh_stock_number(activeKey)"
-                >
+                <a-tabs  v-model:activeKey="activeKey">
 
                     <template #leftExtra >
                         <div style="margin: 0 40px 0 10px;font-size: 18px;font-weight: b;">新建商品</div>
@@ -756,8 +753,8 @@
 
                         </a-row>
 
-                        <!-- 基础信息 -->
-                        <a-form
+                    <!-- 基础信息 -->
+                    <a-form
                         ref="formRef"
                         name="ProductInfo"
                         :model="formState"
@@ -815,6 +812,28 @@
 
                             <a-col :span="8">
                                 <a-form-item
+                                    label="推荐语"
+                                    name="recommend_remark"
+                                >
+                                    <a-input v-model:value="formState.recommend_remark" 
+                                    autoComplete="off" 
+                                    show-count :maxlength="30" 
+                                    placeholder="输入商品推荐语"
+                                    />
+                                </a-form-item>
+                            </a-col>
+
+                            <a-col :span="8">
+                                <a-form-item
+                                    label="商家备注"
+                                    name="remark"
+                                >
+                                    <a-input v-model:value="formState.remark" autoComplete="off" placeholder="商家可见备注"  show-count :maxlength="30" />
+                                </a-form-item>
+                            </a-col>
+
+                            <a-col :span="8">
+                                <a-form-item
                                     label="运费模板"
                                     name="freight_id"
                                 >
@@ -834,28 +853,6 @@
                                     <a-input v-model:value="formState.standard_brand_id.brand_name" placeholder="选择品牌" disabled style="width: calc(74%);padding: 5.5px;" />
                                     <a-button class="font_size_12" @click="PAGEDATA.change_brand_list">选择</a-button>
                                   </a-input-group>
-                                </a-form-item>
-                            </a-col>
-
-                            <a-col :span="8">
-                                <a-form-item
-                                    label="推荐语"
-                                    name="recommend_remark"
-                                >
-                                    <a-input v-model:value="formState.recommend_remark" 
-                                    autoComplete="off" 
-                                    show-count :maxlength="30" 
-                                    placeholder="输入商品推荐语"
-                                    />
-                                </a-form-item>
-                            </a-col>
-
-                            <a-col :span="8">
-                                <a-form-item
-                                    label="商家备注"
-                                    name="remark"
-                                >
-                                    <a-input v-model:value="formState.remark" autoComplete="off" placeholder="商家可见备注"  show-count :maxlength="30" />
                                 </a-form-item>
                             </a-col>
 
@@ -926,7 +923,7 @@
                             </a-col>
 
                         </a-row>
-                        </a-form>
+                    </a-form>
 
                     </a-tab-pane>
 
@@ -1021,7 +1018,6 @@
                                             v-model:value="v_item.value_name"
                                             placeholder="输入值" 
                                             autocomplete="off"
-                                            allow-clear
                                             style="font-size: 12px;width: 200px;" 
                                         />
 
@@ -1048,82 +1044,6 @@
                         
                         <!--发货模式 组件-->
                         <Preselltype_component :specs_info="SPECS.Obj"/>
-
-                        <!--库存开始-->
-                        <!-- <a-divider orientation="left" orientation-margin="0px">库存</a-divider> -->
-                        
-                        <!-- <a-form 
-                            ref="skulistRef" 
-                            :model="skumodel" 
-                            name="basic"
-                        >
-                            <a-table 
-                                :columns="skumodel.skucolumns"
-                                :data-source="skumodel.skudatelist"
-                                :pagination="false"
-                                style="font-size: 12px;"
-                                size="small"
-                                bordered
-                            >
-
-                                <template #bodyCell="{ column, text, record, index }">
-                                    
-                                    <template v-if="column.dataIndex === 'name'">
-                                        <a>{{ text }}</a>
-                                    </template>
-
-                                    <template v-if="column.dataIndex === 'price'">
-
-                                        <a-form-item
-                                            :name="['skudatelist', index, 'price']"
-                                            :rules="{required: true, trigger: 'change', message:'价格不能为空'}"
-                                            >
-                                            <a-input-number 
-                                                placeholder="输入价格" 
-                                                v-model:value="record.price" 
-                                                prefix="￥" 
-                                                :min="0" 
-                                                :step="0.01"
-                                                autocomplete="off"
-                                                allow-clear
-                                                style="font-size: 12px;width: 100%;margin-top: 22px;"/>
-                                        </a-form-item>
-                                    </template>
-
-                                    <template v-if="column.dataIndex === 'stock_num'">
-                                    <a-form-item 
-                                        :name="['skudatelist', index, 'stock_num']"
-                                        :rules="{required: true, trigger: 'change', message:'库存不能为空'}"
-                                        :style="{ 'margin': '0 0 0px 0' }"
-
-                                    >
-                                        <a-input-number 
-                                            placeholder="输入库存" 
-                                            :min="0"
-                                            :max="999999999"
-                                            v-model:value="record.stock_num" 
-                                            autocomplete="off"
-                                            allow-clear
-                                            style="font-size: 12px;width: 100%;margin-top: 22px;"
-                                        />
-                                    </a-form-item>
-                                    </template>
-                                    
-                                    <template v-if="column.dataIndex === 'code'">
-                                        <a-form-item :style="{ 'margin': '0 0 0px 0' }">
-                                            <a-input
-                                                placeholder="商家编码"
-                                                autocomplete="off"
-                                                v-model:value="record.code" 
-                                                style="font-size: 12px;width: 100%;margin-top: 22px;" />
-                                        </a-form-item>
-                                    </template>
-                                    
-                                </template>
-                            
-                            </a-table>
-                        </a-form> -->
-                        <!--库存结束-->
 
                     </a-tab-pane>
 
@@ -1249,7 +1169,7 @@ export default defineComponent({
         })
     },
     props: {
-        data:{typr:Object}
+        data:{type:Object}
     },
     // ✅ 必须添加 emits 声明:指定该组件可能会触发的事件
     emits: ['add_call_back'],
@@ -1786,210 +1706,6 @@ export default defineComponent({
 
         })
 
-        // 根据规格-->构造价格、库存、商家编码
-        const skulistRef = ref()
-        const skumodel = reactive({
-            skucolumns:[],
-            skudatelist:[]
-        })
-        const sku_list = {
-            
-            // 提取sku的name数组
-            get_name_sku_list:() =>{
-                var name_list = []
-                var datalist = SPECS.Obj;
-                for(let i of datalist){
-                    name_list.push(i.property_name)
-                }
-                return name_list
-            },
-
-            // 提取-初始情况下-sku_价格、库存
-            get_p_s_obj:() => {
-                var res_obj = {}
-                for(let i of SPECS.Obj){
-                    for(let y of i.values){
-                        if(y.price != undefined){
-                            var p_s_obj = {}
-                            p_s_obj.price === undefined ? '':y.price
-                            p_s_obj.stock_num === undefined ? '':y.stock_num
-                            p_s_obj.code = y.code === undefined ? '':y.code
-                            res_obj[y.value] = p_s_obj
-                        }
-                    }
-                }
-                return res_obj
-            },
-
-            // 笛卡尔积方法sku_value数组取值
-            get_value_sku_list:() =>{
-            
-                var res_list = []
-
-                var datalist = SPECS.Obj;
-                
-                // 规格取值
-                for(let i of datalist){
-                    var v_list = []
-                    for(let y of i.values){
-                        v_list.push(y.value_name)
-                    }
-                    res_list.push(v_list)
-                }
-
-                // 笛卡尔积方法
-                var d_list = tool.Fun_.cartesianProduct(res_list)
-
-                return d_list
-
-            },
-
-            // comlum取值
-            get_colums:() =>{
-
-                var name_list = sku_list.get_name_sku_list()
-                var res_list = []
-                for(let i of name_list){
-                    let c_obj = {}
-                    c_obj.title = i;
-                    c_obj.dataIndex = i;
-                    res_list.push(c_obj)
-                }
-
-                let price_obj = {title:'价格',dataIndex:'price'}
-                let stock_num_obj = {title:'库存',dataIndex:'stock_num'}
-                let code_obj = {title:'编码',dataIndex:'code'}
-                res_list.push(price_obj)
-                res_list.push(stock_num_obj)
-                res_list.push(code_obj)
-                return res_list
-            },
-
-            // 规格表单data取值(实时)
-            get_data:() =>{
-
-                var p_s_obj = sku_list.get_p_s_obj();
-
-                var name_list = sku_list.get_name_sku_list()//名称列表
-
-                var d_list = sku_list.get_value_sku_list()// 值列表
-
-                var o_sku_v_obj = sku_list.load_old_sku(d_list, skumodel.skudatelist)// 历史数据匹配关系
-
-                var data_list = []
-
-                for(let y of d_list){
-
-                    var y_text_name = y.join('')
-
-                    var data = {}
-
-                    for(var i=0;i<name_list.length;i++){
-
-                        data[name_list[i]] = y[i];
-
-                    }
-                    if(o_sku_v_obj[y_text_name] !== undefined &&o_sku_v_obj[y_text_name] !== ''){
-                            var o_obj = o_sku_v_obj[y_text_name]
-                            data.price = o_obj.price
-                            data.stock_num = o_obj.stock_num
-                            data.code = o_obj.code
-                    }
-
-                    data_list.push(data)
-
-                }
-
-                return data_list
-
-            },
-
-            // 规格历史值保留
-            load_old_sku:(sku_value_list, data)=>{
-                var d_list = sku_value_list// 值列表
-                var res_obj = {};
-                for(let i=0;i<d_list.length;i++){
-                    var name = d_list[i].join('')
-                    res_obj[name]=data[i]
-                }
-                return res_obj
-            }
-
-
-        }
-
-        // 库存验证
-        const get_sku_list = async()=>{
-
-            // 库存未初始化
-            if(skulistRef.value === undefined){
-
-                tool.Fun_.message('error', '库存信息不能为空！');
-
-                refesh_stock_number('3') // 刷新库存
-
-                activeKey.value = '3'
-
-                return false
-
-            }
-
-            // 库存以及初始化
-            var res = await skulistRef.value.validate().then(()=>{
-
-                var sku_list_res = skumodel.skudatelist;
-                var s_list = []
-                sku_list_res.forEach(obj=>{
-                    var o = {}
-                    var sell_obj = []
-
-                    Object.keys(obj).forEach(key=>{
-                        if(key !== 'stock_num' && key !== 'price' && key !== 'code'){
-                            var s_obj = {}
-                            s_obj.property_name = key;
-                            s_obj.value_name = obj[key]
-                            sell_obj.push(s_obj)
-                        }
-                    })
-
-                    o.sell_properties = sell_obj; //名称对象
-                    o.sku_type = 0;
-                    o.stock_num = obj.stock_num;
-                    o.price = obj.price * 100;// 价格转换为分
-                    o.code = obj.code; // 商家编码
-                    s_list.push(o)
-                })
-                return s_list
-
-            }).catch(error => {
-
-                tool.Fun_.message('error',error.errorFields[0].errors[0]);
-
-                activeKey.value = '3';
-
-                return false
-
-            })
-
-            return res
-        }
-
-        // 刷新库存
-        const refesh_stock_number = (activate_key) =>{
-            
-            // 分类id填写验证：：未选择分类id无法获取-发布规则-品牌id-等信息
-            // console.log(activate_key)
-            // console.log(CATE.cate_value.value)
-
-            // 选择的是库存tag;
-            if(activate_key == '3'){
-                var colums = sku_list.get_colums();
-                var data_list = sku_list.get_data();
-                skumodel.skucolumns = colums
-                skumodel.skudatelist = data_list
-            }
-
-        }
 
         // 分类&属性
         const CATE = {
@@ -2877,14 +2593,14 @@ export default defineComponent({
             }
 
             // 库存信息
-            var sku_list_obj = await get_sku_list();
-            if(sku_list_obj){
+            // var sku_list_obj = await get_sku_list();
+            // if(sku_list_obj){
 
-                product_data_obj.spec_prices_v2 = sku_list_obj;
+            //     product_data_obj.spec_prices_v2 = sku_list_obj;
             
-            }else{
-                return
-            }
+            // }else{
+            //     return
+            // }
 
             // 描述详情
             var description_obj = DES.get_img();
@@ -2983,11 +2699,6 @@ export default defineComponent({
             SPECS,
             // -------------分类属性
             CATE,
-            // --------------库存
-            sku_list,       // 库存操作方法
-            skumodel,       // 库存表格数据
-            refesh_stock_number,// 库存刷新事件
-            skulistRef,     // 库存必填方法
             simpleImage,
             // -------------描述详情
             editorRef,DES,
